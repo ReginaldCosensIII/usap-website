@@ -1,0 +1,58 @@
+root = true
+
+# =============================================================================
+# USAP Website — .editorconfig
+# =============================================================================
+
+# ----- Default: all files -----
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# ----- C# source -----
+[*.cs]
+indent_size = 4
+# Require IDE0011: braces on if/else (helps dotnet format --verify-no-changes)
+dotnet_style_prefer_auto_properties = true:suggestion
+csharp_prefer_braces = true:warning
+
+# ----- Razor / CSHTML -----
+[*.cshtml]
+indent_size = 4
+
+# ----- JSON -----
+[*.json]
+indent_size = 2
+
+# ----- CSS -----
+[*.css]
+indent_size = 2
+
+# ----- JavaScript -----
+[*.js]
+indent_size = 2
+
+# ----- TypeScript -----
+[*.ts]
+indent_size = 2
+
+# ----- XML / csproj / sln -----
+[*.{xml,csproj,props,targets,config}]
+indent_size = 2
+
+# ----- YAML -----
+[*.{yml,yaml}]
+indent_size = 2
+
+# ----- Markdown -----
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# ----- Solution file — Visual Studio manages formatting -----
+[*.sln]
+indent_style = tab

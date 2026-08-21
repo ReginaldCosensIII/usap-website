@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — United States Antenna Products</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @* Skip link — must be the first focusable element in the document. *@
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+        @* Provisional text-only site identity — production logo pending client asset delivery. *@
+        <a class="site-identity" asp-page="/Index" aria-label="United States Antenna Products — Home">
+            United States Antenna Products
+        </a>
+
+        @await Html.PartialAsync("_Navigation")
+    </header>
+
+    <main id="main-content" tabindex="-1">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <p>United States Antenna Products, LLC</p>
+        <nav aria-label="Footer navigation">
+            <a asp-page="/Index">Home</a>
+            <a asp-page="/Products/Index">Products</a>
+            <a asp-page="/TechnicalResources">Technical Resources</a>
+            <a asp-page="/AboutUs">About Us</a>
+            <a asp-page="/ContactUs">Contact Us</a>
+            <a asp-page="/RequestAQuote">Request a Quote</a>
+        </nav>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
