@@ -1,0 +1,116 @@
+@* _Header.cshtml — Shared site header partial.
+   Provisional text-only brand region. Ready to accept a production logo image
+   without requiring header reconstruction — replace .site-brand-text content
+   with an <img> when the official asset is delivered.
+   Active-route detection uses ViewContext.RouteData. *@
+
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+
+    // Return "is-active" class and aria-current attribute values per route.
+    string HomeClass    = currentPage == "/Index" ? "primary-nav-link is-active" : "primary-nav-link";
+    string ProdClass    = currentPage.StartsWith("/Products", StringComparison.OrdinalIgnoreCase) ? "primary-nav-link is-active" : "primary-nav-link";
+    string ResClass     = currentPage == "/TechnicalResources" ? "primary-nav-link is-active" : "primary-nav-link";
+    string AboutClass   = currentPage == "/AboutUs" ? "primary-nav-link is-active" : "primary-nav-link";
+    string ContactClass = currentPage == "/ContactUs" ? "primary-nav-link is-active" : "primary-nav-link";
+    string QuoteClass   = currentPage == "/RequestAQuote" ? "nav-cta is-active" : "nav-cta";
+
+    string HomeCurrent    = currentPage == "/Index" ? "page" : "";
+    string ProdCurrent    = currentPage.StartsWith("/Products", StringComparison.OrdinalIgnoreCase) ? "page" : "";
+    string ResCurrent     = currentPage == "/TechnicalResources" ? "page" : "";
+    string AboutCurrent   = currentPage == "/AboutUs" ? "page" : "";
+    string ContactCurrent = currentPage == "/ContactUs" ? "page" : "";
+    string QuoteCurrent   = currentPage == "/RequestAQuote" ? "page" : "";
+}
+
+<header class="site-header" role="banner">
+    <div class="container">
+        <div class="site-header-inner">
+
+            @* Brand / logo region — text-only placeholder until production logo delivered *@
+            <a class="site-brand"
+               asp-page="/Index"
+               aria-label="United States Antenna Products — Home">
+                <div class="site-brand-text" aria-hidden="true">
+                    <span class="site-brand-name">United States Antenna Products</span>
+                    <span class="site-brand-sub">LLC</span>
+                </div>
+            </a>
+
+            @* Mobile toggle — revealed by CSS only when js-nav-ready class is present on <html> *@
+            <button class="nav-toggle"
+                    id="nav-toggle"
+                    type="button"
+                    aria-controls="primary-nav-list"
+                    aria-expanded="false"
+                    aria-label="Open navigation menu">
+                @* Hamburger icon *@
+                <svg class="icon-open" aria-hidden="true" focusable="false"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6"  x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+                @* Close icon *@
+                <svg class="icon-close" aria-hidden="true" focusable="false"
+                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6"  x2="6"  y2="18" />
+                    <line x1="6"  y1="6"  x2="18" y2="18" />
+                </svg>
+            </button>
+
+            @* Primary navigation *@
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <ul class="primary-nav-list" id="primary-nav-list" role="list">
+                    <li>
+                        <a class="@HomeClass"
+                           asp-page="/Index"
+                           aria-current="@(HomeCurrent != "" ? HomeCurrent : null)">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@ProdClass"
+                           asp-page="/Products/Index"
+                           aria-current="@(ProdCurrent != "" ? ProdCurrent : null)">
+                            Products
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@ResClass"
+                           asp-page="/TechnicalResources"
+                           aria-current="@(ResCurrent != "" ? ResCurrent : null)">
+                            Technical Resources
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@AboutClass"
+                           asp-page="/AboutUs"
+                           aria-current="@(AboutCurrent != "" ? AboutCurrent : null)">
+                            About Us
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@ContactClass"
+                           asp-page="/ContactUs"
+                           aria-current="@(ContactCurrent != "" ? ContactCurrent : null)">
+                            Contact Us
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@QuoteClass"
+                           asp-page="/RequestAQuote"
+                           aria-current="@(QuoteCurrent != "" ? QuoteCurrent : null)">
+                            Request a Quote
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</header>

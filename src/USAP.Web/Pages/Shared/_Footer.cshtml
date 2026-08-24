@@ -1,0 +1,48 @@
+@* _Footer.cshtml — Shared site footer partial.
+   Uses only approved information: company name, current year, and existing
+   approved route links. No address, phone, email, social profiles,
+   Privacy Policy, Terms, or any destination without a current approved route. *@
+
+<footer class="site-footer" role="contentinfo">
+    <div class="container">
+        <div class="footer-inner">
+
+            @* Brand column *@
+            <div class="footer-brand">
+                <p class="footer-brand-name">United States Antenna Products, LLC</p>
+            </div>
+
+            @* Products / Resources column *@
+            <div class="footer-col">
+                <h2 class="footer-col-heading">Products &amp; Resources</h2>
+                <nav class="footer-nav" aria-label="Products and resources navigation">
+                    <a asp-page="/Products/Index">Products</a>
+                    <a asp-page="/TechnicalResources">Technical Resources</a>
+                </nav>
+            </div>
+
+            @* Company column *@
+            <div class="footer-col">
+                <h2 class="footer-col-heading">Company</h2>
+                <nav class="footer-nav" aria-label="Company navigation">
+                    <a asp-page="/AboutUs">About Us</a>
+                    <a asp-page="/Index">Home</a>
+                </nav>
+            </div>
+
+            @* Inquiries column *@
+            <div class="footer-col">
+                <h2 class="footer-col-heading">Inquiries</h2>
+                <nav class="footer-nav" aria-label="Inquiries navigation">
+                    <a asp-page="/ContactUs">Contact Us</a>
+                    <a asp-page="/RequestAQuote">Request a Quote</a>
+                </nav>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; @DateTime.Now.Year United States Antenna Products, LLC. All rights reserved.</p>
+        </div>
+    </div>
+</footer>

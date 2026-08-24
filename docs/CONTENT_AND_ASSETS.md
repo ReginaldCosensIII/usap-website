@@ -59,7 +59,7 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Site name | ✅ | "United States Antenna Products, LLC" |
 | Navigation labels | ✅ | Home, Products, Technical Resources, About Us, Contact Us, Request a Quote |
 | Production logo | ❌ | SVG or high-resolution PNG required |
-| Favicon | ❌ | Template favicon removed; production asset pending |
+| Favicon | ✅ Approved | `favicon.ico`, 20,222 bytes. Source: current public USAP website. Copied into the repository by the human project lead. Reuse authorized by the human project lead. Approved for this implementation. **Not** an original production logo or primary brand-source file. Wired in `_Layout.cshtml` via `<link rel="icon" type="image/x-icon" href="~/favicon.ico" />`. |
 | Footer contact details | ❌ | Address, phone, email pending |
 | Social links | ❌ | URLs and display permission pending |
 | Copyright phrasing | 🟡 | Phrasing not yet approved |
