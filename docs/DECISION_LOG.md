@@ -151,3 +151,21 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 **Decision:** `body` uses `min-height: 100vh; display: flex; flex-direction: column`. `main` uses `flex: 1; width: 100%`. `overflow-x: hidden` is not applied.
 **Reason:** Ensures the footer reaches the bottom of the viewport on short pages without masking layout defects. Horizontal overflow is addressed through correct widths, not masking.
 **Verified:** Manual browser check by Reggie on 2026-08-21 confirmed no horizontal overflow at ≈390 px and ≈768 px.
+
+---
+
+## DEC-017 — Provisional semantic design tokens, system fonts, and progressive-enhancement disclosure navigation
+
+**Date:** 2026-08-21 (updated 2026-08-23)
+**Decision:** Design system implemented with provisional semantic CSS custom property tokens centralized in `site.css`. System font stack used. Mobile navigation implemented as a CSS disclosure with a small dependency-free, external, deferred JavaScript file.
+**Reason:**
+- **Provisional tokens:** Official brand assets (colors, typography, logo) are not yet supplied. Centralizing values in `:root` allows a complete visual update from one location when assets arrive, without HTML or layout restructuring.
+- **System fonts:** Zero external font requests. Eliminates a latency dependency, a privacy concern, and a branding decision that should be made with official assets.
+- **Disclosure navigation:** A progressive-enhancement disclosure (`aria-expanded` + `hidden` attribute) avoids a modal focus trap, body-scroll locking, and any external library dependency. Navigation works without JavaScript. The deferred external script (`site-navigation.js`) adds enhancement only.
+- **No third-party CSS or JS:** No framework or library lock-in. All code is auditable and replaceable.
+**Impact:**
+- Desktop navigation and white header activate at `64rem` (1024px). Tablet (768px) and below use the mobile disclosure pattern on a navy header.
+- Two focus-ring tokens: `--focus-ring` (blue, approximately 6.87:1 on white) for light surfaces; `--focus-ring-dark` (white, approximately 17.31:1 on navy) for dark/navy surfaces.
+- Mobile active-route indicator uses `--color-accent-dark-surface: #ff4d5f` (approximately 5.34:1 on navy) for a left border that independently meets 3:1 contrast.
+- All visual token values and the navigation JS contract are documented in `docs/DESIGN_SYSTEM.md`. Replacing provisional values or extending the system in subsequent milestones does not require HTML restructuring.
+**Classification:** Fixed scope — Planning & Foundation / Design System and Responsive Foundation.

@@ -5,11 +5,13 @@
 }
 
 @* Provisional error page — custom error handling deferred to Core Site Build task. *@
-<h1>An error occurred</h1>
+<div class="container section">
+    <h1>An error occurred</h1>
 
-@if (Model.ShowRequestId)
-{
-    <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
-}
+    @if (Model.ShowRequestId)
+    {
+        <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
+    }
 
-<p>If this problem persists, please <a asp-page="/ContactUs">contact us</a>.</p>
+    <p>If this problem persists, please <a asp-page="/ContactUs">contact us</a>.</p>
+</div>

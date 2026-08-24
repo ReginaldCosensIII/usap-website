@@ -46,7 +46,10 @@ usap-website/
     └── USAP.Web/
         ├── Pages/
         │   ├── Products/     /products and /products/{familySlug}
-        │   ├── Shared/       _Layout.cshtml, _Navigation.cshtml
+        │   ├── Shared/
+        │   │   ├── _Layout.cshtml        root layout (skip link, partials, deferred JS)
+        │   │   ├── _Header.cshtml        shared header with brand region and primary nav
+        │   │   └── _Footer.cshtml        shared footer with link columns and copyright
         │   ├── Index.cshtml          /
         │   ├── AboutUs.cshtml        /about-us
         │   ├── ContactUs.cshtml      /contact-us
@@ -55,7 +58,9 @@ usap-website/
         │   ├── ThankYou.cshtml       /thank-you (provisional)
         │   └── Error.cshtml
         ├── Properties/launchSettings.json
-        ├── wwwroot/css/site.css   (minimal structural shell)
+        ├── wwwroot/
+        │   ├── css/site.css          design system tokens, layout, components
+        │   └── js/site-navigation.js  dependency-free mobile nav module
         ├── appsettings.json
         ├── appsettings.Development.json
         └── Program.cs
@@ -71,11 +76,34 @@ usap-website/
 | Production | IIS environment variables |
 | Certificates | IIS HTTPS bindings — never in source control |
 
-## CSS shell
+## CSS architecture
 
-`body`: `min-height: 100vh; display: flex; flex-direction: column`
+Single organized stylesheet `site.css` with 12 labeled sections:
+Tokens → Reset → Typography → Layout primitives → Links/buttons → Cards/surfaces →
+Form controls → Header/navigation → Footer → Utilities → Responsive → Reduced-motion.
+
+`body`: `min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column`
 `main`: `flex: 1; width: 100%`
-No `overflow-x: hidden`. Layout integrity maintained through proper widths.
+No `overflow-x: hidden`. Layout integrity maintained through correct widths.
+
+All design tokens are CSS custom properties in the `:root` block. See `docs/DESIGN_SYSTEM.md`.
+
+## Shared partial structure
+
+`_Layout.cshtml` includes `_Header.cshtml` and `_Footer.cshtml` via `Html.PartialAsync`.
+Navigation JavaScript (`site-navigation.js`) is loaded as an external deferred script via
+`<script src="~/js/site-navigation.js" defer>` before closing `</body>`, with
+`asp-append-version` for cache-busting. It does not block page rendering.
+
+## Progressive-enhancement navigation
+
+Mobile navigation uses a CSS disclosure pattern:
+- Nav list is visible by default (no-JS fallback).
+- JavaScript adds `js-nav-ready` to `<html>`, which CSS uses to reveal the toggle and hide the list.
+- The toggle manages `aria-expanded`, `hidden`, and `aria-label` on the nav list ID (`primary-nav-list`).
+- Desktop navigation activates at `64rem` (1024px); mobile disclosure applies below that.
+- No focus trap, no body-scroll lock, no external library.
+- See `docs/DESIGN_SYSTEM.md` — Mobile navigation interaction contract.
 
 ## Deferred decisions
 
@@ -83,7 +111,6 @@ No `overflow-x: hidden`. Layout integrity maintained through proper widths.
 |---|---|
 | Static content data format and location | Catalog & Resources |
 | Custom 404/error handling | Core Site Build |
-| Design tokens, typography, color system | Core Site Build |
 | SMTP/email service | Forms & Search |
 | Analytics (GA4), sitemap, robots.txt | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized |
