@@ -111,10 +111,16 @@ Mobile navigation uses a CSS disclosure pattern:
 |---|---|
 | Static content data format and location | Catalog & Resources |
 | Custom 404/error handling | Core Site Build |
-| SMTP/email service | Forms & Search |
+| SMTP/email service | Forms & Search (Currently simulated in Development with `DevelopmentInquirySubmissionService`; unavailable elsewhere) |
 | Analytics (GA4), sitemap, robots.txt | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized |
 | Legacy URL redirect map | When redirect mapping begins |
+
+## Forms and Validation
+
+- Forms use native ASP.NET Core `DataAnnotations` and `IValidatableObject` for server-side validation.
+- JavaScript provides only progressive enhancement (conditional field visibility). Server validation remains authoritative.
+- Submission endpoints (`/contact-us`, `/request-a-quote`) are protected by a POST-only rate limit partitioned by IP.
 
 ## IIS deployment
 

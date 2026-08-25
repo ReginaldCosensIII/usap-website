@@ -6,8 +6,15 @@
 
 <div class="container section">
     <h1>Contact Us</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Contact form and company contact information will be implemented in the Forms &amp; Search task.</p>
-        <p>Contact details, SMTP configuration, and antiforgery protection are pending implementation and client-supplied content.</p>
+    <p>Tell us what you need, and provide any available product or project details.</p>
+
+    <div class="card mt-8">
+        <div class="card-body">
+            <partial name="_InquiryForm" for="Input" />
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/inquiry-form.js" asp-append-version="true" defer></script>
+}

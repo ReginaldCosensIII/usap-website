@@ -1,0 +1,95 @@
+@model USAP.Web.Models.InquiryFormInput
+@using USAP.Web.Models
+
+<form method="post" id="inquiryForm" class="inquiry-form stack" data-quote-value="@((int)InquiryType.RequestAQuote)">
+
+    <div asp-validation-summary="All" class="notice notice-error" role="alert"></div>
+
+    @* Honeypot *@
+    <div class="sr-only" aria-hidden="true">
+        <label for="Website">Website</label>
+        <input type="text" asp-for="Website" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid grid-2">
+        <div class="form-group">
+            <label asp-for="Name" class="form-label">Name <span class="form-required" aria-label="required">*</span></label>
+            <input asp-for="Name" class="form-control" autocomplete="name" aria-required="true" />
+            <span asp-validation-for="Name" class="form-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">Email Address <span class="form-required" aria-label="required">*</span></label>
+            <input asp-for="Email" type="email" class="form-control" autocomplete="email" aria-required="true" />
+            <span asp-validation-for="Email" class="form-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Organization" class="form-label">Organization/Company</label>
+            <input asp-for="Organization" class="form-control" autocomplete="organization" />
+            <span asp-validation-for="Organization" class="form-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">Phone</label>
+            <input asp-for="Phone" type="tel" class="form-control" autocomplete="tel" />
+            <span asp-validation-for="Phone" class="form-error"></span>
+        </div>
+    </div>
+
+    <div class="grid grid-2">
+        <div class="form-group">
+            <label asp-for="Type" class="form-label">Inquiry Type <span class="form-required" aria-label="required">*</span></label>
+            <select asp-for="Type" asp-items="Html.GetEnumSelectList<InquiryType>()" class="form-control js-inquiry-type-select" aria-required="true">
+            </select>
+            <span asp-validation-for="Type" class="form-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PreferredContactMethod" class="form-label">Preferred Contact Method</label>
+            <select asp-for="PreferredContactMethod" asp-items="Html.GetEnumSelectList<ContactMethod>()" class="form-control">
+            </select>
+            <span asp-validation-for="PreferredContactMethod" class="form-error"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProductOfInterest" class="form-label">Product/Model of Interest</label>
+        <input asp-for="ProductOfInterest" class="form-control" />
+        <span asp-validation-for="ProductOfInterest" class="form-error"></span>
+    </div>
+
+    <fieldset class="form-group js-conditional-group js-quote-fields stack-sm quote-details-group">
+        <legend class="form-label">Quote Details</legend>
+
+        <div class="grid grid-2">
+            <div class="form-group">
+                <label asp-for="EstimatedQuantity" class="form-label">Estimated Quantity</label>
+                <input asp-for="EstimatedQuantity" class="form-control" />
+                <span asp-validation-for="EstimatedQuantity" class="form-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DesiredTimeline" class="form-label">Desired Timeline</label>
+                <input asp-for="DesiredTimeline" class="form-control" placeholder="e.g., target quarter or ASAP" />
+                <span asp-validation-for="DesiredTimeline" class="form-error"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IntendedApplication" class="form-label">Intended Application</label>
+            <textarea asp-for="IntendedApplication" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="IntendedApplication" class="form-error"></span>
+        </div>
+    </fieldset>
+
+    <div class="form-group">
+        <label asp-for="Message" class="form-label">Message / Project Requirements <span class="form-required" aria-label="required">*</span></label>
+        <textarea asp-for="Message" class="form-control" aria-required="true"></textarea>
+        <span asp-validation-for="Message" class="form-error"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary btn-lg">Submit Inquiry</button>
+    </div>
+</form>

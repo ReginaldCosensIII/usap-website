@@ -6,9 +6,16 @@
 
 <div class="container section">
     <h1>Thank You</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER — PROVISIONAL]</strong> This confirmation page is a route stub only.</p>
-        <p>The final behavior — including which form it confirms, redirect logic, and copy — is deferred pending form implementation approval in the Forms &amp; Search task.</p>
-        <p>Do not link to this page in production without approved form behavior in place.</p>
+    <p>@(string.IsNullOrEmpty(Model.ConfirmationMessage) ? "Your inquiry has been successfully submitted." : Model.ConfirmationMessage)</p>
+
+    @if (!string.IsNullOrEmpty(Model.ReferenceNumber))
+    {
+        <div class="notice notice-success" style="margin-top: 2rem;">
+            <p><strong>Reference Number:</strong> @Model.ReferenceNumber</p>
+        </div>
+    }
+
+    <div style="margin-top: 2rem;">
+        <a href="/" class="btn btn-outline">Return to Homepage</a>
     </div>
 </div>
