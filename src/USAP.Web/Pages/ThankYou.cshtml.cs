@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace USAP.Web.Pages;
 
-/// <summary>
-/// Provisional confirmation page stub.
-/// Final route, redirect behavior, and copy are deferred pending form implementation approval.
-/// </summary>
 public class ThankYouModel : PageModel
 {
+    [TempData]
+    public string? ReferenceNumber { get; set; }
+
+    [TempData]
+    public string? ConfirmationMessage { get; set; }
+
     public void OnGet()
     {
     }

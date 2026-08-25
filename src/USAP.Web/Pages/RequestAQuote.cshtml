@@ -6,8 +6,15 @@
 
 <div class="container section">
     <h1>Request a Quote</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Quote request form will be implemented in the Forms &amp; Search task.</p>
-        <p>Form fields, recipients, antiforgery protection, spam controls, and confirmation behavior are pending implementation and client approval.</p>
+    <p>Provide the available product, quantity, application, and timeline details for your request.</p>
+
+    <div class="card mt-8">
+        <div class="card-body">
+            <partial name="_InquiryForm" for="Input" />
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/inquiry-form.js" asp-append-version="true" defer></script>
+}

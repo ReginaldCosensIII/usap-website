@@ -390,6 +390,10 @@ main {
   margin-top: var(--space-8);
 }
 
+.mt-8 {
+  margin-top: var(--space-8);
+}
+
 /* --- Cluster (horizontal flex) --- */
 .cluster {
   display: flex;
@@ -772,6 +776,25 @@ select.form-control {
   font-size: var(--text-xs);
   color: var(--color-error);
   font-weight: var(--weight-medium);
+}
+
+.validation-summary-valid {
+  display: none;
+}
+
+/* Quote details fieldset */
+.quote-details-group {
+  margin: var(--space-4) 0 0 0;
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--color-border-default);
+  border-radius: var(--border-radius);
+  background-color: var(--color-surface-subtle);
+}
+
+.quote-details-group legend {
+  padding: 0 var(--space-2);
+  font-weight: var(--weight-semibold);
+  color: var(--color-brand-navy);
 }
 
 
@@ -1159,6 +1182,7 @@ hr {
     display: flex !important; /* override JS-collapsed state */
     position: static;
     flex-direction: row;
+    flex-wrap: nowrap;
     background: transparent;
     border: none;
     padding: 0;
@@ -1309,11 +1333,19 @@ hr {
 
   /* Mobile header: brand + toggle side by side */
   .site-header-inner {
+    width: 100%;
     flex-wrap: wrap;
   }
 
+  .nav-toggle {
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+  }
+
   .primary-nav {
+    flex: 0 0 100%;
     width: 100%;
+    order: 3;
   }
 }
 
