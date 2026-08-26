@@ -1,0 +1,336 @@
+/* homepage.css - Styles specifically for the USAP Homepage */
+
+/* ==========================================================================
+   Hero Section - Mobile First (<1024px)
+   ========================================================================== */
+
+.home-hero {
+    position: relative;
+    width: 100%;
+    /* Mobile height */
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--color-brand-navy, #0f203c);
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.home-hero-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.home-hero-poster,
+.home-hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.home-hero-video {
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.home-hero-video.is-ready {
+    opacity: 1;
+}
+
+/* Overlay for readability */
+.home-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(15, 32, 60, 0.7); /* strong navy overlay on mobile */
+    z-index: 3;
+}
+
+.home-hero-content-wrapper {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    padding-block: var(--space-8);
+}
+
+.home-hero-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.home-hero-content .eyebrow {
+    color: #ff5050; /* Accessible red, contrast 5.2:1 against navy */
+    margin-bottom: var(--space-2);
+}
+
+.home-hero-content h1 {
+    color: #ffffff;
+    margin-bottom: var(--space-4);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    text-wrap: balance;
+}
+
+.home-hero-content p {
+    font-size: var(--text-lg);
+    max-width: 40rem;
+    margin-bottom: var(--space-6);
+    opacity: 0.9;
+    margin-inline: auto;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+}
+
+.home-hero-divider {
+    display: none;
+}
+
+/* ==========================================================================
+   Trust Strip - Mobile First (<1024px)
+   ========================================================================== */
+
+.trust-strip {
+    background-color: var(--color-brand-navy, #0f203c);
+    color: #ffffff;
+    padding-block: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trust-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    /* Two equal columns below 1024px */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-items: start;
+}
+
+.trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
+}
+
+/* Center item 5 as a complete unit */
+.trust-item:nth-child(5) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    max-width: 20rem;
+}
+
+.trust-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--color-brand-red, #c02026);
+    flex-shrink: 0;
+}
+
+.trust-text {
+    display: flex;
+    flex-direction: column;
+    font-size: var(--text-sm);
+}
+
+.trust-text strong {
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.trust-text span {
+    color: var(--color-neutral-30, #d1d5db);
+    font-size: 0.875rem;
+}
+
+/* Extremely narrow fallback */
+@media (max-width: 389px) {
+    .trust-list {
+        grid-template-columns: 1fr;
+    }
+    .trust-item:nth-child(5) {
+        grid-column: auto;
+    }
+}
+
+/* ==========================================================================
+   Desktop Breakpoints (>=1024px)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+    .home-hero {
+        --hero-split: 48%;
+        --hero-slant-offset: 5vw;
+        --hero-divider-width: clamp(7px, 0.5vw, 10px);
+        --hero-divider-gap: 8px;
+        --hero-dotted-width: 3px;
+
+        display: block; /* Switch from flex column to block */
+        min-height: clamp(34rem, 60vh, 42rem);
+        /* Navy background is on the parent, so the clipped area reveals it */
+        background-color: var(--color-brand-navy, #0f203c);
+    }
+
+    .home-hero-content-wrapper {
+        /* Restrict width to guarantee 24px clearance from the furthest left point of the diagonal */
+        width: calc(var(--hero-split) - var(--hero-slant-offset) - 24px);
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        /* Hero specific left padding */
+        padding-left: clamp(2rem, 8vw, 6rem);
+        padding-right: 0;
+        padding-block: var(--space-8);
+        position: relative;
+        z-index: 4;
+        min-height: clamp(34rem, 60vh, 42rem); /* Ensure it takes full height for centering */
+    }
+
+    .home-hero-media {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        /* Media begins at the diagonal edge */
+        clip-path: polygon(
+            calc(var(--hero-split) + var(--hero-slant-offset)) 0,
+            100% 0,
+            100% 100%,
+            calc(var(--hero-split) - var(--hero-slant-offset)) 100%
+        );
+    }
+
+    .home-hero-content {
+        text-align: left;
+        align-items: flex-start;
+        padding-inline: 0;
+        margin-inline: 0;
+    }
+
+    .home-hero-content p {
+        margin-inline: 0;
+        /* Slightly narrower maximum width to ensure readability */
+        max-width: 36rem;
+    }
+
+    .hero-actions {
+        justify-content: flex-start;
+    }
+
+    /* Restrained media overlay (left gradient) */
+    .home-hero-overlay {
+        background: linear-gradient(to right, var(--color-brand-navy) 0%, rgba(15,32,60,0) 25%);
+    }
+
+    /* Diagonal divider container (Unclipped full-hero overlay) */
+    .home-hero-divider {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        pointer-events: none;
+    }
+
+    /* Diagonal divider - Solid */
+    .home-hero-divider::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-color: var(--color-brand-red, #c02026);
+        /* Same angle, starting exactly at the media edge */
+        clip-path: polygon(
+            calc(var(--hero-split) + var(--hero-slant-offset)) 0,
+            calc(var(--hero-split) + var(--hero-slant-offset) + var(--hero-divider-width)) 0,
+            calc(var(--hero-split) - var(--hero-slant-offset) + var(--hero-divider-width)) 100%,
+            calc(var(--hero-split) - var(--hero-slant-offset)) 100%
+        );
+    }
+
+    /* Diagonal divider - Dotted companion on the media side */
+    .home-hero-divider::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        /* Create a vertical repeating pattern */
+        background-image: repeating-linear-gradient(
+            to bottom,
+            var(--color-brand-red, #c02026) 0,
+            var(--color-brand-red, #c02026) 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        /* Clip it to a thin diagonal strip parallel to the solid line */
+        clip-path: polygon(
+            calc(var(--hero-split) + var(--hero-slant-offset) + var(--hero-divider-width) + var(--hero-divider-gap)) 0,
+            calc(var(--hero-split) + var(--hero-slant-offset) + var(--hero-divider-width) + var(--hero-divider-gap) + var(--hero-dotted-width)) 0,
+            calc(var(--hero-split) - var(--hero-slant-offset) + var(--hero-divider-width) + var(--hero-divider-gap) + var(--hero-dotted-width)) 100%,
+            calc(var(--hero-split) - var(--hero-slant-offset) + var(--hero-divider-width) + var(--hero-divider-gap)) 100%
+        );
+    }
+
+    /* Trust Strip */
+    .trust-strip {
+        padding-block: var(--space-4);
+    }
+
+    .trust-list {
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-3);
+    }
+
+    .trust-item {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+        position: relative;
+    }
+
+    .trust-item:nth-child(5) {
+        grid-column: auto;
+        max-width: none;
+        justify-self: auto;
+    }
+
+    /* Separators for items 1-4 */
+    .trust-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        right: calc(var(--space-3) / -2);
+        top: 10%;
+        height: 80%;
+        width: 1px;
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+}
+
+/* 1280-1599px: 45% content / 55% media */
+@media (min-width: 1280px) {
+    .home-hero {
+        --hero-split: 45%;
+    }
+}
+
+/* 1600px+: 42% content / 58% media */
+@media (min-width: 1600px) {
+    .home-hero {
+        --hero-split: 42%;
+    }
+}
