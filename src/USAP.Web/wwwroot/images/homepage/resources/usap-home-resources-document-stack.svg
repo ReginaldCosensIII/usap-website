@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="usap-doc-blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0057B8" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#0D1B2E" stop-opacity="0.04"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(510 90) rotate(-5 220 260)">
+    <rect x="38" y="32" width="350" height="500" rx="10" fill="#0D1B2E" opacity="0.07"/>
+    <rect x="18" y="16" width="350" height="500" rx="10" fill="#FFFFFF" stroke="#0057B8" stroke-width="2" opacity="0.92"/>
+    <path d="M18 96H368" stroke="#C8102E" stroke-width="8"/>
+    <path d="M52 58H208M52 126H286M52 152H320M52 178H272" stroke="#0D1B2E" stroke-width="8" stroke-linecap="round" opacity="0.24"/>
+    <g transform="translate(70 240)" fill="none" stroke="#0057B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.48">
+      <path d="M0 118H242M28 118V34M28 52H198M30 43L198 52L30 61"/>
+      <path d="M62 28V75M96 32V71M130 36V67M164 40V63M198 45V59"/>
+      <path d="M28 118L48 82H8Z"/>
+      <path d="M28 118V154M10 154H46"/>
+    </g>
+    <path d="M52 438H190M52 464H248" stroke="#0D1B2E" stroke-width="7" stroke-linecap="round" opacity="0.18"/>
+  </g>
+  <g transform="translate(650 112) rotate(6 150 230)">
+    <rect width="300" height="460" rx="10" fill="url(#usap-doc-blue)" stroke="#8EC5F4" stroke-width="2" opacity="0.92"/>
+    <path d="M0 82H300" stroke="#0057B8" stroke-width="7" opacity="0.55"/>
+    <path d="M34 45H184M34 114H250M34 140H226" stroke="#0D1B2E" stroke-width="7" stroke-linecap="round" opacity="0.22"/>
+    <g fill="none" stroke="#0D1B2E" stroke-width="2" opacity="0.25">
+      <path d="M36 212H264M36 248H264M36 284H264M36 320H264M36 356H264"/>
+      <path d="M98 188V380M170 188V380M228 188V380"/>
+    </g>
+    <rect x="34" y="408" width="58" height="8" rx="4" fill="#C8102E" opacity="0.65"/>
+  </g>
+</svg>

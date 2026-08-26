@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Specification sheet</title>
+  <path d="M13 7h24l11 11v39H13Z" fill="none" stroke="#0D1B2E" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M37 7v12h11" fill="none" stroke="#0D1B2E" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M21 30h20M21 38h20M21 46h20M27 26v24M36 26v24" fill="none" stroke="#0057B8" stroke-width="2" opacity="0.9"/>
+  <circle cx="21" cy="52" r="2.5" fill="#C8102E"/>
+</svg>

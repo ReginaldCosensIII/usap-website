@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Product datasheet</title>
+  <path d="M15 7h23l11 11v39H15Z" fill="none" stroke="#0D1B2E" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M38 7v12h11M22 28h20M22 35h20M22 42h12" fill="none" stroke="#0057B8" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M22 50h8" stroke="#C8102E" stroke-width="3" stroke-linecap="round"/>
+</svg>

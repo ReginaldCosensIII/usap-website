@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" width="1200" height="620" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="usap-cta-tower" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.13"/>
+      <stop offset="0.58" stop-color="#9FD3F7" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#5A9FD4" stop-opacity="0.12"/>
+    </linearGradient>
+    <linearGradient id="usap-cta-red" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C8102E" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="#C8102E" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#C8102E" stop-opacity="0.04"/>
+    </linearGradient>
+    <pattern id="usap-cta-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#8EC5F4" stroke-width="1" opacity="0.045"/>
+    </pattern>
+  </defs>
+  <rect x="680" width="520" height="620" fill="url(#usap-cta-grid)"/>
+  <g fill="none" stroke="url(#usap-cta-tower)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M870 584L912 190L954 584M891 584L912 190L933 584"/>
+    <path d="M876 530H948M881 476H943M887 422H937M893 368H931M899 314H925M905 260H919"/>
+    <path d="M876 530L943 476L887 422L931 368L899 314L919 260L906 216"/>
+    <path d="M948 530L881 476L937 422L893 368L925 314L905 260L918 216"/>
+    <path d="M848 584H976M862 570H962"/>
+    <path d="M912 196V86M912 122H1080M914 110L1080 122L914 134"/>
+    <path d="M942 88V156M972 94V150M1002 101V143M1033 108V137M1061 114V131M1080 118V127"/>
+    <path d="M892 198H932M900 183H924"/>
+    <circle cx="912" cy="190" r="8"/>
+    <circle cx="912" cy="190" r="17" opacity="0.52"/>
+  </g>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" opacity="0.14">
+    <path d="M1082 122a38 38 0 0 1 38 38" stroke-width="1.6"/>
+    <path d="M1082 96a64 64 0 0 1 64 64" stroke-width="1.35"/>
+    <path d="M1082 70a90 90 0 0 1 90 90" stroke-width="1.1"/>
+  </g>
+  <path d="M620 584H764L802 546H1036L1074 584H1200" fill="none" stroke="url(#usap-cta-red)" stroke-width="2"/>
+  <circle cx="802" cy="546" r="4" fill="#C8102E" opacity="0.34"/>
+</svg>
