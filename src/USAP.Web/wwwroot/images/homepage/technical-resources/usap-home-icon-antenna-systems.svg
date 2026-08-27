@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Antenna systems</title>
+  <path d="M10 3h28l16 16v42H10Z" fill="#FFFFFF" stroke="#0D1B2E" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M38 3v16h16" fill="none" stroke="#0D1B2E" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="none" stroke="#0057B8" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 25v30M20 31h24M23 38h18M26 45h12M23 55h18"/>
+    <path d="M32 25l-3.5 6h7Z"/>
+  </g>
+  <circle cx="32" cy="50" r="2.8" fill="#C8102E"/>
+</svg>

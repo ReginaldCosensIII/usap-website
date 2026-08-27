@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Rotators and controls</title>
+  <path d="M10 3h28l16 16v42H10Z" fill="#FFFFFF" stroke="#0D1B2E" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M38 3v16h16" fill="none" stroke="#0D1B2E" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="none" stroke="#C8102E" stroke-width="2.5" stroke-linecap="round">
+    <path d="M26 33a6 4 0 0 1 12 0"/>
+    <path d="M22 30a10 6 0 0 1 20 0"/>
+  </g>
+  <g fill="none" stroke="#0057B8" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 30v11M26 35.5h12"/>
+    <rect x="26" y="41" width="12" height="11" rx="2"/>
+    <circle cx="32" cy="46.5" r="2.2"/>
+    <path d="M32 52v3M25 55h14"/>
+  </g>
+</svg>
