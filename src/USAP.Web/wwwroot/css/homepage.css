@@ -336,75 +336,128 @@
 }
 
 /* ==========================================================================
+   Shared Homepage Components
+   ========================================================================== */
+:root {
+    --home-section-padding-block: clamp(3rem, 6vw, 4.75rem);
+    --home-section-content-gap: clamp(2.5rem, 4vw, 4rem);
+    --home-grid-gap: clamp(1.25rem, 2.5vw, 2rem);
+    --home-card-padding: clamp(1.25rem, 2vw, 1.75rem);
+    --home-card-radius: 0.75rem;
+    --home-card-border: 1px solid rgba(15, 32, 60, 0.10);
+    --home-card-shadow:
+        0 1px 2px rgba(15, 32, 60, 0.04),
+        0 10px 30px rgba(15, 32, 60, 0.08);
+}
+
+.home-section {
+    padding-block: var(--home-section-padding-block);
+}
+
+.home-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--home-section-content-gap);
+}
+
+.home-section-header--center {
+    align-items: center;
+    text-align: center;
+}
+
+.home-section-header--inverse {
+    color: var(--color-neutral-00, #ffffff);
+}
+
+.home-section-header.home-section-header--inverse h2,
+.home-section-header.home-section-header--inverse p {
+    color: var(--color-neutral-00, #ffffff);
+}
+
+.home-card {
+    background-color: var(--color-neutral-00, #ffffff);
+    border: var(--home-card-border);
+    border-radius: var(--home-card-radius);
+    box-shadow: var(--home-card-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.home-card:hover,
+.home-card:focus-within {
+    transform: translateY(-4px);
+    box-shadow:
+        0 4px 6px rgba(15, 32, 60, 0.05),
+        0 16px 40px rgba(15, 32, 60, 0.12);
+    border-color: rgba(15, 32, 60, 0.2);
+}
+
+.home-card--padded {
+    padding: var(--home-card-padding);
+}
+
+/* ==========================================================================
    Stage 2: Why USAP
    ========================================================================== */
-.home-why-usap {
-    padding-block: var(--space-12) var(--space-8);
-    background-color: var(--color-neutral-00, #ffffff);
-}
+.home-why-usap { background-color: var(--color-neutral-00, #ffffff); }
 
 .why-usap-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-6);
-}
-
-.why-usap-media {
-    order: 2;
+    gap: var(--home-grid-gap);
 }
 
 .why-usap-content {
-    order: 1;
     display: flex;
     flex-direction: column;
-}
-
-.why-usap-media img {
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-    object-fit: cover;
-    object-position: center;
-    border-radius: var(--radius-md, 8px);
-    border: 1px solid var(--color-neutral-20, #e5e7eb);
 }
 
 .why-usap-content .eyebrow {
     color: var(--color-brand-red, #c02026);
     font-weight: 700;
-    margin-bottom: var(--space-2);
     font-size: var(--text-sm);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     display: block;
+    margin-bottom: var(--space-2);
 }
 
 .why-usap-content h2 {
     color: var(--color-brand-navy, #0f203c);
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    line-height: 1.15;
+    margin-top: 0;
     margin-bottom: var(--space-4);
-    font-size: clamp(1.875rem, 4vw, 2.5rem);
-    line-height: 1.2;
 }
 
 .why-usap-content p {
-    font-size: var(--text-lg);
+    font-size: 1.125rem;
+    line-height: 1.55;
     color: var(--color-neutral-70, #4b5563);
-    margin-bottom: var(--space-6);
-    line-height: 1.6;
+    margin-top: 0;
+    margin-bottom: var(--space-5);
 }
 
 .why-usap-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
     list-style: none;
     padding: 0;
-    margin: 0 0 var(--space-6) 0;
+    margin-top: 0;
+    margin-bottom: var(--space-4);
 }
 
 .why-usap-list li {
     position: relative;
-    padding-left: var(--space-6);
-    margin-bottom: var(--space-3);
+    padding-left: var(--space-5);
     color: var(--color-neutral-70, #4b5563);
     font-size: var(--text-md);
+    line-height: 1.45;
+    margin: 0;
 }
 
 .why-usap-list li::before {
@@ -419,16 +472,23 @@
 }
 
 .why-usap-action {
-    margin-top: auto;
+    margin-top: 0;
+}
+
+.why-usap-media img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: center;
+    border-radius: var(--home-card-radius);
+    box-shadow: var(--home-card-shadow);
 }
 
 /* ==========================================================================
    Stage 2: Applications & Products Sections
    ========================================================================== */
-.home-applications,
-.home-featured-products {
-    padding-block: var(--space-12) var(--space-10);
-}
+
 
 .home-applications {
     background-color: var(--color-neutral-05, #f9fafb);
@@ -438,18 +498,9 @@
     background-color: var(--color-neutral-00, #ffffff);
 }
 
-.section-header {
-    margin-bottom: var(--space-8);
-}
 
-.section-header.center {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
-.section-header .eyebrow {
+.home-section-header .eyebrow {
     color: var(--color-brand-red, #c02026);
     font-weight: 700;
     margin-bottom: var(--space-2);
@@ -459,14 +510,14 @@
     display: block;
 }
 
-.section-header h2 {
+.home-section-header h2 {
     color: var(--color-brand-navy, #0f203c);
     margin-bottom: var(--space-4);
     font-size: clamp(1.875rem, 4vw, 2.5rem);
     line-height: 1.2;
 }
 
-.section-header p {
+.home-section-header p {
     font-size: var(--text-lg);
     color: var(--color-neutral-70, #4b5563);
     max-width: 48rem;
@@ -478,27 +529,13 @@
 .products-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--home-grid-gap);
     margin-bottom: var(--space-8);
 }
 
-.application-card,
-.product-card {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--color-neutral-00, #ffffff);
-    border: 1px solid var(--color-neutral-20, #e5e7eb);
-    border-radius: var(--radius-md, 8px);
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
 
-.application-card:hover,
-.product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
+
+
 
 .application-media,
 .product-media {
@@ -529,7 +566,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: var(--space-5);
+    padding: var(--home-card-padding);
 }
 
 .application-content h3,
@@ -581,23 +618,13 @@
 /* Desktop (1024px+) */
 @media (min-width: 1024px) {
     .why-usap-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 47fr) minmax(0, 53fr);
         align-items: center;
-        gap: var(--space-10);
-    }
-
-    .why-usap-media {
-        order: 1;
-    }
-
-    .why-usap-content {
-        order: 2;
+        gap: var(--home-grid-gap);
     }
 
     .why-usap-media img {
-        max-height: none;
-        height: 100%;
-        aspect-ratio: 4 / 5;
+        max-height: 28rem;
     }
 
     .applications-grid {
@@ -611,25 +638,330 @@
     }
 }
 
-/* Wide Desktop (1280px+) */
-@media (min-width: 1280px) {
-    .products-grid {
-        grid-template-columns: repeat(4, 1fr);
+
+
+
+
+/* ==========================================================================
+   Section 6: Customer Testimonials
+   ========================================================================== */
+.home-testimonials {
+    background-color: var(--color-brand-navy, #0f203c);
+    background-image: url('../images/homepage/testimonials/usap-home-testimonials-signal-background.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: var(--color-neutral-00, #ffffff);
+
+    position: relative;
+    border-top: 4px solid var(--color-brand-red, #c02026);
+}
+
+.testimonials-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+}
+
+.testimonials-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-3);
+}
+
+.testimonials-header .eyebrow {
+    color: var(--color-brand-red, #c02026);
+}
+
+.testimonials-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+}
+
+.testimonial-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 48rem;
+    background: rgba(15, 32, 60, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: var(--space-6) var(--space-4);
+    min-height: 160px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.testimonial-status {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--color-neutral-00, #ffffff);
+    background: var(--color-brand-red, #c02026);
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: var(--space-4);
+}
+
+.testimonial-slide {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.testimonial-slide.active {
+    display: block;
+}
+
+.testimonial-placeholder {
+    font-size: 1.25rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.testimonials-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+}
+
+.testimonials-controls .btn-icon {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--color-neutral-00, #ffffff);
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.testimonials-controls .btn-icon:hover,
+.testimonials-controls .btn-icon:focus {
+    border-color: var(--color-neutral-00, #ffffff);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.testimonials-controls .btn-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.carousel-indicators {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.carousel-indicators .indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.carousel-indicators .indicator.active {
+    background: var(--color-brand-red, #c02026);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+    .testimonial-placeholder {
+        font-size: 1.5rem;
     }
 }
 
 /* ==========================================================================
-   Reduced Motion
+   Section 7: Technical Resources
    ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-    .application-card,
-    .product-card {
-        transition-duration: 0.01ms; /* Effectively 0s, but keeps the property active if needed */
-        transition: none;
-    }
+.home-resources {
+    background-color: var(--color-neutral-05, #f9fafb);
+}
 
-    .application-card:hover,
-    .product-card:hover {
-        transform: none;
+.resources-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--home-section-content-gap);
+}
+
+.resources-intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-width: 58rem;
+}
+
+.resources-intro .eyebrow {
+    color: var(--color-brand-red, #c02026);
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+}
+
+.resources-intro h2 {
+    color: var(--color-brand-navy, #0f203c);
+    margin-bottom: var(--space-3);
+    font-size: clamp(1.875rem, 4vw, 2.5rem);
+    line-height: 1.2;
+}
+
+.resources-intro p {
+    font-size: var(--text-lg);
+    color: var(--color-neutral-70, #4b5563);
+    margin-bottom: var(--space-5);
+    line-height: 1.6;
+}
+
+.resources-showcase {
+    display: flex;
+    flex-direction: column;
+    gap: var(--home-section-content-gap);
+}
+
+.resources-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--home-card-radius);
+    border: var(--home-card-border);
+    box-shadow: var(--home-card-shadow);
+    object-fit: contain;
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--home-grid-gap);
+}
+
+.resource-card {
+    padding: var(--home-card-padding);
+    text-decoration: none;
+    color: var(--color-brand-navy, #0f203c);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.resource-icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+}
+
+.resource-icon img {
+    width: 100%;
+    height: auto;
+}
+
+.resource-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.resource-content h3 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.resource-content p {
+    margin: 0;
+    color: var(--color-neutral-70, #4b5563);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    .resources-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .resources-showcase {
+        display: grid;
+        grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+        gap: var(--home-grid-gap);
+        align-items: start;
+    }
+}
+
+/* ==========================================================================
+   Section 8:/* ==========================================================================
+   Section 8: Closing Inquiry CTA
+   ========================================================================== */
+.home-closing-cta {
+    background-color: var(--color-brand-navy, #0f203c);
+    background-image: url('../images/homepage/closing-cta/usap-home-closing-cta-signal-background.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+
+    color: var(--color-neutral-00, #ffffff);
+    text-align: center;
+}
+
+.closing-cta-content {
+    position: relative;
+    z-index: 3;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.closing-cta-content h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    color: var(--color-neutral-00, #ffffff);
+}
+
+.closing-cta-content p {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.closing-cta-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    justify-content: center;
+    margin-top: var(--space-2);
+}
+
+@media (min-width: 768px) {
+    .closing-cta-actions {
+        flex-direction: row;
     }
 }

@@ -49,3 +49,77 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+    // Testimonials Carousel
+    const carousel = document.getElementById("testimonial-carousel");
+    if (carousel) {
+        const slides = Array.from(carousel.querySelectorAll(".testimonial-slide"));
+        const indicators = Array.from(document.querySelectorAll(".carousel-indicators .indicator"));
+        const prevBtn = document.querySelector(".carousel-prev");
+        const nextBtn = document.querySelector(".carousel-next");
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.add("active");
+                    slide.removeAttribute("hidden");
+                } else {
+                    slide.classList.remove("active");
+                    slide.setAttribute("hidden", "true");
+                }
+            });
+
+            indicators.forEach((indicator, i) => {
+                if (i === index) {
+                    indicator.classList.add("active");
+                    indicator.setAttribute("aria-selected", "true");
+                } else {
+                    indicator.classList.remove("active");
+                    indicator.setAttribute("aria-selected", "false");
+                }
+            });
+            currentIndex = index;
+        }
+
+        function nextSlide() {
+            let nextIndex = currentIndex + 1;
+            if (nextIndex >= slides.length) {
+                nextIndex = 0;
+            }
+            showSlide(nextIndex);
+        }
+
+        function prevSlide() {
+            let prevIndex = currentIndex - 1;
+            if (prevIndex < 0) {
+                prevIndex = slides.length - 1;
+            }
+            showSlide(prevIndex);
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener("click", nextSlide);
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener("click", prevSlide);
+        }
+
+        indicators.forEach((indicator, i) => {
+            indicator.addEventListener("click", () => {
+                showSlide(i);
+            });
+        });
+
+        carousel.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowLeft") {
+                prevSlide();
+            } else if (e.key === "ArrowRight") {
+                nextSlide();
+            }
+        });
+
+        // Make carousel focusable for keyboard events if not already
+        carousel.setAttribute("tabindex", "0");
+    }
