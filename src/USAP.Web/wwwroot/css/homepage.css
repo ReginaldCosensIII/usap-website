@@ -735,13 +735,14 @@
 
     position: relative;
     border-top: 4px solid var(--color-brand-red, #c02026);
+    padding-block: clamp(2.25rem, 4vw, 3.25rem);
 }
 
 .testimonials-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-5);
+    gap: clamp(1.25rem, 2vw, 1.75rem);
 }
 
 .testimonials-header {
@@ -749,7 +750,8 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    margin-bottom: 0;
 }
 
 .testimonials-header .eyebrow {
@@ -760,53 +762,71 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
     width: 100%;
 }
 
 .testimonial-carousel {
     position: relative;
     width: 100%;
-    max-width: 48rem;
-    background: rgba(15, 32, 60, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    padding: var(--space-6) var(--space-4);
-    min-height: 160px;
-    text-align: center;
+    max-width: 52rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    justify-items: stretch;
+}
+
+.testimonial-slide {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    background: rgba(15, 32, 60, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-radius: var(--home-card-radius);
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-.testimonial-status {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: var(--color-neutral-00, #ffffff);
-    background: var(--color-brand-red, #c02026);
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    margin-bottom: var(--space-4);
-}
-
-.testimonial-slide {
-    display: none;
-    animation: fadeIn 0.3s ease;
+    text-align: center;
 }
 
 .testimonial-slide.active {
-    display: block;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
 }
 
-.testimonial-placeholder {
-    font-size: 1.25rem;
+.testimonial-quote {
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.88);
+    margin: 0 0 var(--space-3) 0;
     font-style: italic;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0;
+    max-width: 44rem;
+}
+
+.testimonial-attribution {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.testimonial-client {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.testimonial-context {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.65);
 }
 
 .testimonials-controls {
@@ -814,15 +834,14 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-4);
-    margin-top: var(--space-2);
 }
 
 .testimonials-controls .btn-icon {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(15, 32, 60, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--color-neutral-00, #ffffff);
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -832,14 +851,15 @@
 }
 
 .testimonials-controls .btn-icon:hover,
-.testimonials-controls .btn-icon:focus {
-    border-color: var(--color-neutral-00, #ffffff);
+.testimonials-controls .btn-icon:focus-visible {
+    border-color: rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.1);
+    outline: none;
 }
 
 .testimonials-controls .btn-icon svg {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
 }
 
 .carousel-indicators {
@@ -863,16 +883,8 @@
     background: var(--color-brand-red, #c02026);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 
-@media (min-width: 768px) {
-    .testimonial-placeholder {
-        font-size: 1.5rem;
-    }
-}
+
 
 /* ==========================================================================
    Section 7: Technical Resources
