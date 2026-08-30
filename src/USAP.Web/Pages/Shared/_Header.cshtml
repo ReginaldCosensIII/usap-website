@@ -27,14 +27,13 @@
     <div class="container">
         <div class="site-header-inner">
 
-            @* Brand / logo region — text-only placeholder until production logo delivered *@
+            @* Brand / logo region *@
             <a class="site-brand"
                asp-page="/Index"
-               aria-label="United States Antenna Products — Home">
-                <div class="site-brand-text" aria-hidden="true">
-                    <span class="site-brand-name">United States Antenna Products</span>
-                    <span class="site-brand-sub">LLC</span>
-                </div>
+               aria-label="United States Antenna Products home">
+                <img class="site-brand-logo"
+                     src="~/images/brand/usap-logo.svg"
+                     alt="United States Antenna Products, LLC" />
             </a>
 
             @* Mobile toggle — revealed by CSS only when js-nav-ready class is present on <html> *@

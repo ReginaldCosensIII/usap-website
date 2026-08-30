@@ -1,13 +1,361 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "Engineered Antenna Systems for Demanding Communications";
 }
 
-<div class="container section">
-    <h1>Home</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Homepage content will be implemented in the Core Site Build task.</p>
-        <p>See <code>docs/CONTENT_AND_ASSETS.md</code> for planned homepage sections and outstanding client-input requirements.</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
+}
+
+<!-- Section 1: Hero -->
+<section class="home-hero" aria-labelledby="hero-heading">
+    <div class="home-hero-content-wrapper">
+        <div class="container home-hero-content">
+            <span class="eyebrow">HF &middot; VHF &middot; UHF ANTENNA SYSTEMS</span>
+            <h1 id="hero-heading">Engineered Antenna Systems for Demanding Communications</h1>
+            <p>Explore HF, VHF, and UHF antenna systems, rotator and control equipment, and engineering support for commercial, industrial, government, and military applications.</p>
+            <div class="hero-actions">
+                <a href="/products" class="btn btn-primary">Explore Products</a>
+                <a href="/request-a-quote" class="btn btn-inverse">Request a Quote</a>
+            </div>
+        </div>
     </div>
-</div>
+
+    <div class="home-hero-divider" aria-hidden="true"></div>
+
+    <div class="home-hero-media">
+        <!-- Static fallback/poster -->
+        <img src="~/images/homepage/hero/usap-home-hero-poster-lp-1112mr.png"
+             alt="" class="home-hero-poster" id="hero-poster" width="1440" height="800" decoding="sync" />
+        <!-- Video layer (hidden by default, managed by JS) -->
+        <video id="hero-video" class="home-hero-video"
+               muted loop playsinline preload="metadata"
+               src="~/videos/homepage/usap-home-hero-loop.mp4"
+               aria-hidden="true" hidden></video>
+        <!-- Overlay for readability -->
+        <div class="home-hero-overlay"></div>
+    </div>
+</section>
+
+<!-- Section 2: Trust / Value Strip -->
+<section class="trust-strip" aria-label="Why choose USAP">
+    <div class="container">
+        <ul class="trust-list" role="list">
+            <li class="trust-item">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-icon"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                <div class="trust-text">
+                    <strong>Manufacturing &amp; Testing</strong>
+                    <span>Frederick, Maryland</span>
+                </div>
+            </li>
+            <li class="trust-item">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-icon"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <div class="trust-text">
+                    <strong>Engineering Support</strong>
+                    <span>For application requirements</span>
+                </div>
+            </li>
+            <li class="trust-item">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-icon"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg>
+                <div class="trust-text">
+                    <strong>HF, VHF &amp; UHF Systems</strong>
+                    <span>Fixed and transportable options</span>
+                </div>
+            </li>
+            <li class="trust-item">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-icon"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="trust-text">
+                    <strong>50-Year History</strong>
+                    <span>Antenna products and systems</span>
+                </div>
+            </li>
+            <li class="trust-item">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="trust-icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <div class="trust-text">
+                    <strong>Technical Information</strong>
+                    <span>Datasheets and model details</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- Section 3: Why USAP -->
+<section class="home-section home-why-usap" aria-labelledby="why-usap-heading">
+    <div class="container">
+        <div class="why-usap-grid">
+            <div class="why-usap-intro">
+                <span class="eyebrow">WHY UNITED STATES ANTENNA PRODUCTS</span>
+                <h2 id="why-usap-heading">Product Capability Backed by Engineering Support</h2>
+            </div>
+            <div class="why-usap-media">
+                <img src="~/images/homepage/why-usap/usap-home-why-usap-engineering-integration.png" alt="" width="1448" height="1086" loading="lazy" decoding="async" />
+            </div>
+            <div class="why-usap-body">
+                <p>From individual antenna products to integrated system requirements, USAP provides engineering support to help evaluate applications, select appropriate equipment, and plan system implementation.</p>
+                <ul class="why-usap-list">
+                    <li>Broad HF, VHF and UHF product range</li>
+                    <li>Fixed, transportable and specialized antenna systems</li>
+                    <li>Rotator, control and tower-system options</li>
+                    <li>System-design and installation capabilities</li>
+                </ul>
+                <div class="why-usap-action">
+                    <a href="/contact-us" class="btn btn-primary">Request Information</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: Communication Applications -->
+<section class="home-section home-applications" aria-labelledby="applications-heading">
+    <div class="container home-section-container--wide">
+        <div class="home-section-header home-section-header--center home-section-header--compact">
+            <span class="eyebrow">COMMUNICATION APPLICATIONS</span>
+            <h2 id="applications-heading">Antenna Systems for Diverse Operational Requirements</h2>
+            <p>USAP provides antenna products and related system equipment for commercial, industrial, government, and military applications, with engineering support available for product and system requirements.</p>
+        </div>
+
+        <div class="applications-grid">
+            <article class="home-card application-card">
+                <div class="application-media">
+                    <img src="~/images/homepage/applications/usap-home-application-commercial-industrial.png" alt="" width="600" height="250" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content application-content">
+                    <h3>Commercial &amp; Industrial Communications</h3>
+                    <p>HF, VHF, and UHF antenna options for fixed and specialized commercial or industrial communication requirements.</p>
+                    <div class="home-card-action application-action">
+                        <a href="/products" class="home-card-link">Explore Products</a>
+                    </div>
+                </div>
+            </article>
+            <article class="home-card application-card">
+                <div class="application-media">
+                    <img src="~/images/homepage/applications/usap-home-application-government.png" alt="" width="600" height="250" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content application-content">
+                    <h3>Government &amp; Military Applications</h3>
+                    <p>Fixed, transportable, and tactical antenna options for a range of government and military communication requirements.</p>
+                    <div class="home-card-action application-action">
+                        <a href="/products" class="home-card-link">Explore Products</a>
+                    </div>
+                </div>
+            </article>
+            <article class="home-card application-card">
+                <div class="application-media">
+                    <img src="~/images/homepage/applications/usap-home-application-engineering-support.png" alt="" width="600" height="250" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content application-content">
+                    <h3>Engineering &amp; System Support</h3>
+                    <p>Support for evaluating requirements, selecting equipment, and planning antenna, rotator, control, and tower-system configurations.</p>
+                    <div class="home-card-action application-action">
+                        <a href="/contact-us" class="home-card-link">Request Information</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="section-actions center">
+            <a href="/contact-us" class="btn btn-primary">Discuss Your Requirements</a>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5: Featured Product Families -->
+<section class="home-section home-featured-products" aria-labelledby="featured-products-heading">
+    <div class="container">
+        <div class="home-section-header home-section-header--center">
+            <span class="eyebrow">USAP PRODUCTS & SYSTEMS</span>
+            <h2 id="featured-products-heading">Featured Product Families</h2>
+        </div>
+
+        <div class="products-grid">
+            <article class="home-card product-card">
+                <div class="product-media">
+                    <img src="~/images/homepage/products/usap-home-featured-product-lp-1017.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content product-content">
+                    <h3>HF Log Periodic Antennas</h3>
+                    <p>Commercial and high-power HF log periodic antenna models for fixed and rotating system requirements.</p>
+                    <div class="home-card-action product-action">
+                        <a href="/products" class="home-card-link">View Family</a>
+                    </div>
+                </div>
+            </article>
+            <article class="home-card product-card">
+                <div class="product-media">
+                    <img src="~/images/homepage/products/usap-home-featured-product-transportable-hf.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content product-content">
+                    <h3>Transportable HF Antennas</h3>
+                    <p>Transportable HF log periodic and broadband dipole systems for temporary, semi-permanent, or field deployment.</p>
+                    <div class="home-card-action product-action">
+                        <a href="/products" class="home-card-link">View Family</a>
+                    </div>
+                </div>
+            </article>
+            <article class="home-card product-card">
+                <div class="product-media">
+                    <img src="~/images/homepage/products/usap-home-featured-product-rotator-controls.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content product-content">
+                    <h3>Rotator &amp; Control Systems</h3>
+                    <p>Rotator systems and digital control equipment for positioning and operating compatible antenna installations.</p>
+                    <div class="home-card-action product-action">
+                        <a href="/products" class="home-card-link">View Family</a>
+                    </div>
+                </div>
+            </article>
+            <article class="home-card product-card">
+                <div class="product-media">
+                    <img src="~/images/homepage/products/usap-home-featured-product-v-4213.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
+                </div>
+                <div class="home-card-content product-content">
+                    <h3>VHF/UHF Antenna Systems</h3>
+                    <p>Log periodic and portable discone antenna systems for VHF and UHF applications in fixed or transportable configurations.</p>
+                    <div class="home-card-action product-action">
+                        <a href="/products" class="home-card-link">View Family</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div class="section-actions center">
+            <a href="/products" class="btn btn-primary">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- Section 6: Customer Testimonial Carousel -->
+<section class="home-section home-testimonials" aria-labelledby="testimonials-heading">
+    <div class="container testimonials-container">
+        <div class="home-section-header home-section-header--center home-section-header--inverse testimonials-header">
+            <span class="eyebrow">CUSTOMER FEEDBACK</span>
+            <h2 id="testimonials-heading">What Our Customers Say</h2>
+        </div>
+        <div class="testimonials-content">
+            <div id="testimonial-carousel" class="testimonial-carousel" aria-live="polite">
+                <!-- MOCK TESTIMONIALS - DESIGN REVIEW ONLY. Must be replaced or removed before production. -->
+                <!-- Slide 1 -->
+                <div class="testimonial-slide active" role="group" aria-roledescription="slide" aria-label="1 of 3" aria-hidden="false">
+                    <blockquote class="testimonial-quote">&ldquo;USAP&rsquo;s engineering support helped us evaluate the available antenna and control options and identify a system configuration that fit our operational requirements.&rdquo;</blockquote>
+                    <div class="testimonial-attribution">
+                        <div class="testimonial-client">Mock Client</div>
+                        <div class="testimonial-context">Commercial Communications Integrator</div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="testimonial-slide" role="group" aria-roledescription="slide" aria-label="2 of 3" aria-hidden="true">
+                    <blockquote class="testimonial-quote">&ldquo;The product information and technical guidance made it easier to plan a transportable antenna system around our equipment, deployment needs, and installation constraints.&rdquo;</blockquote>
+                    <div class="testimonial-attribution">
+                        <div class="testimonial-client">Mock Client</div>
+                        <div class="testimonial-context">Field Communications Program</div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="testimonial-slide" role="group" aria-roledescription="slide" aria-label="3 of 3" aria-hidden="true">
+                    <blockquote class="testimonial-quote">&ldquo;From antenna selection through rotator and control integration, the process was clear, responsive, and focused on delivering a practical system solution.&rdquo;</blockquote>
+                    <div class="testimonial-attribution">
+                        <div class="testimonial-client">Mock Client</div>
+                        <div class="testimonial-context">RF Systems Engineering Team</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonials-controls" aria-label="Testimonial controls">
+                <button type="button" class="btn-icon carousel-prev" aria-label="Previous testimonial" aria-controls="testimonial-carousel">
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div class="carousel-indicators" role="tablist" aria-label="Choose a testimonial">
+                    <button type="button" role="tab" aria-selected="true" aria-label="Slide 1" aria-controls="testimonial-carousel" class="indicator active"></button>
+                    <button type="button" role="tab" aria-selected="false" aria-label="Slide 2" aria-controls="testimonial-carousel" class="indicator"></button>
+                    <button type="button" role="tab" aria-selected="false" aria-label="Slide 3" aria-controls="testimonial-carousel" class="indicator"></button>
+                </div>
+                <button type="button" class="btn-icon carousel-next" aria-label="Next testimonial" aria-controls="testimonial-carousel">
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 7: Technical Resources Preview -->
+<section class="home-section home-resources" aria-labelledby="resources-heading">
+    <div class="container home-section-container--wide resources-container">
+
+        <div class="home-section-header home-section-header--center home-section-header--compact resources-header">
+            <span class="eyebrow">TECHNICAL RESOURCES</span>
+            <h2 id="resources-heading">Product Information for Evaluation and Planning</h2>
+            <p class="home-section-support resources-support">Access available product datasheets and approved technical information for USAP antenna systems, rotators, controls, and related equipment.</p>
+        </div>
+
+        <div class="resources-image">
+            <img src="~/images/homepage/resources/usap-home-resources-document-mockup.png" alt="" width="1536" height="1024" loading="lazy" decoding="async" />
+        </div>
+
+        <div class="resources-grid">
+            <a href="/technical-resources" class="home-card resource-card">
+                <div class="resource-icon">
+                    <img src="~/images/homepage/technical-resources/usap-home-icon-product-datasheets.svg" alt="" width="48" height="48" loading="lazy" decoding="async" />
+                </div>
+                <div class="resource-content">
+                    <h3>Product Datasheets</h3>
+                    <p>Model-specific descriptions, specifications, features, and available product information.</p>
+                </div>
+            </a>
+
+            <a href="/technical-resources" class="home-card resource-card">
+                <div class="resource-icon">
+                    <img src="~/images/homepage/technical-resources/usap-home-icon-antenna-systems.svg" alt="" width="48" height="48" loading="lazy" decoding="async" />
+                </div>
+                <div class="resource-content">
+                    <h3>Antenna Systems</h3>
+                    <p>Technical information for HF, VHF, UHF, transportable, NVIS, and receive-loop products.</p>
+                </div>
+            </a>
+
+            <a href="/technical-resources" class="home-card resource-card">
+                <div class="resource-icon">
+                    <img src="~/images/homepage/technical-resources/usap-home-icon-rotators-controls.svg" alt="" width="48" height="48" loading="lazy" decoding="async" />
+                </div>
+                <div class="resource-content">
+                    <h3>Rotators &amp; Controls</h3>
+                    <p>Product information for compatible rotators and digital control equipment.</p>
+                </div>
+            </a>
+
+            <a href="/technical-resources" class="home-card resource-card">
+                <div class="resource-icon">
+                    <img src="~/images/homepage/technical-resources/usap-home-icon-tower-systems-accessories.svg" alt="" width="48" height="48" loading="lazy" decoding="async" />
+                </div>
+                <div class="resource-content">
+                    <h3>Tower Systems &amp; Accessories</h3>
+                    <p>Available system details and supporting product documentation.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="resources-action">
+            <a href="/technical-resources" class="btn btn-primary">Browse Technical Resources</a>
+        </div>
+
+    </div>
+</section>
+
+<!-- Section 8: Closing Inquiry CTA -->
+<section class="home-section home-closing-cta" aria-labelledby="closing-cta-heading">
+    <div class="container">
+        <div class="closing-cta-content">
+            <h2 id="closing-cta-heading">Ready to Discuss Your Antenna Requirements?</h2>
+            <p>Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.</p>
+            <div class="closing-cta-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Request Information</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/homepage.js" asp-append-version="true" defer></script>
+}

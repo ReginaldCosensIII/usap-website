@@ -804,8 +804,8 @@ select.form-control {
 
 /* --- Site header wrapper --- */
 .site-header {
-  background-color: var(--color-brand-navy);
-  border-bottom: var(--border-width) solid var(--color-border-dark);
+  background-color: var(--color-neutral-100);
+  border-bottom: var(--border-width) solid var(--color-border-subtle);
   position: relative;
   z-index: var(--z-sticky);
 }
@@ -816,7 +816,7 @@ select.form-control {
   justify-content: space-between;
   gap: var(--space-6);
   min-height: var(--header-height);
-  padding-block: var(--space-3);
+  padding-block: var(--space-2);
 }
 
 /* --- Brand region --- */
@@ -827,33 +827,16 @@ select.form-control {
   text-decoration: none;
 }
 
-/* Provisional text-only brand treatment.
-   Structurally ready for a logo image without requiring header reconstruction:
-   simply replace the inner markup with an <img> when the production logo is delivered. */
-.site-brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: var(--leading-tight);
-}
-
-.site-brand-name {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-extrabold);
-  color: var(--color-text-inverse);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.site-brand-sub {
-  font-size: var(--text-xs);
-  font-weight: var(--weight-regular);
-  color: var(--color-neutral-80);
-  letter-spacing: 0.05em;
+.site-brand-logo {
+  width: clamp(6.75rem, 15vw, 7.75rem);
+  height: auto;
+  border-radius: var(--border-radius-sm);
+  display: block;
 }
 
 .site-brand:focus-visible {
-  outline: var(--focus-ring-dark);
-  outline-offset: var(--focus-ring-offset-dark);
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
   border-radius: var(--border-radius-sm);
 }
 
@@ -949,7 +932,7 @@ select.form-control {
   border: var(--border-width-2) solid var(--color-neutral-60);
   border-radius: var(--border-radius-sm);
   cursor: pointer;
-  color: var(--color-text-inverse);
+  color: var(--color-brand-navy);
   flex-shrink: 0;
   padding: 0;
   transition:
@@ -958,13 +941,13 @@ select.form-control {
 }
 
 .nav-toggle:hover {
-  border-color: var(--color-text-inverse);
-  background-color: rgb(255 255 255 / 0.08);
+  border-color: var(--color-brand-navy);
+  background-color: var(--color-neutral-95);
 }
 
 .nav-toggle:focus-visible {
-  outline: var(--focus-ring-dark);
-  outline-offset: var(--focus-ring-offset-dark);
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* When JS is active, reveal the toggle on mobile */
@@ -1022,15 +1005,23 @@ select.form-control {
 .footer-brand {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
 }
 
-.footer-brand-name {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-extrabold);
+.footer-brand-line {
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  font-weight: var(--weight-bold);
   color: var(--color-text-inverse);
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.footer-brand-line--accent {
+  color: var(--color-brand-red);
+}
+
+.footer-brand-line--final {
+  font-size: clamp(0.875rem, 1.1vw, 1.125rem);
 }
 
 /* Footer link columns */
@@ -1193,26 +1184,6 @@ hr {
     display: none !important; /* hidden at desktop regardless of JS */
   }
 
-  /* Desktop header: white surface, navy text */
-  .site-header {
-    background-color: var(--color-neutral-100);
-    border-bottom: var(--border-width) solid var(--color-border-subtle);
-  }
-
-  .site-brand-name {
-    color: var(--color-brand-navy);
-  }
-
-  .site-brand-sub {
-    color: var(--color-neutral-40);
-  }
-
-  /* Brand link focus on white surface */
-  .site-brand:focus-visible {
-    outline: var(--focus-ring);
-    outline-offset: var(--focus-ring-offset);
-  }
-
   /* Nav links on white surface */
   .primary-nav-link {
     color: var(--color-neutral-40);
@@ -1271,7 +1242,9 @@ hr {
 
   /* Mobile nav panel */
   .primary-nav {
-    width: 100%;
+    flex: 0 0 100vw;
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
     order: 3; /* push below brand + toggle row */
   }
 
@@ -1335,17 +1308,18 @@ hr {
   .site-header-inner {
     width: 100%;
     flex-wrap: wrap;
+    row-gap: 0;
+    padding-bottom: 0;
+  }
+
+  .site-brand {
+    margin-bottom: var(--space-2);
   }
 
   .nav-toggle {
     flex: 0 0 auto;
     margin-inline-start: auto;
-  }
-
-  .primary-nav {
-    flex: 0 0 100%;
-    width: 100%;
-    order: 3;
+    margin-bottom: var(--space-2);
   }
 }
 

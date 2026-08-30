@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Installation guide</title>
+  <path d="M12 7h25l11 11v39H12Z" fill="none" stroke="#0D1B2E" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M37 7v12h11" fill="none" stroke="#0D1B2E" stroke-width="2.5"/>
+  <path d="M20 46l9-9M26 31a7 7 0 0 0 9 9l8 8l5-5l-8-8a7 7 0 0 0-9-9l4 5l-4 4Z" fill="none" stroke="#0057B8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="20" cy="46" r="3" fill="#C8102E"/>
+</svg>

@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] — United States Antenna Products</title>
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     @* Skip link — must be the first focusable element in the document. *@

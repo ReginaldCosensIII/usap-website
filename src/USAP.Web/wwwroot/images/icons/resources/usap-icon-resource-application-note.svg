@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="title">
+  <title id="title">Application note</title>
+  <path d="M12 7h25l11 11v39H12Z" fill="none" stroke="#0D1B2E" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M37 7v12h11" fill="none" stroke="#0D1B2E" stroke-width="2.5"/>
+  <path d="M20 45V31M20 37h16M22 34l14 3l-14 3M27 29v16M32 31v12M36 34v6" fill="none" stroke="#0057B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M40 30a7 7 0 0 1 7 7M40 25a12 12 0 0 1 12 12" fill="none" stroke="#C8102E" stroke-width="1.8" stroke-linecap="round"/>
+</svg>
