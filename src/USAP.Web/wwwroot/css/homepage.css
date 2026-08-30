@@ -177,7 +177,8 @@
 @media (min-width: 1024px) {
     .home-hero {
         --hero-split: 48%;
-        --hero-slant-offset: 5vw;
+        --hero-diagonal-width: clamp(4rem, 10vw, 8rem);
+        --hero-slant-offset: calc(var(--hero-diagonal-width) / 2);
         --hero-divider-width: clamp(7px, 0.5vw, 10px);
         --hero-divider-gap: 8px;
         --hero-dotted-width: 3px;
@@ -205,17 +206,26 @@
 
     .home-hero-media {
         position: absolute;
-        inset: 0;
-        width: 100%;
+        left: calc(var(--hero-split) - var(--hero-slant-offset));
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: auto;
         height: 100%;
         z-index: 1;
-        /* Media begins at the diagonal edge */
+        /* Media begins at the local diagonal edge */
         clip-path: polygon(
-            calc(var(--hero-split) + var(--hero-slant-offset)) 0,
+            var(--hero-diagonal-width) 0,
             100% 0,
             100% 100%,
-            calc(var(--hero-split) - var(--hero-slant-offset)) 100%
+            0 100%
         );
+    }
+
+    .home-hero-poster,
+    .home-hero-video {
+        object-fit: cover;
+        object-position: center center;
     }
 
     .home-hero-content {
