@@ -1,7 +1,14 @@
 @page
 @model ErrorModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Error",
+        Description = "The requested page could not be completed.",
+        CanonicalPath = "/Error",
+        Robots = "noindex, nofollow",
+        OpenGraphType = "website"
+    };
 }
 
 @* Provisional error page — custom error handling deferred to Core Site Build task. *@

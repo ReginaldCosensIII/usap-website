@@ -1,7 +1,14 @@
 @page "/thank-you"
 @model USAP.Web.Pages.ThankYouModel
 @{
-    ViewData["Title"] = "Thank You";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Thank You",
+        Description = "Your request has been received by United States Antenna Products.",
+        CanonicalPath = "/thank-you",
+        Robots = "noindex, nofollow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">

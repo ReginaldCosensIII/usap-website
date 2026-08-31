@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — United States Antenna Products</title>
+    @await Html.PartialAsync("_Seo")
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+    @await RenderSectionAsync("StructuredData", required: false)
 </head>
 <body>
     @* Skip link — must be the first focusable element in the document. *@

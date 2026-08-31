@@ -1,7 +1,14 @@
 @page
 @model USAP.Web.Pages.Products.IndexModel
 @{
-    ViewData["Title"] = "Products";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Antenna Products & Systems",
+        Description = "Explore HF, VHF, and UHF antenna systems, rotator and control equipment, and related product families from United States Antenna Products.",
+        CanonicalPath = "/products",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">

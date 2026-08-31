@@ -24,16 +24,16 @@ Wireframes are structural and responsive references. The high-fidelity design co
 
 | # | Section | Status |
 |---|---|---|
-| 1 | Header / primary navigation | 🟡 Structural shell; production logo, branding, mobile menu pending |
-| 2 | Hero | ❌ Headline, subheadline, CTA, imagery pending |
-| 3 | Trust / authority strip | ❌ Certifications, affiliations, or trust indicators pending (verified facts only) |
-| 4 | Why United States Antenna Products | ❌ Value proposition and differentiators pending |
-| 5 | Communication applications / industries served | ❌ Application areas pending verified client content |
-| 6 | Featured product families | ❌ Family names, descriptions, imagery pending (up to six approved families) |
-| 7 | Client feedback / testimonials | ❌ Testimonials with attribution and publication permission pending |
-| 8 | Technical Resources preview | ❌ Resource titles and descriptions pending |
-| 9 | Request Information / Request Quote CTA | ❌ Copy and CTA text pending |
-| 10 | Footer | 🟡 Company name placeholder; contact, social, legal links pending |
+| 1 | Header / primary navigation | 🟡 Implemented with provisional/current brand assets. Final production logo and brand approval remain pending. |
+| 2 | Hero | 🟡 Implemented with provisional copy, video/poster media, and CTA content. Final client review and approval remain pending. |
+| 3 | Trust / authority strip | 🟡 Implemented provisionally. Claims and capability statements still require final verification or approval. |
+| 4 | Why United States Antenna Products | 🟡 Implemented with provisional/current-public-source content and assets. Final approval remains pending. |
+| 5 | Communication applications / industries served | 🟡 Implemented provisionally. Final application language and approval remain pending. |
+| 6 | Featured product families | 🟡 Implemented provisionally. Final approved family structure, product data, and imagery remain pending. |
+| 7 | Client feedback / testimonials | 🟡 Structural/provisional placeholder only. Approved testimonials, attribution, and publication permission remain pending. |
+| 8 | Technical Resources preview | 🟡 Implemented provisionally. Final approved resource titles, descriptions, files, and organization remain pending. |
+| 9 | Request Information / Request Quote CTA | 🟡 Implemented provisionally. Final copy approval remains pending. |
+| 10 | Footer | 🟡 Implemented provisionally. Final brand assets and approved contact, social, and legal presentation remain pending. |
 
 ---
 
@@ -41,14 +41,14 @@ Wireframes are structural and responsive references. The high-fidelity design co
 
 | Page | Route | Status |
 |---|---|---|
-| Home | `/` | 🟡 Stub |
+| Home | `/` | 🟡 Provisional implementation. Final client copy, imagery, branding, and approval remain pending. |
 | Products listing | `/products` | 🟡 Stub — up to six approved families pending |
 | Product family detail | `/products/{familySlug}` | ❌ All product data pending |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
 | About Us | `/about-us` | ❌ Company copy pending |
-| Contact Us | `/contact-us` | ❌ Form, contact details pending |
-| Request a Quote | `/request-a-quote` | ❌ Form, recipients pending |
-| Thank You | `/thank-you` | 🟡 Provisional stub — form behavior undefined |
+| Contact Us | `/contact-us` | 🟡 Provisional inquiry form exists. Public contact presentation and production delivery/recipient configuration remain pending. |
+| Request a Quote | `/request-a-quote` | 🟡 Provisional inquiry form exists. Production delivery/recipient configuration and final copy remain pending. |
+| Thank You | `/thank-you` | 🟡 Provisional confirmation page exists. Final production submission/redirect behavior and copy remain pending. |
 | Privacy Policy | Not created | ❌ Legal text required from client |
 | Terms of Use | Not created | ❌ Legal text required from client (if applicable) |
 
@@ -60,8 +60,9 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Navigation labels | ✅ | Home, Products, Technical Resources, About Us, Contact Us, Request a Quote |
 | Production logo | ❌ | SVG or high-resolution PNG required |
 | Favicon | ✅ Approved | `favicon.ico`, 20,222 bytes. Source: current public USAP website. Copied into the repository by the human project lead. Reuse authorized by the human project lead. Approved for this implementation. **Not** an original production logo or primary brand-source file. Wired in `_Layout.cshtml` via `<link rel="icon" type="image/x-icon" href="~/favicon.ico" />`. |
-| Footer contact details | ❌ | Address, phone, email pending |
-| Social links | ❌ | URLs and display permission pending |
+| Social preview image | 🟡 Placeholder | **PROVISIONAL — REPLACE BEFORE LAUNCH**. The current homepage hero poster (`/images/homepage/hero/usap-home-hero-poster-lp-1112mr.png`, 1,939,324 bytes, 1915x821) is temporarily reused as the sitewide social-preview image. A dedicated branded 1200x630 social-preview image is required before production launch. Page-specific social images are optional later enhancements. |
+| Footer contact details | 🟡 Placeholder | **CURRENT PUBLIC SOURCE — REUSE PENDING CLIENT REVISION**. Phone: `240-341-7120`. Fax: `240-371-4980`. Address: `5263 Agro Drive, Frederick, MD 21703`. Official website: `https://www.usantennaproducts.com/`. Public email remains missing. Reconfirm before production launch. |
+| Social links | 🟡 Placeholder | **CURRENT PUBLIC SOURCE — REUSE PENDING CLIENT REVISION**. Facebook: `https://www.facebook.com/usantennaproducts/`. LinkedIn: `https://www.linkedin.com/company/united-states-antenna-products-l-l-c-/`. Reviewed 2026-08-31. Intended for future `Organization.sameAs`. No X/Twitter profile is currently approved. Reconfirm before production launch. |
 | Copyright phrasing | 🟡 | Phrasing not yet approved |
 
 ---
@@ -119,5 +120,12 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 ## Rules
 
 - No engineering specifications, performance claims, military/government relationships, or customer references may be added without written client approval.
-- Contact details and form recipients are stored in secrets management, never in source code or documentation.
+- Publicly displayed business contact information may be stored in source and project documentation when sourced from USAP’s official public website or supplied by CES/USAP.
+- Public contact information must be reconfirmed before production launch.
+- Private form-recipient addresses, SMTP credentials, API keys, and other operational secrets must never be committed to source or documentation.
+- Private operational values must use approved secrets management or environment configuration.
 - Legal text must come from the client; CES does not draft or supply legal content.
+- Information from the current official USAP website may be reused during the rebuild.
+- Current public information remains authoritative for working implementation unless CES or USAP provides a correction.
+- Critical contact, legal, domain, and launch information must still be reconfirmed before production deployment.
+- Provisional metadata and assets must be replaced or formally accepted before launch.

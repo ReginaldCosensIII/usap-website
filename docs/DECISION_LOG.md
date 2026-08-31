@@ -169,3 +169,19 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Mobile active-route indicator uses `--color-accent-dark-surface: #ff4d5f` (approximately 5.34:1 on navy) for a left border that independently meets 3:1 contrast.
 - All visual token values and the navigation JS contract are documented in `docs/DESIGN_SYSTEM.md`. Replacing provisional values or extending the system in subsequent milestones does not require HTML restructuring.
 **Classification:** Fixed scope — Planning & Foundation / Design System and Responsive Foundation.
+
+---
+
+## DEC-018 — Reusable Head and Metadata Foundation
+
+**Date:** 2026-08-31
+**Decision:**
+- Canonical production origin confirmed as `https://www.usantennaproducts.com`.
+- Canonical URLs must use the configured production origin rather than incoming Host headers.
+- Option B selected: strongly typed `SeoMetadata` passed through ViewData and rendered by a shared partial (`_Seo.cshtml`).
+- The current hero poster is accepted only as a provisional default social image.
+- A final branded 1200x630 social image remains required.
+- Twitter/X handles are omitted until approved.
+- Advanced structured data remains deferred.
+- **C16A Addendum:** Placeholder product-family routes are `noindex, follow`. They must remain unindexed until catalog data and slug validation (returning true 404s for invalid slugs) are implemented.
+**Reason:** C16 Foundation implementation and C16A Corrective Review.

@@ -1,7 +1,14 @@
 @page "/technical-resources"
 @model USAP.Web.Pages.TechnicalResourcesModel
 @{
-    ViewData["Title"] = "Technical Resources";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Technical Resources",
+        Description = "Access available product datasheets and technical information for USAP antenna systems, rotators, controls, and related equipment.",
+        CanonicalPath = "/technical-resources",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">

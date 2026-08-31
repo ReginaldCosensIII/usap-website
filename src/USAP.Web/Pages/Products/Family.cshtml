@@ -1,7 +1,14 @@
 @page "/products/{familySlug}"
 @model USAP.Web.Pages.Products.FamilyModel
 @{
-    ViewData["Title"] = $"Product Family — {Model.FamilySlug}";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Antenna Product Family",
+        Description = "Review antenna system information and product-family details from United States Antenna Products.",
+        CanonicalPath = Request.Path.Value,
+        Robots = "noindex, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">
