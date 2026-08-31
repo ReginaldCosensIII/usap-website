@@ -2,17 +2,17 @@
 
 ## Route map
 
-| Route | Page | Status | Notes |
-|---|---|---|---|
-| `/` | `Pages/Index.cshtml` | Stub | Pending client copy, design, imagery |
-| `/products` | `Pages/Products/Index.cshtml` | Stub | Up to six approved product families — pending client data |
-| `/products/{familySlug}` | `Pages/Products/Family.cshtml` | Stub | Pending product data per family |
-| `/technical-resources` | `Pages/TechnicalResources.cshtml` | Stub | Pending approved documents and organization |
-| `/about-us` | `Pages/AboutUs.cshtml` | Stub | Pending client copy and imagery |
-| `/contact-us` | `Pages/ContactUs.cshtml` | Stub — no form | Deferred to Forms & Search |
-| `/request-a-quote` | `Pages/RequestAQuote.cshtml` | Stub — no form | Deferred to Forms & Search |
-| `/thank-you` | `Pages/ThankYou.cshtml` | Provisional stub | Form behavior, redirect logic, and copy require approval |
-| `/Error` | `Pages/Error.cshtml` | Minimal stub | Custom error/404 deferred to Core Site Build |
+| Route | Page | Status | Notes | Metadata & Indexing |
+|---|---|---|---|---|
+| `/` | `Pages/Index.cshtml` | Provisional | Pending client copy, design, imagery | `HF, VHF & UHF Antenna Systems` (index, follow) |
+| `/products` | `Pages/Products/Index.cshtml` | Stub | Up to six approved product families — pending client data | `Antenna Products & Systems` (index, follow) |
+| `/products/{familySlug}` | `Pages/Products/Family.cshtml` | Stub | Pending product data per family | **PROVISIONAL**: `Antenna Product Family` (noindex, follow). Must be replaced when catalog content is implemented. Valid slugs will become indexable later. |
+| `/technical-resources` | `Pages/TechnicalResources.cshtml` | Stub | Pending approved documents and organization | `Technical Resources` (index, follow) |
+| `/about-us` | `Pages/AboutUs.cshtml` | Stub | Pending client copy and imagery | `About Us` (index, follow) |
+| `/contact-us` | `Pages/ContactUs.cshtml` | Provisional | Pending client copy and imagery | `Contact Us` (index, follow) |
+| `/request-a-quote` | `Pages/RequestAQuote.cshtml` | Provisional | Pending client copy and imagery | `Request a Quote` (index, follow) |
+| `/thank-you` | `Pages/ThankYou.cshtml` | Provisional stub | Form behavior, redirect logic, and copy require approval | `Thank You` (noindex, nofollow) |
+| `/Error` | `Pages/Error.cshtml` | Minimal stub | Custom error/404 deferred to Core Site Build | `Error` (noindex, nofollow) |
 
 ## Technical Resources scope
 

@@ -1,7 +1,14 @@
 @page "/about-us"
 @model USAP.Web.Pages.AboutUsModel
 @{
-    ViewData["Title"] = "About Us";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "About Us",
+        Description = "Learn about United States Antenna Products, its antenna systems, engineering support, and manufacturing and testing capabilities.",
+        CanonicalPath = "/about-us",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">

@@ -105,6 +105,15 @@ Mobile navigation uses a CSS disclosure pattern:
 - No focus trap, no body-scroll lock, no external library.
 - See `docs/DESIGN_SYSTEM.md` — Mobile navigation interaction contract.
 
+## Metadata and SEO Architecture
+
+- **SiteSettings**: Strongly typed global settings bound to `appsettings.json` (e.g., BaseUrl, DefaultTitle).
+- **SeoMetadata**: Strongly typed per-page metadata model passed via `ViewData[SeoMetadata.ViewDataKey]`.
+- **Shared Partial (`_Seo.cshtml`)**: Extracts settings and metadata to safely render canonical URLs, Open Graph, Twitter/X cards, theme color, and title. Safe encoding is handled by Razor.
+- **Canonical generation strategy**: Canonical URLs combine the configured `SiteSettings.BaseUrl` and `SeoMetadata.CanonicalPath` (or current request path), ignoring query strings and `Host` headers.
+- **Non-production indexing protection**: An environment-aware middleware in `Program.cs` adds `X-Robots-Tag: noindex, nofollow` to all non-production responses.
+- **Structured Data**: A `@RenderSectionAsync("StructuredData", required: false)` exists in `_Layout.cshtml` `<head>` for future page-specific structured data extensions.
+
 ## Deferred decisions
 
 | Decision | Deferred to |

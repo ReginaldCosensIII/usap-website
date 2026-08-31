@@ -1,7 +1,14 @@
 @page "/request-a-quote"
 @model USAP.Web.Pages.RequestAQuoteModel
 @{
-    ViewData["Title"] = "Request a Quote";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Request a Quote",
+        Description = "Request information or a quote for antenna systems, rotators, controls, and engineering support from United States Antenna Products.",
+        CanonicalPath = "/request-a-quote",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">

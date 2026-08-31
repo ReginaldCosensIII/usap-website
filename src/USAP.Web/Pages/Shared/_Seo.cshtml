@@ -1,0 +1,89 @@
+@using Microsoft.Extensions.Options
+@using USAP.Web.Models
+@inject IOptions<SiteSettings> SiteSettingsOptions
+@{
+    var settings = SiteSettingsOptions.Value;
+    var seo = ViewData[SeoMetadata.ViewDataKey] as SeoMetadata;
+
+    var pageTitle = seo?.Title ?? settings.DefaultTitle;
+    var siteName = settings.SiteName;
+    var separator = settings.TitleSeparator;
+
+    string fullTitle;
+    if (string.IsNullOrWhiteSpace(pageTitle))
+    {
+        fullTitle = siteName;
+    }
+    else if (pageTitle.Contains(siteName, StringComparison.OrdinalIgnoreCase))
+    {
+        fullTitle = pageTitle;
+    }
+    else
+    {
+        fullTitle = $"{pageTitle} {separator} {siteName}";
+    }
+
+    var description = seo?.Description ?? settings.DefaultDescription;
+    var robots = seo?.Robots ?? "index, follow";
+
+    // Canonical path logic
+    var rawPath = seo?.CanonicalPath ?? Context.Request.Path.Value ?? "/";
+
+    // Remove query string and fragment if any
+    var queryIndex = rawPath.IndexOf('?');
+    if (queryIndex >= 0) rawPath = rawPath.Substring(0, queryIndex);
+    var hashIndex = rawPath.IndexOf('#');
+    if (hashIndex >= 0) rawPath = rawPath.Substring(0, hashIndex);
+
+    // Treat as local root-relative path and prevent protocol-relative '//'
+    var path = rawPath.TrimStart('/');
+    path = "/" + path;
+
+    // Remove trailing slash for consistency (unless it's exactly "/")
+    if (path.Length > 1 && path.EndsWith("/"))
+    {
+        path = path.TrimEnd('/');
+    }
+
+    var canonicalUrl = $"{settings.BaseUrl}{path}";
+
+    // Open Graph
+    var ogType = seo?.OpenGraphType ?? "website";
+
+    // Social Image
+    var socialImagePath = seo?.SocialImagePath ?? settings.DefaultSocialImagePath;
+
+    // Normalize path to prevent '//' and ensure root relative
+    var normalizedSocialImagePath = "/" + socialImagePath.TrimStart('/');
+    var normalizedDefaultSocialImagePath = "/" + settings.DefaultSocialImagePath.TrimStart('/');
+
+    var socialImageUrl = $"{settings.BaseUrl}{normalizedSocialImagePath}";
+    var socialImageAlt = seo?.SocialImageAlt ?? settings.DefaultSocialImageAlt;
+}
+
+<title>@fullTitle</title>
+<meta name="description" content="@description" />
+<meta name="robots" content="@robots" />
+<link rel="canonical" href="@canonicalUrl" />
+<meta name="theme-color" content="@settings.ThemeColor" />
+
+<meta property="og:title" content="@fullTitle" />
+<meta property="og:description" content="@description" />
+<meta property="og:type" content="@ogType" />
+<meta property="og:url" content="@canonicalUrl" />
+<meta property="og:site_name" content="@settings.SiteName" />
+<meta property="og:locale" content="@settings.Locale" />
+<meta property="og:image" content="@socialImageUrl" />
+<meta property="og:image:alt" content="@socialImageAlt" />
+@if (string.Equals(normalizedSocialImagePath, normalizedDefaultSocialImagePath, StringComparison.OrdinalIgnoreCase))
+{
+    @* Only emit dimensions if it is the verified default image *@
+    <meta property="og:image:width" content="1915" />
+    <meta property="og:image:height" content="821" />
+}
+
+<meta name="twitter:card" content="@settings.TwitterCard" />
+<meta name="twitter:title" content="@fullTitle" />
+<meta name="twitter:description" content="@description" />
+<meta name="twitter:image" content="@socialImageUrl" />
+<meta name="twitter:image:alt" content="@socialImageAlt" />

@@ -1,7 +1,14 @@
 @page
 @model IndexModel
 @{
-    ViewData["Title"] = "Engineered Antenna Systems for Demanding Communications";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "HF, VHF & UHF Antenna Systems",
+        Description = "Explore HF, VHF, and UHF antenna systems, rotators, controls, technical resources, and engineering support from United States Antenna Products.",
+        CanonicalPath = "/",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 @section Styles {

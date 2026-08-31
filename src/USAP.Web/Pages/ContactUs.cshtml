@@ -1,7 +1,14 @@
 @page "/contact-us"
 @model USAP.Web.Pages.ContactUsModel
 @{
-    ViewData["Title"] = "Contact Us";
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Contact Us",
+        Description = "Contact United States Antenna Products with questions about antenna systems, technical resources, or general information.",
+        CanonicalPath = "/contact-us",
+        Robots = "index, follow",
+        OpenGraphType = "website"
+    };
 }
 
 <div class="container section">
