@@ -1231,6 +1231,13 @@ hr {
   }
 }
 
+/* ---------- 3xl: ≥1600px ---------- */
+@media (min-width: 100rem) {
+  :root {
+    --container-content: 85rem;
+  }
+}
+
 /* --- Mobile navigation (max-width: <1024px) — includes tablets --- */
 @media (max-width: 63.9375rem) {
   /* Desktop-only classes collapse naturally at mobile */

@@ -174,7 +174,7 @@
    Desktop Breakpoints (>=1024px)
    ========================================================================== */
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
     .home-hero {
         --hero-split: 48%;
         --hero-diagonal-width: clamp(4rem, 10vw, 8rem);
@@ -235,7 +235,12 @@
         margin-inline: 0;
     }
 
+    .home-hero-content h1 {
+        font-size: clamp(3rem, 3.25vw, 3.25rem);
+    }
+
     .home-hero-content p {
+        font-size: 1.0625rem;
         margin-inline: 0;
         /* Slightly narrower maximum width to ensure readability */
         max-width: 36rem;
@@ -295,7 +300,9 @@
             calc(var(--hero-split) - var(--hero-slant-offset) + var(--hero-divider-width) + var(--hero-divider-gap)) 100%
         );
     }
+}
 
+@media (min-width: 1024px) {
     /* Trust Strip */
     .trust-strip {
         padding-block: var(--space-4);
@@ -331,17 +338,10 @@
     }
 }
 
-/* 1280-1599px: 45% content / 55% media */
-@media (min-width: 1280px) {
-    .home-hero {
-        --hero-split: 45%;
-    }
-}
-
-/* 1600px+: 42% content / 58% media */
+/* 1600px+: hero content layout adjustments */
 @media (min-width: 1600px) {
-    .home-hero {
-        --hero-split: 42%;
+    .home-hero-content-wrapper {
+        padding-left: clamp(6rem, 8vw, 12rem);
     }
 }
 
@@ -585,6 +585,12 @@
 
 .home-section-container--wide {
     max-width: 72rem;
+}
+
+@media (min-width: 1600px) {
+    .home-section-container--wide {
+        max-width: var(--container-content);
+    }
 }
 
 .home-applications {
