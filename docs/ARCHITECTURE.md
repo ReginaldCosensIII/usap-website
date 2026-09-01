@@ -49,7 +49,9 @@ usap-website/
         │   ├── Shared/
         │   │   ├── _Layout.cshtml        root layout (skip link, partials, deferred JS)
         │   │   ├── _Header.cshtml        shared header with brand region and primary nav
-        │   │   └── _Footer.cshtml        shared footer with link columns and copyright
+        │   │   ├── _Footer.cshtml        shared footer with link columns and copyright
+        │   │   ├── _Seo.cshtml
+        │   │   └── _StructuredData.cshtml
         │   ├── Index.cshtml          /
         │   ├── AboutUs.cshtml        /about-us
         │   ├── ContactUs.cshtml      /contact-us
@@ -60,7 +62,9 @@ usap-website/
         ├── Properties/launchSettings.json
         ├── wwwroot/
         │   ├── css/site.css          design system tokens, layout, components
-        │   └── js/site-navigation.js  dependency-free mobile nav module
+        │   ├── js/site-navigation.js  dependency-free mobile nav module
+        │   ├── robots.txt
+        │   └── sitemap.xml
         ├── appsettings.json
         ├── appsettings.Development.json
         └── Program.cs
@@ -112,7 +116,11 @@ Mobile navigation uses a CSS disclosure pattern:
 - **Shared Partial (`_Seo.cshtml`)**: Extracts settings and metadata to safely render canonical URLs, Open Graph, Twitter/X cards, theme color, and title. Safe encoding is handled by Razor.
 - **Canonical generation strategy**: Canonical URLs combine the configured `SiteSettings.BaseUrl` and `SeoMetadata.CanonicalPath` (or current request path), ignoring query strings and `Host` headers.
 - **Non-production indexing protection**: An environment-aware middleware in `Program.cs` adds `X-Robots-Tag: noindex, nofollow` to all non-production responses.
-- **Structured Data**: A `@RenderSectionAsync("StructuredData", required: false)` exists in `_Layout.cshtml` `<head>` for future page-specific structured data extensions.
+- **Sitemap**: Static XML architecture (`wwwroot/sitemap.xml`) selected over dynamic generation. Contains exactly six provisional top-level routes and must be reviewed before production launch.
+- **Robots.txt**: Static architecture (`wwwroot/robots.txt`). Explicitly declares the sitemap. Non-production safety relies on the `X-Robots-Tag` header instead of complex `robots.txt` generation.
+- **Structured Data**: A shared `_StructuredData.cshtml` safely serializes foundational `Organization` and `WebSite` JSON-LD graphs via `System.Text.Json`. It is rendered once in the `<head>` of `_Layout.cshtml`.
+- **Page-level schema hook**: An optional `@await RenderSectionAsync("StructuredData", required: false)` exists in `_Layout.cshtml` `<head>` for future page-specific structured data extensions (e.g., `Product`, `BreadcrumbList`).
+- **Redirects**: Redirect implementation remains deferred. Initial legacy URL rules are documented in `docs/REDIRECT_MAP.md`.
 
 ## Deferred decisions
 
@@ -121,9 +129,9 @@ Mobile navigation uses a CSS disclosure pattern:
 | Static content data format and location | Catalog & Resources |
 | Custom 404/error handling | Core Site Build |
 | SMTP/email service | Forms & Search (Currently simulated in Development with `DevelopmentInquirySubmissionService`; unavailable elsewhere) |
-| Analytics (GA4), sitemap, robots.txt | Forms & Search |
+| Analytics (GA4) | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized |
-| Legacy URL redirect map | When redirect mapping begins |
+| Legacy URL redirect map | The initial redirect map now exists. Redirect implementation remains deferred until the catalog/resource mapping and IIS review are complete. |
 
 ## Forms and Validation
 

@@ -35,6 +35,20 @@ Deferred to Core Site Build. Unrecognized routes currently return a plain ASP.NE
 
 See `docs/CONTENT_AND_ASSETS.md`.
 
+## Search Indexing and Sitemap
+
+A static XML sitemap defines exactly six provisional routes (`/`, `/products`, `/technical-resources`, `/about-us`, `/contact-us`, `/request-a-quote`).
+
+**Excluded routes:**
+* `/products/{familySlug}` (currently `noindex, follow`).
+* `/thank-you` (`noindex, nofollow`).
+* `/Error` (`noindex, nofollow`).
+* Arbitrary placeholder or invalid product-family routes and all PDF/attachment URLs.
+
+**Important:**
+* Invalid product-family slugs (e.g., `/products/this-is-not-real`) currently return HTTP 200 OK because `Family.cshtml.cs` blindly binds the route data. This is a known soft-404 defect that remains until the catalog implementation adds slug validation.
+* The sitemap and structured-data values are provisional and **must be reviewed again before production launch**.
+
 ## Redirect map
 
-`docs/REDIRECT_MAP.md` does not exist yet. It will be created when legacy URL analysis begins.
+See `docs/REDIRECT_MAP.md` for the current legacy URL mapping strategy and rules. Redirect implementation remains deferred.

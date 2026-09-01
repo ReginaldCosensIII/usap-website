@@ -7,6 +7,7 @@
     <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+    @await Html.PartialAsync("_StructuredData")
     @await RenderSectionAsync("StructuredData", required: false)
 </head>
 <body>

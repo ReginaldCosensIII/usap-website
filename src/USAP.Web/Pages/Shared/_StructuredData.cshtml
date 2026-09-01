@@ -1,0 +1,54 @@
+@using System.Text.Json
+@using Microsoft.Extensions.Options
+@using USAP.Web.Models
+@inject IOptions<SiteSettings> SiteSettingsOptions
+@{
+    var settings = SiteSettingsOptions.Value;
+
+    var structuredData = new Dictionary<string, object>
+    {
+        ["@context"] = "https://schema.org",
+        ["@graph"] = new object[]
+        {
+            new Dictionary<string, object>
+            {
+                ["@type"] = "Organization",
+                ["@id"] = $"{settings.BaseUrl}/#organization",
+                ["name"] = settings.OrganizationName,
+                ["url"] = settings.BaseUrl + "/",
+                ["telephone"] = "240-341-7120",
+                ["address"] = new Dictionary<string, object>
+                {
+                    ["@type"] = "PostalAddress",
+                    ["streetAddress"] = "5263 Agro Drive",
+                    ["addressLocality"] = "Frederick",
+                    ["addressRegion"] = "MD",
+                    ["postalCode"] = "21703",
+                    ["addressCountry"] = "US"
+                },
+                ["sameAs"] = new string[]
+                {
+                    "https://www.facebook.com/usantennaproducts/",
+                    "https://www.linkedin.com/company/united-states-antenna-products-l-l-c-/"
+                }
+            },
+            new Dictionary<string, object>
+            {
+                ["@type"] = "WebSite",
+                ["@id"] = $"{settings.BaseUrl}/#website",
+                ["url"] = settings.BaseUrl + "/",
+                ["name"] = settings.SiteName,
+                ["publisher"] = new Dictionary<string, string>
+                {
+                    ["@id"] = $"{settings.BaseUrl}/#organization"
+                },
+                ["inLanguage"] = "en-US"
+            }
+        }
+    };
+
+    var jsonString = JsonSerializer.Serialize(structuredData);
+}
+<script type="application/ld+json">
+    @Html.Raw(jsonString)
+</script>
