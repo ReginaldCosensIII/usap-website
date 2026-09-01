@@ -185,3 +185,18 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Advanced structured data remains deferred.
 - **C16A Addendum:** Placeholder product-family routes are `noindex, follow`. They must remain unindexed until catalog data and slug validation (returning true 404s for invalid slugs) are implemented.
 **Reason:** C16 Foundation implementation and C16A Corrective Review.
+
+---
+
+## DEC-019 - Search Indexing and Structured Data Foundation
+
+**Date:** 2026-08-31
+**Decision:**
+- Static sitemap architecture selected over dynamic generation due to the limited number of current static routes.
+- Static robots.txt selected. Existing non-production header retained.
+- Shared Organization and WebSite JSON-LD added via _StructuredData.cshtml.
+- Logo omitted from structured data pending final production asset.
+- Product/breadcrumb schemas deferred.
+- Redirect map documented (docs/REDIRECT_MAP.md) but redirects not yet implemented.
+- Sitemap and structured-data values require launch reconfirmation.
+**Reason:** USAP-SEO-002-C17 Search Indexing implementation.
