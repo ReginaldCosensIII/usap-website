@@ -3,22 +3,38 @@
 @{
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
-        Title = "Error",
-        Description = "The requested page could not be completed.",
-        CanonicalPath = "/Error",
+        Title = "Something Went Wrong",
+        Description = "An unexpected problem occurred while processing your request.",
         Robots = "noindex, nofollow",
+        OmitCanonical = true,
         OpenGraphType = "website"
     };
 }
 
-@* Provisional error page — custom error handling deferred to Core Site Build task. *@
-<div class="container section">
-    <h1>An error occurred</h1>
+@section Styles {
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+}
 
-    @if (Model.ShowRequestId)
-    {
-        <p><strong>Request ID:</strong> <code>@Model.RequestId</code></p>
-    }
+<div class="error-page-wrapper">
+    <div class="error-container">
+        <div class="error-grid">
+            <div class="error-visual">
+                <div class="error-code" aria-hidden="true">500</div>
+            </div>
+            <div class="error-content">
+                <h1 class="error-heading">Something Went Wrong</h1>
+                <p class="error-description">An unexpected problem occurred while processing your request.</p>
 
-    <p>If this problem persists, please <a asp-page="/ContactUs">contact us</a>.</p>
+                @if (Model.ShowRequestId)
+                {
+                    <div class="error-technical"><strong>Request ID:</strong><code>@Model.RequestId</code></div>
+                }
+
+                <div class="error-actions">
+                    <a asp-page="/Index" class="btn btn-primary">Return to Homepage</a>
+                    <a asp-page="/ContactUs" class="btn btn-outline">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

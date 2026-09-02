@@ -11,4 +11,5 @@ public class SeoMetadata
     public string? OpenGraphType { get; set; }
     public string? SocialImagePath { get; set; }
     public string? SocialImageAlt { get; set; }
+    public bool OmitCanonical { get; set; }
 }

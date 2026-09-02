@@ -200,3 +200,18 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Redirect map documented (docs/REDIRECT_MAP.md) but redirects not yet implemented.
 - Sitemap and structured-data values require launch reconfirmation.
 **Reason:** USAP-SEO-002-C17 Search Indexing implementation.
+
+---
+
+## DEC-020 — Custom 404 and Production Error Handling
+
+**Date:** 2026-09-01
+**Decision:**
+- Dedicated `/not-found` Razor Page created to handle HTTP 404 responses via `app.UseStatusCodePagesWithReExecute("/not-found")`.
+- Existing `/Error` Razor Page retained exclusively for HTTP 500 unexpected server failures via `app.UseExceptionHandler("/Error")`.
+- HTTP status codes are explicitly preserved.
+- Canonical and `og:url` tags are omitted on error responses to prevent indexing issues.
+- `Organization` and `WebSite` JSON-LD intentionally remain sitewide.
+- Product slug validation and legacy redirects remain deferred.
+- The error pages share a transparent light-surface technical overlay composite PNG as a restrained background texture.
+**Reason:** Separates 404 marketing experience from 500 technical support experience, avoiding recursive error loops and making `PageModel` logic simpler.

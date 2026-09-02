@@ -80,6 +80,19 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 
 ---
 
+## Shared Design Assets
+
+| Asset | Path | Dimensions / Size / Hash | Notes |
+|---|---|---|---|
+| Light-surface technical overlay | `src/USAP.Web/wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` | 1983x793, 511351 bytes, SHA256: B85D9E10639BB6138666647E69D1709EE124A581A12187077B95F182FBE116C1 | Approved transparent background composite for restrained use on white and light-gray surfaces. Genuine RGBA transparency. |
+
+**Design Rules for Textures:**
+- Texture must remain decorative, low contrast, nonessential, and strictly subordinate to content.
+- Do not use page-wide graph-paper grids or place target-like rings directly around headings.
+- The approved composite PNG remains available for restrained light-surface use.
+- Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass.
+- Experimental SVG and raster modules were excluded because they had not reached the required visual quality.
+
 ## Outstanding client inputs
 
 **Priority 1 — before Core Site Build:**

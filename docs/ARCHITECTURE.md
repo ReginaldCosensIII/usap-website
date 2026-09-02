@@ -122,12 +122,19 @@ Mobile navigation uses a CSS disclosure pattern:
 - **Page-level schema hook**: An optional `@await RenderSectionAsync("StructuredData", required: false)` exists in `_Layout.cshtml` `<head>` for future page-specific structured data extensions (e.g., `Product`, `BreadcrumbList`).
 - **Redirects**: Redirect implementation remains deferred. Initial legacy URL rules are documented in `docs/REDIRECT_MAP.md`.
 
+## Error Handling Architecture
+
+- **Dedicated 404 Page**: A separate `/not-found` Razor Page handles HTTP 404 (Not Found) responses using `app.UseStatusCodePagesWithReExecute("/not-found")`.
+- **Dedicated 500 Page**: The `/Error` Razor Page is retained exclusively for unexpected server failures using `app.UseExceptionHandler("/Error")`.
+- **Status Preservation**: HTTP status codes are explicitly preserved.
+- **Canonical Omission**: Error pages omit canonical and `og:url` tags to prevent indexing errors.
+- **Deferred Validation**: Product-family soft-404 validation remains deferred.
+
 ## Deferred decisions
 
 | Decision | Deferred to |
 |---|---|
 | Static content data format and location | Catalog & Resources |
-| Custom 404/error handling | Core Site Build |
 | SMTP/email service | Forms & Search (Currently simulated in Development with `DevelopmentInquirySubmissionService`; unavailable elsewhere) |
 | Analytics (GA4) | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized |

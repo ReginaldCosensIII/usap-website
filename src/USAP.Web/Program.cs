@@ -78,7 +78,7 @@ var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    // Custom error handling deferred to Core Site Build task.
+    // Dedicated Razor Page handler for unexpected server failures (HTTP 500).
     app.UseExceptionHandler("/Error");
 
     // HSTS is not applied in Development; IIS/production configuration controls HSTS headers.
@@ -103,6 +103,8 @@ if (!app.Environment.IsProduction())
         await next(context);
     });
 }
+
+app.UseStatusCodePagesWithReExecute("/not-found");
 
 app.UseRouting();
 
