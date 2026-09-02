@@ -12,7 +12,8 @@
 | `/contact-us` | `Pages/ContactUs.cshtml` | Provisional | Pending client copy and imagery | `Contact Us` (index, follow) |
 | `/request-a-quote` | `Pages/RequestAQuote.cshtml` | Provisional | Pending client copy and imagery | `Request a Quote` (index, follow) |
 | `/thank-you` | `Pages/ThankYou.cshtml` | Provisional stub | Form behavior, redirect logic, and copy require approval | `Thank You` (noindex, nofollow) |
-| `/Error` | `Pages/Error.cshtml` | Minimal stub | Custom error/404 deferred to Core Site Build | `Error` (noindex, nofollow) |
+| `/not-found` | `Pages/NotFound.cshtml` | Utility | Custom 404 handler returning HTTP 404 | `Page Not Found` (noindex, nofollow) |
+| `/Error` | `Pages/Error.cshtml` | Utility | Custom 500 handler returning HTTP 500 | `Something Went Wrong` (noindex, nofollow) |
 
 ## Technical Resources scope
 
@@ -25,7 +26,7 @@ Both `/contact-us` and `/request-a-quote` will confirm via `/thank-you` (provisi
 
 ## Custom 404
 
-Deferred to Core Site Build. Unrecognized routes currently return a plain ASP.NET Core error response.
+Implemented using a dedicated `/not-found` Razor Page and `UseStatusCodePagesWithReExecute`. Unrecognized routes correctly return a branded page with HTTP 404.
 
 ## Legal routes
 
@@ -42,6 +43,7 @@ A static XML sitemap defines exactly six provisional routes (`/`, `/products`, `
 **Excluded routes:**
 * `/products/{familySlug}` (currently `noindex, follow`).
 * `/thank-you` (`noindex, nofollow`).
+* `/not-found` (`noindex, nofollow`).
 * `/Error` (`noindex, nofollow`).
 * Arbitrary placeholder or invalid product-family routes and all PDF/attachment URLs.
 

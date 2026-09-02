@@ -64,13 +64,19 @@
 <title>@fullTitle</title>
 <meta name="description" content="@description" />
 <meta name="robots" content="@robots" />
-<link rel="canonical" href="@canonicalUrl" />
+@if (!(seo?.OmitCanonical ?? false))
+{
+    <link rel="canonical" href="@canonicalUrl" />
+}
 <meta name="theme-color" content="@settings.ThemeColor" />
 
 <meta property="og:title" content="@fullTitle" />
 <meta property="og:description" content="@description" />
 <meta property="og:type" content="@ogType" />
-<meta property="og:url" content="@canonicalUrl" />
+@if (!(seo?.OmitCanonical ?? false))
+{
+    <meta property="og:url" content="@canonicalUrl" />
+}
 <meta property="og:site_name" content="@settings.SiteName" />
 <meta property="og:locale" content="@settings.Locale" />
 <meta property="og:image" content="@socialImageUrl" />

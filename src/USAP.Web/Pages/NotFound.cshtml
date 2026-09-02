@@ -1,0 +1,44 @@
+@page "/not-found"
+@model NotFoundModel
+@{
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = "Page Not Found",
+        Description = "The requested page could not be found.",
+        Robots = "noindex, nofollow",
+        OmitCanonical = true,
+        OpenGraphType = "website"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true" />
+}
+
+<div class="error-page-wrapper">
+    <div class="error-container">
+        <div class="error-grid">
+            <div class="error-visual">
+                <div class="error-code" aria-hidden="true">404</div>
+            </div>
+            <div class="error-content">
+                <h1 class="error-heading">Page Not Found</h1>
+                <p class="error-description">The requested page may have moved or the address may be incorrect.</p>
+
+                <div class="error-actions">
+                    <a asp-page="/Index" class="btn btn-primary">Return to Homepage</a>
+                    <a asp-page="/Products/Index" class="btn btn-outline">Explore Products</a>
+                </div>
+
+                <div class="error-nav">
+                    <h2>Helpful Links</h2>
+                    <ul>
+                        <li><a asp-page="/TechnicalResources">Technical Resources</a></li>
+                        <li><a asp-page="/ContactUs">Contact Us</a></li>
+                        <li><a asp-page="/RequestAQuote">Request a Quote</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
