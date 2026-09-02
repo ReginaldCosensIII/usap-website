@@ -84,14 +84,17 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 
 | Asset | Path | Dimensions / Size / Hash | Notes |
 |---|---|---|---|
-| Light-surface technical overlay | `src/USAP.Web/wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` | 1983x793, 511351 bytes, SHA256: B85D9E10639BB6138666647E69D1709EE124A581A12187077B95F182FBE116C1 | Approved transparent background composite for restrained use on white and light-gray surfaces. Genuine RGBA transparency. |
+| Light-surface technical overlay | `src/USAP.Web/wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` | 1983x793, 511351 bytes, SHA256: B85D9E10639BB6138666647E69D1709EE124A581A12187077B95F182FBE116C1 | Approved transparent background composite. Currently deployed only on `/not-found` and `/Error` (desktop, ≥1025 px). **Not approved for Contact Us or Request a Quote.** |
+| Calibration marks V2 | `src/USAP.Web/wwwroot/images/homepage/decorative/usap-calibration-marks-v2.svg` | SVG, SHA256: 48CFD82707231B744760B2B529601EA0293C6A27F9C23BBCAADFB3FD86C6EAE8 | Approved optional decorative asset. Not deployed on any page. Available for possible future use. Must not be revised or versioned without approval. |
 
 **Design Rules for Textures:**
 - Texture must remain decorative, low contrast, nonessential, and strictly subordinate to content.
 - Do not use page-wide graph-paper grids or place target-like rings directly around headings.
-- The approved composite PNG remains available for restrained light-surface use.
-- Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass.
+- The approved composite PNG is deployed on the 404 and 500 error pages only. It is not approved for Contact Us, Request a Quote, or any other interactive form page.
+- Signal-arcs V2 SVG was rejected and must not be used or restored.
+- Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass, if time permits after substantial page work is complete.
 - Experimental SVG and raster modules were excluded because they had not reached the required visual quality.
+
 
 ## Outstanding client inputs
 
