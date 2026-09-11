@@ -45,7 +45,7 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Products listing | `/products` | 🟡 Stub — up to six approved families pending |
 | Product family detail | `/products/{familySlug}` | ❌ All product data pending |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
-| About Us | `/about-us` | ❌ Company copy pending |
+| About Us | `/about-us` | 🟡 Provisionally complete for current phase. Sourced from public USAP website without repetition; uses shared closing CTA. Final client approval, company history, manufacturing details, and production imagery pending. |
 | Contact Us | `/contact-us` | 🟡 Provisional inquiry form exists. Public contact presentation and production delivery/recipient configuration remain pending. |
 | Request a Quote | `/request-a-quote` | 🟡 Provisional inquiry form exists. Production delivery/recipient configuration and final copy remain pending. |
 | Thank You | `/thank-you` | 🟡 Provisional confirmation page exists. Final production submission/redirect behavior and copy remain pending. |
@@ -84,14 +84,51 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 
 | Asset | Path | Dimensions / Size / Hash | Notes |
 |---|---|---|---|
-| Light-surface technical overlay | `src/USAP.Web/wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` | 1983x793, 511351 bytes, SHA256: B85D9E10639BB6138666647E69D1709EE124A581A12187077B95F182FBE116C1 | Approved transparent background composite for restrained use on white and light-gray surfaces. Genuine RGBA transparency. |
+| Light-surface technical overlay | `src/USAP.Web/wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` | 1983x793, 511351 bytes, SHA256: B85D9E10639BB6138666647E69D1709EE124A581A12187077B95F182FBE116C1 | Approved transparent background composite. Currently deployed only on `/not-found` and `/Error` (desktop, ≥1025 px). **Not approved for Contact Us or Request a Quote.** |
+| Calibration marks V2 | `src/USAP.Web/wwwroot/images/homepage/decorative/usap-calibration-marks-v2.svg` | SVG, SHA256: 48CFD82707231B744760B2B529601EA0293C6A27F9C23BBCAADFB3FD86C6EAE8 | Approved optional decorative asset. Not deployed on any page. Available for possible future use. Must not be revised or versioned without approval. |
 
 **Design Rules for Textures:**
 - Texture must remain decorative, low contrast, nonessential, and strictly subordinate to content.
 - Do not use page-wide graph-paper grids or place target-like rings directly around headings.
-- The approved composite PNG remains available for restrained light-surface use.
-- Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass.
+- The approved composite PNG is deployed on the 404 and 500 error pages only. It is not approved for Contact Us, Request a Quote, or any other interactive form page.
+- Signal-arcs V2 SVG was rejected and must not be used or restored.
+- Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass, if time permits after substantial page work is complete.
 - Experimental SVG and raster modules were excluded because they had not reached the required visual quality.
+
+---
+
+## About Us provisional copy & asset status (C11 provisional completion)
+
+Provisional copy on `/about-us` is strictly anchored to published factual statements from the current public USAP website as provisional migration-source authority. The page is provisionally complete for the current phase.
+
+* **Status:** Provisionally complete for current phase. Existing public-source company content has been used without unnecessary repetition. Client review and formal approval remain required.
+* **Closing CTA:** The shared default closing CTA component (`.closing-cta--default`) with signal background image is adopted until page-specific variants are approved.
+* **Provisional Assets:** Provisional About images remain scheduled for replacement; they are development placeholders only and must not be described as production-approved. Additional section texture accents remain deferred.
+* **Public source URLs:**
+  * `https://www.usantennaproducts.com/about-usap/`
+  * `https://www.usantennaproducts.com/antenna-category/rotator-systems/`
+  * `https://www.usantennaproducts.com/antenna-category/digital-rotator-controller/`
+  * `https://www.usantennaproducts.com/antenna-category/tower-systems-accessories/`
+* **Supported factual statements implemented:**
+  * Military, government, and commercial sectors served.
+  * System offerings include rotator systems, digital rotator controllers, tower systems, and related accessories.
+  * Rotator control capabilities support antenna operation from locations with a secure internet connection.
+  * Integrated services cover requirements evaluation, system construction, installation design, and installation.
+  * Customer support includes phone assistance and manuals/software for purchased systems without additional charges.
+  * Dedicated, personalized service as a core business principle.
+* **Missing client information (requires client input before final expansion):**
+  * Founding date and company origin
+  * Founder or leadership history
+  * Ownership milestones
+  * Major company milestones
+  * Facility and manufacturing details
+  * Testing and quality-control processes
+  * Certifications or standards
+  * Approved government, military, or commercial project examples
+  * Approved customer history or case studies
+  * These items must not be invented and remain pending client delivery.
+
+---
 
 ## Outstanding client inputs
 

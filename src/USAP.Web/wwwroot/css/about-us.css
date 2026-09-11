@@ -1,0 +1,526 @@
+/*
+ * about-us.css — United States Antenna Products
+ *
+ * Page-specific styles for the About Us page (/about-us).
+ * Refined heritage feature and unified feature-card system (USAP-ABOUT-001-C3).
+ * Integrates with site.css tokens, typography, and responsive primitives.
+ */
+
+/* =============================================================================
+   1. ABOUT HERO (Preserved)
+   ============================================================================= */
+
+.about-hero {
+  position: relative;
+  width: 100%;
+  min-height: 22rem;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-brand-navy);
+  color: var(--color-text-inverse);
+  padding-block: var(--space-12);
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-brand-navy-border);
+}
+
+/* Background gradient & decorative geometry (CSS-only fallback and base) */
+.about-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 60% 80% at 90% 20%, rgba(30, 52, 80, 0.45) 0%, transparent 70%),
+    radial-gradient(circle 350px at 10% 90%, rgba(200, 16, 46, 0.08) 0%, transparent 70%),
+    linear-gradient(135deg, #0d1b2e 0%, #112239 100%);
+}
+
+/* Hero image container with provisional media */
+.about-hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.about-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Contrast overlay over image */
+.about-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(
+    90deg,
+    rgba(13, 27, 46, 0.95) 0%,
+    rgba(13, 27, 46, 0.88) 50%,
+    rgba(13, 27, 46, 0.65) 100%
+  );
+}
+
+@media (max-width: 63.9375rem) {
+  .about-hero-overlay {
+    background: rgba(13, 27, 46, 0.90);
+  }
+}
+
+.about-hero-content {
+  position: relative;
+  z-index: 4;
+  max-width: 44rem;
+}
+
+.about-hero-eyebrow {
+  color: var(--color-accent-dark-surface);
+  margin-bottom: var(--space-2);
+}
+
+.about-hero-title {
+  color: var(--color-text-inverse);
+  font-size: clamp(2rem, 3.5vw + 0.5rem, 3rem);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-4);
+  text-wrap: balance;
+}
+
+.about-hero-lead {
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: var(--space-6);
+  max-width: 38rem;
+}
+
+.about-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+
+/* =============================================================================
+   2. COMPANY OVERVIEW SECTION (Heritage Card & Capabilities)
+   ============================================================================= */
+
+.about-overview-section {
+  background-color: var(--color-surface-page);
+}
+
+.about-overview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+@media (min-width: 64rem) {
+  .about-overview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header feature"
+      "body   feature";
+    column-gap: var(--space-12);
+    row-gap: var(--space-6);
+    align-items: start;
+  }
+
+  .about-overview-header {
+    grid-area: header;
+  }
+
+  .about-overview-body {
+    grid-area: body;
+  }
+
+  .about-overview-feature {
+    grid-area: feature;
+  }
+}
+
+.about-overview-lead {
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-default);
+  font-weight: var(--weight-medium);
+}
+
+.about-overview-body > p + p {
+  margin-top: var(--space-4);
+}
+
+/* Heritage & Capabilities Visual Composition (Refined Engineering Plate) */
+.about-heritage-card {
+  position: relative;
+  background-color: var(--card-surface);
+  border: var(--card-border);
+  border-left: var(--card-accent-navy-width) solid var(--color-brand-navy);
+  border-radius: var(--card-radius);
+  padding: var(--space-6);
+  box-shadow: var(--card-shadow-rest);
+  overflow: hidden;
+}
+
+@media (min-width: 48rem) {
+  .about-heritage-card {
+    padding: var(--space-8);
+  }
+}
+
+.about-heritage-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+/* In-Card 50-Year Anniversary Mark */
+.about-card-anniversary {
+  position: relative;
+}
+
+.about-anniversary-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.about-anniversary-numeral {
+  font-size: clamp(3rem, 4.5vw, 4.25rem);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-brand-navy);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.about-anniversary-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.about-anniversary-unit {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-brand-navy);
+  line-height: 1;
+}
+
+.about-anniversary-datum {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  max-width: 150px;
+}
+
+.about-anniversary-tick {
+  width: 3px;
+  height: 7px;
+  background-color: var(--color-brand-red);
+  flex-shrink: 0;
+}
+
+.about-anniversary-rule {
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--color-brand-navy) 0%, rgba(13, 27, 46, 0.25) 100%);
+  flex: 1;
+}
+
+.about-anniversary-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-brand-navy);
+  opacity: 0.85;
+  line-height: 1.2;
+}
+
+.about-heritage-divider {
+  height: 1px;
+  background-color: var(--color-border-subtle);
+  margin-block: var(--space-5);
+  border: none;
+}
+
+.about-heritage-capabilities {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-capabilities-heading {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-brand-navy);
+  margin-bottom: var(--space-3);
+}
+
+.about-capabilities-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.about-capability-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.about-capability-indicator {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-brand-red);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.about-capability-text {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-brand-navy);
+}
+
+
+/* =============================================================================
+   3 & 4. ASYMMETRICAL SECTION INTRO (Shared by Sections 3 & 4)
+   ============================================================================= */
+
+.about-section-intro-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 64rem) {
+  .about-section-intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "header media"
+      "body   media";
+    column-gap: var(--space-12);
+    row-gap: var(--space-4);
+    align-items: start;
+    margin-bottom: var(--space-10);
+  }
+
+  .about-section-intro-header {
+    grid-area: header;
+  }
+
+  .about-section-intro-body {
+    grid-area: body;
+  }
+
+  .about-intro-media {
+    grid-area: media;
+  }
+}
+
+.about-intro-media {
+  width: 100%;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: 0 2px 8px rgba(13, 27, 46, 0.05), 0 1px 2px rgba(13, 27, 46, 0.04);
+  aspect-ratio: 16 / 10;
+  background-color: var(--color-surface-subtle);
+}
+
+.about-intro-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.about-facility-lead,
+.about-support-lead {
+  font-size: var(--text-md);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-default);
+  font-weight: var(--weight-medium);
+}
+
+
+/* =============================================================================
+   SHARED FEATURE-CARD SYSTEM (Manufacturing & Testing + Integrated Support)
+   ============================================================================= */
+
+.about-feature-card {
+  background-color: var(--card-surface);
+  border: var(--card-border);
+  border-top: var(--card-accent-red-height) solid var(--color-brand-red);
+  border-radius: var(--card-radius);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+  box-shadow: var(--card-shadow-rest);
+}
+
+.about-card-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-brand-red);
+  margin-bottom: var(--space-1);
+}
+
+.about-card-number {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-brand-red);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.about-card-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  color: var(--color-brand-navy);
+  margin: 0;
+}
+
+.about-card-text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+
+/* =============================================================================
+   3. MANUFACTURING & TESTING SECTION
+   ============================================================================= */
+
+.about-facility-section {
+  background-color: var(--color-surface-subtle);
+  border-block: 1px solid var(--color-border-subtle);
+}
+
+.about-facility-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 48rem) {
+  .about-facility-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .about-facility-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* =============================================================================
+   4. INTEGRATED SUPPORT SECTION
+   ============================================================================= */
+
+.about-support-section {
+  background-color: var(--color-surface-page);
+}
+
+.about-support-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 48rem) {
+  .about-support-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .about-support-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+
+/* =============================================================================
+   5. PRODUCTS BRIDGE
+   ============================================================================= */
+
+.about-bridge-panel {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+@media (min-width: 48rem) {
+  .about-bridge-panel {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-10) var(--space-8);
+  }
+}
+
+.about-bridge-content {
+  max-width: 40rem;
+}
+
+.about-bridge-content h2 {
+  font-size: var(--text-xl);
+  color: var(--color-brand-navy);
+  margin-bottom: var(--space-2);
+}
+
+.about-bridge-content p {
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+.about-bridge-action {
+  flex-shrink: 0;
+}
+
+
+/* =============================================================================
+   6. CLOSING CTA
+   Styles promoted to shared .closing-cta component in site.css
+   ============================================================================= */

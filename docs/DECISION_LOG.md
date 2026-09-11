@@ -215,3 +215,20 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Product slug validation and legacy redirects remain deferred.
 - The error pages share a transparent light-surface technical overlay composite PNG as a restrained background texture.
 **Reason:** Separates 404 marketing experience from 500 technical support experience, avoiding recursive error loops and making `PageModel` logic simpler.
+
+---
+
+## DEC-021 — Form-page background texture experiment rejected; branch scope reduced
+
+**Date:** 2026-09-02
+**Decision:**
+- A controlled visual trial applied the approved composite PNG (`usap-light-surface-technical-signal-overlay-v1.png`) to the Contact Us and Request a Quote page surfaces as a desktop-only background texture.
+- Multiple scaling and positioning variants (`cover`, `100% auto` + `center top`, `100% auto` + `center center`) were reviewed.
+- The treatment was rejected. The 1983 × 793 asset does not suit tall, form-focused layouts at any tested position or scale. At all variants, the artwork introduced visual noise without improving page hierarchy or usability.
+- The implementation was removed before push or merge. The form pages retain their existing clean presentation.
+- `ContactUs.cshtml`, `RequestAQuote.cshtml`, and `site.css` are identical to `main`.
+- A possible form-page redesign may be considered later as a separate task. That future task must not assume that a background texture is the correct solution.
+- The calibration-marks V2 SVG (`usap-calibration-marks-v2.svg`, SHA256: `48CFD82707231B744760B2B529601EA0293C6A27F9C23BBCAADFB3FD86C6EAE8`) is retained as an approved optional decorative asset. It is not deployed on any page.
+- Signal-arcs V2 SVG remains rejected and must not be used, restored, or recreated.
+- Substantial internal-page work (products, resources, about) takes priority over further decorative texture experimentation.
+**Classification:** Experiment closed without scope addition. No functional change.

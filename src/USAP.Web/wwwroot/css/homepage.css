@@ -353,34 +353,25 @@
     --home-section-content-gap: clamp(2.5rem, 4vw, 4rem);
     --home-section-header-content-gap: clamp(1.75rem, 3vw, 2.5rem);
     --home-grid-gap: clamp(1.25rem, 2.5vw, 2rem);
-    --home-card-padding: clamp(1.25rem, 2vw, 1.75rem);
-    --home-card-radius: 0.75rem;
-    --home-card-border: 1px solid rgba(15, 32, 60, 0.10);
-    --home-card-shadow:
-        0 1px 2px rgba(15, 32, 60, 0.04),
-        0 10px 30px rgba(15, 32, 60, 0.08);
-    --home-eyebrow-font-size: var(--text-sm);
-    --home-eyebrow-font-weight: 700;
-    --home-eyebrow-letter-spacing: 0.05em;
-    --home-section-heading-font-size: clamp(1.75rem, 3vw, 2.25rem);
-    --home-section-heading-line-height: 1.15;
-    --home-section-support-font-size: 1.125rem;
-    --home-section-support-line-height: 1.55;
-    --home-card-heading-font-size: clamp(1.2rem, 1.45vw, 1.35rem);
-    --home-card-heading-line-height: 1.25;
-    --home-card-copy-font-size: 1rem;
-    --home-card-copy-line-height: 1.5;
+    --home-card-padding: var(--card-padding);
+    --home-card-radius: var(--card-radius);
+    --home-card-border: var(--card-border);
+    --home-card-shadow: var(--card-shadow-rest);
+    --home-eyebrow-font-size: var(--eyebrow-font-size);
+    --home-eyebrow-font-weight: var(--eyebrow-font-weight);
+    --home-eyebrow-letter-spacing: var(--eyebrow-letter-spacing);
+    --home-section-heading-font-size: var(--section-heading-font-size);
+    --home-section-heading-line-height: var(--section-heading-line-height);
+    --home-section-support-font-size: var(--section-lead-font-size);
+    --home-section-support-line-height: var(--section-lead-line-height);
+    --home-card-heading-font-size: var(--card-heading-font-size);
+    --home-card-heading-line-height: var(--card-heading-line-height);
+    --home-card-copy-font-size: var(--card-body-font-size);
+    --home-card-copy-line-height: var(--card-body-line-height);
 }
 
 .home-section {
     padding-block: var(--home-section-padding-block);
-}
-
-.home-section .eyebrow {
-    font-size: var(--home-eyebrow-font-size);
-    font-weight: var(--home-eyebrow-font-weight);
-    letter-spacing: var(--home-eyebrow-letter-spacing);
-    text-transform: uppercase;
 }
 
 .home-section-header {
@@ -415,23 +406,40 @@
 }
 
 .home-card {
-    background-color: var(--color-neutral-00, #ffffff);
+    background-color: var(--card-surface);
     border: var(--home-card-border);
     border-radius: var(--home-card-radius);
     box-shadow: var(--home-card-shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: transform var(--card-transition-duration) var(--card-transition-ease),
+                box-shadow var(--card-transition-duration) var(--card-transition-ease),
+                border-color var(--card-transition-duration) var(--card-transition-ease);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-.home-card:hover,
+@media (hover: hover) and (pointer: fine) {
+    .home-card:hover {
+        transform: translateY(var(--card-hover-translate-y));
+        box-shadow: var(--card-shadow-hover);
+        border-color: var(--card-hover-border-color);
+    }
+}
+
 .home-card:focus-within {
-    transform: translateY(-4px);
-    box-shadow:
-        0 4px 6px rgba(15, 32, 60, 0.05),
-        0 16px 40px rgba(15, 32, 60, 0.12);
-    border-color: rgba(15, 32, 60, 0.2);
+    transform: translateY(var(--card-hover-translate-y));
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--card-hover-border-color);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-card {
+        transition: none;
+    }
+    .home-card:hover,
+    .home-card:focus-within {
+        transform: none;
+    }
 }
 
 .home-card--padded {
@@ -1043,54 +1051,6 @@
 }
 
 /* ==========================================================================
-   Section 8:/* ==========================================================================
    Section 8: Closing Inquiry CTA
+   Styles promoted to shared .closing-cta component in site.css
    ========================================================================== */
-.home-closing-cta {
-    background-color: var(--color-brand-navy, #0f203c);
-    background-image: url('../images/homepage/closing-cta/usap-home-closing-cta-signal-background.png');
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    position: relative;
-
-    color: var(--color-neutral-00, #ffffff);
-    text-align: center;
-}
-
-.closing-cta-content {
-    position: relative;
-    z-index: 3;
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
-
-.closing-cta-content h2 {
-    margin: 0;
-    font-size: clamp(2rem, 4vw, 2.5rem);
-    color: var(--color-neutral-00, #ffffff);
-}
-
-.closing-cta-content p {
-    margin: 0;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.closing-cta-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    justify-content: center;
-    margin-top: var(--space-2);
-}
-
-@media (min-width: 768px) {
-    .closing-cta-actions {
-        flex-direction: row;
-    }
-}
