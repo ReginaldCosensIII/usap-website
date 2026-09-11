@@ -45,7 +45,7 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Products listing | `/products` | 🟡 Stub — up to six approved families pending |
 | Product family detail | `/products/{familySlug}` | ❌ All product data pending |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
-| About Us | `/about-us` | ❌ Company copy pending |
+| About Us | `/about-us` | 🟡 Provisionally complete for current phase. Sourced from public USAP website without repetition; uses shared closing CTA. Final client approval, company history, manufacturing details, and production imagery pending. |
 | Contact Us | `/contact-us` | 🟡 Provisional inquiry form exists. Public contact presentation and production delivery/recipient configuration remain pending. |
 | Request a Quote | `/request-a-quote` | 🟡 Provisional inquiry form exists. Production delivery/recipient configuration and final copy remain pending. |
 | Thank You | `/thank-you` | 🟡 Provisional confirmation page exists. Final production submission/redirect behavior and copy remain pending. |
@@ -95,6 +95,40 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 - Reusable standalone SVG texture modules are deferred to a dedicated future visual-asset pass, if time permits after substantial page work is complete.
 - Experimental SVG and raster modules were excluded because they had not reached the required visual quality.
 
+---
+
+## About Us provisional copy & asset status (C11 provisional completion)
+
+Provisional copy on `/about-us` is strictly anchored to published factual statements from the current public USAP website as provisional migration-source authority. The page is provisionally complete for the current phase.
+
+* **Status:** Provisionally complete for current phase. Existing public-source company content has been used without unnecessary repetition. Client review and formal approval remain required.
+* **Closing CTA:** The shared default closing CTA component (`.closing-cta--default`) with signal background image is adopted until page-specific variants are approved.
+* **Provisional Assets:** Provisional About images remain scheduled for replacement; they are development placeholders only and must not be described as production-approved. Additional section texture accents remain deferred.
+* **Public source URLs:**
+  * `https://www.usantennaproducts.com/about-usap/`
+  * `https://www.usantennaproducts.com/antenna-category/rotator-systems/`
+  * `https://www.usantennaproducts.com/antenna-category/digital-rotator-controller/`
+  * `https://www.usantennaproducts.com/antenna-category/tower-systems-accessories/`
+* **Supported factual statements implemented:**
+  * Military, government, and commercial sectors served.
+  * System offerings include rotator systems, digital rotator controllers, tower systems, and related accessories.
+  * Rotator control capabilities support antenna operation from locations with a secure internet connection.
+  * Integrated services cover requirements evaluation, system construction, installation design, and installation.
+  * Customer support includes phone assistance and manuals/software for purchased systems without additional charges.
+  * Dedicated, personalized service as a core business principle.
+* **Missing client information (requires client input before final expansion):**
+  * Founding date and company origin
+  * Founder or leadership history
+  * Ownership milestones
+  * Major company milestones
+  * Facility and manufacturing details
+  * Testing and quality-control processes
+  * Certifications or standards
+  * Approved government, military, or commercial project examples
+  * Approved customer history or case studies
+  * These items must not be invented and remain pending client delivery.
+
+---
 
 ## Outstanding client inputs
 
