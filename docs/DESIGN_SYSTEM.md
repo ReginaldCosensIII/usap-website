@@ -298,6 +298,69 @@ To implement a page-specific background or tint without duplicating CTA CSS:
 
 ---
 
+## Shared Internal-Page Hero Foundation
+
+Promoted in C1 from the approved About Us hero treatment into a sitewide reusable design-system component in `src/USAP.Web/wwwroot/css/site.css`.
+
+### Component Anatomy
+
+| Class | Role | Visual & Structural Properties |
+|---|---|---|
+| `.internal-hero` | Landmark `<section>` shell | `position: relative`, full-width, `min-height: 22rem`, flex center, `background-color: var(--color-brand-navy)`, `color: var(--color-text-inverse)`, `padding-block: var(--space-12)`, `overflow: hidden`, `border-bottom: 1px solid var(--color-brand-navy-border)`. |
+| `.internal-hero-bg` | Geometric fallback base | `position: absolute`, `inset: 0`, z-index 1, radial/linear gradients providing consistent brand atmosphere when imagery is loading. |
+| `.internal-hero-image` | Decorative background image | `position: absolute`, `inset: 0`, z-index 2, `object-fit: cover`, `object-position: center` (customized per modifier), `pointer-events: none`. Rendered via `<img>` with `alt=""`, `fetchpriority="high"`, intrinsic dimensions `width="2048"` and `height="768"`. |
+| `.internal-hero-overlay` | Text contrast protection | `position: absolute`, `inset: 0`, z-index 3, gradient from 95% opacity on left to 65% on right, collapsing to solid 90% opacity below 1024px (`64rem`) to guarantee WCAG AAA/AA text contrast across all viewports. `pointer-events: none`. |
+| `.internal-hero-content` | Readable content wrapper | `position: relative`, z-index 4, `max-width: 44rem`. |
+| `.internal-hero-eyebrow` | Eyebrow category tag | `color: var(--color-accent-dark-surface)` (`#ff4d5f`, 5.34:1 on navy), `margin-bottom: var(--space-2)`. |
+| `.internal-hero-title` | Semantic `<h1>` heading | `clamp(2rem, 3.5vw + 0.5rem, 3rem)`, `line-height: var(--leading-tight)`, text-wrap balance, white. |
+| `.internal-hero-lead` | Supporting lead text | `font-size: var(--text-md)`, `line-height: var(--leading-relaxed)`, 92% white, `max-width: 38rem`. |
+| `.internal-hero-actions` | Optional button cluster | Flex wrap with `gap: var(--space-3)`. Used on About Us; omitted on form pages where the form directly follows. |
+
+### Page-Specific Modifiers & Focal Positions
+
+| Modifier | Applied Route | Asset Reference | Intended Subject / Focal Alignment |
+|---|---|---|---|
+| `.internal-hero--about` | `/about-us` | `images/about/usap-about-hero-lp1017-clean-v2.png` | `object-position: 70% center` (highlights LP-1017 log-periodic array on right). |
+| `.internal-hero--contact` | `/contact-us` | `images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png` | `object-position: 65% center` (highlights communication signal bubble while leaving left space for copy). |
+| `.internal-hero--quote` | `/request-a-quote` | `images/request-a-quote/usap-quote-hero-technical-planning-candidate-a-v1.png` | `object-position: 60% center` (highlights technical planning documents and calipers). |
+
+### Accessibility Rules for Hero Imagery
+
+- Hero images are strictly decorative backgrounds. They must render with empty `alt=""` and `aria-hidden` attributes or container concealment so screen readers do not announce decorative elements.
+- Meaningful content resides exclusively in semantic HTML headings, paragraphs, and links.
+- High-contrast CSS gradient overlays are mandatory to ensure text contrast passes WCAG AA/AAA standards across all responsive viewports.
+
+---
+
+## Shared Form-Page Layout & Contact Sidebar
+
+A standardized two-column layout applied to `/contact-us` and `/request-a-quote`.
+
+### Layout Anatomy
+
+- `.form-page-layout`: Flex column on mobile; CSS Grid (`grid-template-columns: minmax(0, 1.7fr) minmax(19rem, 23rem)`) at desktop (`min-width: 64rem`).
+- `.form-page-main`: Primary content column hosting the interactive inquiry form (`_InquiryForm.cshtml`). Remains first in DOM and mobile reading order.
+- `.contact-sidebar`: Right-hand complementary column (`<aside>`) containing the verified contact-information card and Google Maps embed card. Stacks cleanly below the form on viewports below 1024px.
+- Both sidebar cards use the stationary informational card pattern (`.card.card--ambient.card--ambient-stationary.card--accent-left-navy`), avoiding unwanted translation or elevation on hover.
+
+### Verified Contact Information Card
+
+- Semantic `<address>` element formatted with `font-style: normal`.
+- Displays official company address: `5263 Agro Drive, Frederick, MD 21703`.
+- Phone link formatted with `tel:+12403417120` displaying `240-341-7120`.
+- Clearly labeled fax: `240-371-4980`.
+- Direct Google Maps directions link with `target="_blank"` and `rel="noopener noreferrer"`.
+- No unsupported email addresses, employee names, or office hours are displayed.
+
+### Google Maps Embed Card
+
+- HTTPS API-key-free query embed: `https://maps.google.com/maps?q=5263+Agro+Drive,+Frederick,+MD+21703&...`.
+- Wrapped in a responsive 4:3 frame (`.contact-map-frame`) with subtle border and card radius.
+- Attributes: `loading="lazy"`, `allowfullscreen`, `referrerpolicy="no-referrer-when-downgrade"`, and descriptive accessible `title`.
+- Accessible text fallback link provided directly below the iframe for users who cannot view or load third-party frames.
+
+---
+
 ## Form control foundations
 
 | Class | Purpose |

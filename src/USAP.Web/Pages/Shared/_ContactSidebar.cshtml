@@ -1,0 +1,62 @@
+@* _ContactSidebar.cshtml — Shared right-hand contact information & location map sidebar.
+   Used on Contact Us (/contact-us) and Request a Quote (/request-a-quote).
+   Contains only verified public contact information and an API-key-free Google Maps embed.
+*@
+
+<aside class="contact-sidebar" aria-label="Contact information and company location">
+    <!-- Contact Information Card -->
+    <div class="card card--ambient card--ambient-stationary card--accent-left-navy contact-info-card">
+        <div class="card-body">
+            <h2 class="contact-sidebar-heading">Contact Information</h2>
+            <address class="contact-address">
+                <span class="contact-company-name">United States Antenna Products, LLC</span>
+                <span class="contact-address-lines">
+                    5263 Agro Drive<br />
+                    Frederick, MD 21703
+                </span>
+                <div class="contact-phone-fax">
+                    <div class="contact-detail-row">
+                        <span class="contact-detail-label">Phone:</span>
+                        <span class="contact-detail-value">
+                            <a href="tel:+12403417120" class="contact-phone-link" aria-label="Call United States Antenna Products at 240-341-7120">240-341-7120</a>
+                        </span>
+                    </div>
+                    <div class="contact-detail-row">
+                        <span class="contact-detail-label">Fax:</span>
+                        <span class="contact-detail-value">240-371-4980</span>
+                    </div>
+                </div>
+                <a href="https://maps.google.com/?q=5263+Agro+Drive,+Frederick,+MD+21703"
+                   class="contact-directions-link"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="Get directions to 5263 Agro Drive in Frederick, Maryland on Google Maps (opens in new tab)">
+                    Get Directions
+                </a>
+            </address>
+        </div>
+    </div>
+
+    <!-- Location Map Card -->
+    <div class="card card--ambient card--ambient-stationary card--accent-left-navy contact-map-card">
+        <div class="card-body">
+            <h2 class="contact-sidebar-heading">Facility Location</h2>
+            <div class="contact-map-frame">
+                <iframe src="https://maps.google.com/maps?q=5263+Agro+Drive,+Frederick,+MD+21703&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
+                        title="Map showing United States Antenna Products at 5263 Agro Drive in Frederick, Maryland"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <p class="contact-map-fallback">
+                Can't view the map?
+                <a href="https://maps.google.com/?q=5263+Agro+Drive,+Frederick,+MD+21703"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   aria-label="View 5263 Agro Drive on Google Maps (opens in new tab)">
+                    View location directly on Google Maps
+                </a>
+            </p>
+        </div>
+    </div>
+</aside>

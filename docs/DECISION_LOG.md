@@ -232,3 +232,34 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Signal-arcs V2 SVG remains rejected and must not be used, restored, or recreated.
 - Substantial internal-page work (products, resources, about) takes priority over further decorative texture experimentation.
 **Classification:** Experiment closed without scope addition. No functional change.
+
+---
+
+## DEC-022 — Shared Internal-Page Hero Foundation, Contact Sidebar, Maps Embed, and Reference-Grounded Asset Promotion
+
+**Date:** 2026-09-11
+**Decision:**
+- Promoted the About Us hero structure and styling into a unified shared design-system component (`.internal-hero`) in `site.css`, supporting semantic landmarks, intrinsic background image rendering, shared contrast overlay protection, and page-specific focal position modifiers (`.internal-hero--about`, `.internal-hero--contact`, `.internal-hero--quote`).
+- Applied the shared hero foundation across `/about-us`, `/contact-us`, and `/request-a-quote`.
+- Promoted six approved assets from `USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` into `src/USAP.Web/wwwroot/images/` (3 About Us reference-grounded assets, 1 Contact Us conceptual hero, 1 Request a Quote conceptual hero, and 1 store-only Technical Resources hero).
+- Completely removed three superseded provisional About assets from `wwwroot/images/about/` after verifying zero remaining runtime references.
+- Implemented a shared two-column responsive form-page layout (`.form-page-layout`) with desktop grid and mobile column stack, keeping the primary form first in DOM and accessibility order.
+- Created `_ContactSidebar.cshtml` partial housing verified public USAP contact details (address, phone, fax, directions link) and an HTTPS API-key-free Google Maps embed with lazy loading and accessible fallback link.
+- Strictly preserved all form-processing, PageModel logic, validation attributes, antiforgery tokens, honeypot fields, reCAPTCHA integration, rate limiting, and email dispatch services.
+- Preserved alternate candidates exclusively in `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip`.
+- Maintained the Technical Resources hero asset as store-only, deferred from runtime presentation until authorized.
+**Reason:** Checkpoint USAP-CONTACT-ASSETS-001-C1 to establish unified internal-page layout foundations and integrate review-grounded visual assets.
+
+---
+
+## DEC-023 — Contact Us Hero Revision: Nonmedical Signal Treatment and Provenance Preservation
+
+**Date:** 2026-09-12
+**Decision:**
+- Replaced the Contact Us hero production asset `src/USAP.Web/wwwroot/images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png` with a revised rendering that removes the electronic signal waveform resembling an ECG/EKG or medical telemetry monitor.
+- Replaced the waveform with clean, nonmedical communication signal bars inside the speech bubble while preserving the overall glass/chrome speech bubble composition, dark industrial lighting, and right focal weighting.
+- Preserved the identical production filename (`usap-contact-hero-communication-signal-candidate-c-v1.png`) and runtime path, requiring zero changes to Razor markup or CSS styles.
+- Preserved the original archive `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` (SHA-256: `3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267`) untouched as a historical source record containing the superseded waveform asset.
+- Created a supplemental provenance directory `project-input/USAP_Contact_Hero_Revision_2026-09-12/` containing a byte-for-byte copy of the revised asset, `CHECKSUMS.sha256` (`B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4`), and explanatory `README.md`.
+- Maintained status as pending USAP/client visual approval.
+**Reason:** Checkpoint USAP-CONTACT-ASSETS-001-C2 to eliminate medical misinterpretation while preserving unified design-system styling and runtime stability.

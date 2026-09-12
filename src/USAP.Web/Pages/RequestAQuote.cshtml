@@ -11,14 +11,38 @@
     };
 }
 
-<div class="container section">
-    <h1>Request a Quote</h1>
-    <p>Provide the available product, quantity, application, and timeline details for your request.</p>
-
-    <div class="card mt-8">
-        <div class="card-body">
-            <partial name="_InquiryForm" for="Input" />
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--quote" aria-labelledby="quote-hero-title">
+    <div class="internal-hero-bg" aria-hidden="true"></div>
+    <img class="internal-hero-image"
+         src="~/images/request-a-quote/usap-quote-hero-technical-planning-candidate-a-v1.png"
+         alt=""
+         width="2048"
+         height="768"
+         fetchpriority="high"
+         decoding="async" />
+    <div class="internal-hero-overlay" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">Request a Quote</span>
+            <h1 id="quote-hero-title" class="internal-hero-title">Request a Quote for Your Antenna System</h1>
+            <p class="internal-hero-lead">Share your application and system requirements so USAP can evaluate the request and follow up with an appropriate direction.</p>
         </div>
+    </div>
+</section>
+
+<!-- Section 2: Form & Sidebar -->
+<div class="container section">
+    <div class="form-page-layout">
+        <div class="form-page-main">
+            <div class="card">
+                <div class="card-body">
+                    <partial name="_InquiryForm" for="Input" />
+                </div>
+            </div>
+        </div>
+
+        <partial name="_ContactSidebar" />
     </div>
 </div>
 
