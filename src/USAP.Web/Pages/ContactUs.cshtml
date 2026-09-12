@@ -11,14 +11,38 @@
     };
 }
 
-<div class="container section">
-    <h1>Contact Us</h1>
-    <p>Tell us what you need, and provide any available product or project details.</p>
-
-    <div class="card mt-8">
-        <div class="card-body">
-            <partial name="_InquiryForm" for="Input" />
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--contact" aria-labelledby="contact-hero-title">
+    <div class="internal-hero-bg" aria-hidden="true"></div>
+    <img class="internal-hero-image"
+         src="~/images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png"
+         alt=""
+         width="2048"
+         height="768"
+         fetchpriority="high"
+         decoding="async" />
+    <div class="internal-hero-overlay" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">Contact USAP</span>
+            <h1 id="contact-hero-title" class="internal-hero-title">Contact United States Antenna Products</h1>
+            <p class="internal-hero-lead">Connect with USAP about antenna products, technical support, or general questions.</p>
         </div>
+    </div>
+</section>
+
+<!-- Section 2: Form & Sidebar -->
+<div class="container section">
+    <div class="form-page-layout">
+        <div class="form-page-main">
+            <div class="card">
+                <div class="card-body">
+                    <partial name="_InquiryForm" for="Input" />
+                </div>
+            </div>
+        </div>
+
+        <partial name="_ContactSidebar" />
     </div>
 </div>
 

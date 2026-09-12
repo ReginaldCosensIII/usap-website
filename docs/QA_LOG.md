@@ -144,3 +144,82 @@ To prevent recurrence:
   * Protected homepage PNG `usap-home-application-commercial-industrial.png` SHA-256 confirmed byte-for-byte identical: `8665ABC4ED755509938DCB12E3825B1301DB76533EB4C8BD813530DD69D579E3`.
   * Closing CTA background PNG `usap-home-closing-cta-signal-background.png` SHA-256 confirmed byte-for-byte identical: `396B7AAE1CE34B5A05781E1FC00F0D754F53A962DBFA9812E9DFF38968B317B9`.
   * Zero images generated, modified, or duplicated.
+
+---
+
+## QA-005 — USAP-CONTACT-ASSETS-001-C1 Verification: Shared Heroes, Contact Sidebars, and Reference-Grounded Assets
+
+* **Date:** 2026-09-11
+* **Milestone / Task:** USAP-CONTACT-ASSETS-001-C1 (Shared Internal Heroes, Contact Sidebars, Maps, and About Asset Integration)
+* **Scope:**
+  * Verification of canonical review package (`USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip`, SHA-256: `3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267`) in `project-input/`.
+  * Promotion and byte-for-byte hash verification of 6 authorized image assets in `wwwroot/images/`.
+  * Removal of 3 superseded provisional About assets from `wwwroot/images/about/`.
+  * Implementation and computed-style verification of shared `.internal-hero` component in `site.css` across `/about-us`, `/contact-us`, and `/request-a-quote`.
+  * Implementation of shared responsive two-column layout (`.form-page-layout`) and `_ContactSidebar.cshtml` partial housing verified public USAP contact details and HTTPS Google Maps embed.
+  * Verification that Technical Resources hero asset is stored in `wwwroot` but completely unreferenced and unrequested at runtime.
+  * Strict preservation of all form models, handlers, validation attributes, antiforgery tokens, honeypot fields, and submission behavior.
+* **Archive & Asset Hash Evidence:**
+  * Package: `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` -> `3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267` (MATCH).
+  * Promoted Assets:
+    1. About Hero: `usap-about-hero-lp1017-clean-v2.png` -> `D6D1C8F8B0515818B924FC3AD32BCC90D47BDD02B15DE9C154C2F7037D4D6557` (MATCH).
+    2. About Manufacturing: `usap-about-manufacturing-rf-interface-lp1019-candidate-c-v2.png` -> `99F8873AA732B6B90611F976E8E8A795EBCE00A0EE581A7FADF3B866081E4033` (MATCH).
+    3. About Integrated Support: `usap-about-integrated-support-lp1112mr-clean-v2.png` -> `87EB5F2A6BA0AA7A938CECF590D52193C87E3C0CA914CBC77303E868A7A79423` (MATCH).
+    4. Contact Hero: `usap-contact-hero-communication-signal-candidate-c-v1.png` -> `C6F70E4B0CA756EB16486B194BACED5B9412529E196C6D0A5DF253E5BE588E88` (MATCH).
+    5. Quote Hero: `usap-quote-hero-technical-planning-candidate-a-v1.png` -> `6269BE6639F6CCB31A214CC05D7EF9EF587A57A782244778CBAD181261C53FBE` (MATCH).
+    6. Technical Resources Hero (store only): `usap-technical-resources-hero-requirements-document-candidate-b-v1.png` -> `03FE67FA5A836A472A4C19C172B44AAA154CE282088155E135027FEC01CEF48A` (MATCH).
+* **Runtime Safety & Process Verification:**
+  * User-owned Debug server (PID 13528 on ports 5296 / 7012) preserved untouched.
+  * Agent-owned Release server compiled cleanly (`dotnet build USAP.Web.sln --configuration Release --no-restore`) and verified on isolated port `http://127.0.0.1:5099`.
+  * Verified HTTP 200 OK on all 6 primary routes (`/`, `/about-us`, `/products`, `/technical-resources`, `/contact-us`, `/request-a-quote`).
+* **Broken Images & Asset Request Verification:**
+  * Zero 404s for any promoted or active asset on `/about-us`, `/contact-us`, `/request-a-quote`, `/products`, `/technical-resources`.
+  * Technical Resources hero confirmed unreferenced by grep and DOM inspection.
+  * All 3 superseded provisional About assets confirmed deleted from disk and absent from all runtime markups and CSS.
+* **Shared Hero Computed Style Evidence:**
+  * About Hero: `background-color: rgb(13, 27, 46)`, `min-height: 352px (22rem)`, `title font-size: 48px`, `lead font-size: 20px`, `image object-fit: cover`, `image object-position: 70% 50%`.
+  * Contact Hero: `background-color: rgb(13, 27, 46)`, `min-height: 352px (22rem)`, `title font-size: 48px`, `lead font-size: 20px`, `image object-fit: cover`, `image object-position: 65% 50%`.
+  * Quote Hero: `background-color: rgb(13, 27, 46)`, `min-height: 352px (22rem)`, `title font-size: 48px`, `lead font-size: 20px`, `image object-fit: cover`, `image object-position: 60% 50%`.
+* **Form Integrity & Security Verification:**
+  * PageModel handlers (`ContactUsModel`, `RequestAQuoteModel`, `InquiryPageModelBase`) unchanged.
+  * `_InquiryForm.cshtml` bindings, validation attributes, field-level spans, validation summary, antiforgery token, honeypot field, and submit button 100% identical and preserved.
+  * Google Maps embed: HTTPS, query `5263 Agro Drive, Frederick, MD 21703`, `loading="lazy"`, `allowfullscreen`, `referrerpolicy="no-referrer-when-downgrade"`, descriptive accessible title, and accessible direct Google Maps link.
+* **Responsive & Horizontal Overflow Verification:**
+  * Tested viewports: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * Zero horizontal overflow on `/about-us`, `/contact-us`, and `/request-a-quote` across all viewports.
+* **Build & Code Formatting:**
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Only pre-existing `IDE0011` brace warnings in `Program.cs` reported. Zero format warnings in new/modified files.
+  * `git diff --check`: Clean (0 whitespace/conflict errors).
+
+---
+
+## QA-006 — USAP-CONTACT-ASSETS-001-C2 Verification: Revised Contact Hero, Provenance, and Corrected QA Evidence
+
+* **Date:** 2026-09-12
+* **Milestone / Task:** USAP-CONTACT-ASSETS-001-C2 (Revised Contact Hero Validation and QA Evidence Corrections)
+* **Scope:**
+  * Protection, inspection, and verification of user-supplied revised Contact Us hero image `src/USAP.Web/wwwroot/images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png`.
+  * Visual inspection confirming removal of medical/ECG waveform and replacement with clean horizontal communication signal bars within speech bubble.
+  * Verification of supplemental provenance directory `project-input/USAP_Contact_Hero_Revision_2026-09-12/` containing byte-for-byte duplicate, `CHECKSUMS.sha256`, and `README.md`.
+  * Verification that canonical archive `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` remains byte-for-byte unchanged (`3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267`).
+  * Confirmation that zero Razor markup or CSS selector changes were required.
+  * Correction of C1 broken-image test defect: implemented scroll-into-view, lazy-loading decode, and `naturalWidth > 0` validation across all 6 core routes (`c2_local_image_loading_evidence.json`).
+  * Creation of genuine browser Tab-key navigation evidence targeting contact info links on `/contact-us` (`c2_keyboard_focus_evidence.png`, `c2_keyboard_focus_evidence.json`).
+  * Release build, format verification, and visual regression testing across all 6 required viewports.
+* **Hero Asset Checksums & Provenance:**
+  * Original Archived Candidate C: `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` -> `C6F70E4B0CA756EB16486B194BACED5B9412529E196C6D0A5DF253E5BE588E88` (preserved in archive).
+  * Revised Production Candidate C: `src/USAP.Web/wwwroot/images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png` -> `B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4` (2048 × 768 px, 1,671,032 bytes, sRGB PNG).
+  * Supplemental Provenance Copy: `project-input/USAP_Contact_Hero_Revision_2026-09-12/usap-contact-hero-communication-signal-candidate-c-v1.png` -> `B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4` (BYTE-IDENTICAL MATCH).
+  * Archive: `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` -> `3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267` (BYTE-IDENTICAL UNCHANGED).
+* **Corrected Local Image Loading Evidence:**
+  * All local `<img>` elements scrolled into view, decoded, and verified with `complete === true` and `naturalWidth > 0` across `/`, `/about-us`, `/products`, `/technical-resources`, `/contact-us`, and `/request-a-quote`.
+  * Zero broken local images.
+* **Genuine Keyboard Focus Evidence:**
+  * Real browser Tab-key sequence dispatched from top of document to `.contact-phone-link`.
+  * `document.activeElement` confirmed as `<a class="contact-phone-link" href="tel:+12403417120">240-341-7120</a>`.
+  * Computed focus outline: `3px solid rgb(0, 87, 184)` with `outline-offset: 2px`.
+* **Runtime Verification:**
+  * Clean Release build (0 errors, 0 warnings).
+  * Isolated Release server verified on port 5099 with HTTP 200 on all 6 routes.
+  * Zero horizontal overflow across all 6 viewports (390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080).

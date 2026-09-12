@@ -45,9 +45,9 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Products listing | `/products` | 🟡 Stub — up to six approved families pending |
 | Product family detail | `/products/{familySlug}` | ❌ All product data pending |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
-| About Us | `/about-us` | 🟡 Provisionally complete for current phase. Sourced from public USAP website without repetition; uses shared closing CTA. Final client approval, company history, manufacturing details, and production imagery pending. |
-| Contact Us | `/contact-us` | 🟡 Provisional inquiry form exists. Public contact presentation and production delivery/recipient configuration remain pending. |
-| Request a Quote | `/request-a-quote` | 🟡 Provisional inquiry form exists. Production delivery/recipient configuration and final copy remain pending. |
+| About Us | `/about-us` | 🟡 Provisionally complete with reference-grounded imagery integrated; uses shared hero and closing CTA. Final client approval, company history, and manufacturing details pending. |
+| Contact Us | `/contact-us` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
+| Request a Quote | `/request-a-quote` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
 | Thank You | `/thank-you` | 🟡 Provisional confirmation page exists. Final production submission/redirect behavior and copy remain pending. |
 | Privacy Policy | Not created | ❌ Legal text required from client |
 | Terms of Use | Not created | ❌ Legal text required from client (if applicable) |
@@ -97,13 +97,59 @@ All four files are in `docs/reference-materials/`. They are **not served publicl
 
 ---
 
-## About Us provisional copy & asset status (C11 provisional completion)
+## Internal-Page Asset Review Package & Promoted Assets (C1)
 
-Provisional copy on `/about-us` is strictly anchored to published factual statements from the current public USAP website as provisional migration-source authority. The page is provisionally complete for the current phase.
+Canonical archive preserved in repository: `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` (19,112,932 bytes).
+SHA-256: `3BB2A04AAED355C9DF3209F49C3A92D57E946F12FB1D968868F6363904391267`
 
-* **Status:** Provisionally complete for current phase. Existing public-source company content has been used without unnecessary repetition. Client review and formal approval remain required.
+### Promoted Assets in `wwwroot`
+
+| Intended Use | Relative Path in `src/USAP.Web/wwwroot/` | Dimensions | SHA-256 | Accuracy Classification & Status |
+|---|---|---|---|---|
+| About Us Hero | `images/about/usap-about-hero-lp1017-clean-v2.png` | 2048 × 768 | `D6D1C8F8B0515818B924FC3AD32BCC90D47BDD02B15DE9C154C2F7037D4D6557` | Reference-grounded visualization (LP-1017 family). Production-intent review asset pending USAP engineering approval. |
+| About Us: Manufacturing & Testing | `images/about/usap-about-manufacturing-rf-interface-lp1019-candidate-c-v2.png` | 1536 × 1024 | `99F8873AA732B6B90611F976E8E8A795EBCE00A0EE581A7FADF3B866081E4033` | Reference-grounded visualization (Candidate C: LP-1019 RF interface). Grounded in published specs. Does not depict real facility or measured test. |
+| About Us: Integrated Support | `images/about/usap-about-integrated-support-lp1112mr-clean-v2.png` | 1536 × 1024 | `87EB5F2A6BA0AA7A938CECF590D52193C87E3C0CA914CBC77303E868A7A79423` | Reference-grounded visualization (LP-1112MR transportable antenna system). Pending USAP product-owner approval. |
+| Contact Us Hero (Revised) | `images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png` | 2048 × 768 | `B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4` | Conceptual communication illustration (Candidate C revision). Medical-appearing ECG/EKG waveform replaced with clean communication signal bars. Production asset duplicated in `project-input/USAP_Contact_Hero_Revision_2026-09-12/`. Pending USAP visual approval. |
+| Request a Quote Hero | `images/request-a-quote/usap-quote-hero-technical-planning-candidate-a-v1.png` | 2048 × 768 | `6269BE6639F6CCB31A214CC05D7EF9EF587A57A782244778CBAD181261C53FBE` | Conceptual communication illustration (Candidate A: technical planning). Does not depict specific customer contract or quote. |
+| Technical Resources Hero | `images/technical-resources/usap-technical-resources-hero-requirements-document-candidate-b-v1.png` | 2048 × 768 | `03FE67FA5A836A472A4C19C172B44AAA154CE282088155E135027FEC01CEF48A` | Conceptual communication illustration (Candidate B). **Store only**: not referenced or loaded during C1/C2. |
+
+### Contact Us Hero Revision and Provenance (C2)
+
+The Contact Us hero image was revised in C2 to address potential misinterpretation of the illuminated waveform in the original Candidate C:
+1. **Original Archived Version:** Preserved inside the unchanged September 11 archive `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` (`SHA-256: C6F70E4B0CA756EB16486B194BACED5B9412529E196C6D0A5DF253E5BE588E88`). It contains a jagged waveform that could be mistaken for an ECG/EKG or medical monitoring telemetry display.
+2. **Revised Production Version:** Deployed in `src/USAP.Web/wwwroot/images/contact-us/usap-contact-hero-communication-signal-candidate-c-v1.png` (`SHA-256: B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4`). It preserves the dark blue/navy lighting, overall composition, glass speech bubble, and right focal weighting of Candidate C, but replaces the medical-looking waveform with three clean, nonmedical communication signal bars.
+3. **Preserved Runtime Reference:** The filename was kept identical so that zero Razor markup or CSS selector changes were required.
+4. **Supplemental Provenance:** A byte-for-byte copy is preserved in `project-input/USAP_Contact_Hero_Revision_2026-09-12/` with matching checksum and explanatory README.
+5. **Approval Status:** Remains pending formal USAP/client visual approval.
+
+### Alternate Candidates Retained Exclusively in Archive
+
+The following exploratory candidates are preserved exclusively inside `project-input/USAP_Internal_Page_Asset_Review_Package_2026-09-11.zip` and are not deployed to `wwwroot`:
+- Manufacturing Candidate A: `usap-about-manufacturing-structural-inspection-aperiodic-loop-candidate-a-v2.png`
+- Manufacturing Candidate B: `usap-about-manufacturing-rotation-mechanism-r3500-candidate-b-v2.png`
+- Manufacturing comparison sheet: `usap-about-manufacturing-candidates-comparison-v2.png`
+- Contact Us Candidate A: `usap-contact-hero-support-headset-candidate-a-v1.png`
+- Contact Us Candidate B: `usap-contact-hero-telephone-receiver-candidate-b-v1.png`
+- Request a Quote Candidate C: `usap-quote-hero-custom-engineering-candidate-c-v1.png`
+
+### Superseded Provisional About Assets Removed
+
+The following provisional placeholders were completely replaced and deleted from source control in C1:
+- `src/USAP.Web/wwwroot/images/about/usap-about-hero-provisional-v1.png`
+- `src/USAP.Web/wwwroot/images/about/usap-about-manufacturing-testing-provisional-v1.jpg`
+- `src/USAP.Web/wwwroot/images/about/usap-about-integrated-support-provisional-v1.jpg`
+
+---
+
+## About Us copy & asset status (C1 reference-grounded integration)
+
+Copy on `/about-us` is strictly anchored to published factual statements from the current public USAP website as provisional migration-source authority.
+
+* **Status:** Provisionally complete for current phase with reference-grounded imagery integrated. Client review and formal approval remain required.
+* **Hero Image:** `usap-about-hero-lp1017-clean-v2.png` integrated via `.internal-hero--about`.
+* **Manufacturing Image:** Candidate C (`usap-about-manufacturing-rf-interface-lp1019-candidate-c-v2.png`) integrated into Section 3 intro frame.
+* **Integrated Support Image:** `usap-about-integrated-support-lp1112mr-clean-v2.png` integrated into Section 4 intro frame.
 * **Closing CTA:** The shared default closing CTA component (`.closing-cta--default`) with signal background image is adopted until page-specific variants are approved.
-* **Provisional Assets:** Provisional About images remain scheduled for replacement; they are development placeholders only and must not be described as production-approved. Additional section texture accents remain deferred.
 * **Public source URLs:**
   * `https://www.usantennaproducts.com/about-usap/`
   * `https://www.usantennaproducts.com/antenna-category/rotator-systems/`
