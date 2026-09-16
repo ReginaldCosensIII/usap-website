@@ -1,21 +1,195 @@
 @page "/products/{familySlug}"
 @model USAP.Web.Pages.Products.FamilyModel
 @{
+    var familyName = Model.Family?.Name ?? "Product Family";
+    var familyEyebrow = Model.Family?.CardEyebrow ?? "Product Family";
+    var familySummary = Model.Family?.CardSummary ?? "Antenna system information and product-family details from United States Antenna Products.";
+
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
-        Title = "Antenna Product Family",
-        Description = "Review antenna system information and product-family details from United States Antenna Products.",
-        CanonicalPath = Request.Path.Value,
+        Title = familyName,
+        Description = familySummary,
+        CanonicalPath = $"/products/{Model.FamilySlug}",
         Robots = "noindex, follow",
         OpenGraphType = "website"
     };
 }
 
-<div class="container section">
-    <h1>Product Family</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Displaying stub for family: <code>@Html.Encode(Model.FamilySlug)</code></p>
-        <p>Product family detail pages will be implemented in the Catalog &amp; Resources task.</p>
-        <p>Family names, specifications, and imagery are pending client-supplied content.</p>
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--family internal-hero--family-@Model.FamilySlug" aria-labelledby="family-hero-title">
+    @if (Model.Family?.ResponsiveHero != null)
+    {
+        var hero = Model.Family.ResponsiveHero;
+        <picture class="internal-hero-picture">
+            <source media="(max-width: 47.999rem)"
+                    srcset="@hero.MobileImagePath"
+                    width="@hero.MobileWidth"
+                    height="@hero.MobileHeight" />
+            <img src="@hero.DesktopImagePath"
+                 alt="@hero.AltText"
+                 class="internal-hero-img"
+                 width="@hero.DesktopWidth"
+                 height="@hero.DesktopHeight"
+                 fetchpriority="high"
+                 decoding="async" />
+        </picture>
+    }
+    else
+    {
+        <div class="internal-hero-bg" aria-hidden="true"></div>
+    }
+    <div class="internal-hero-overlay internal-hero-overlay--family" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">@familyEyebrow</span>
+            <h1 id="family-hero-title" class="internal-hero-title">@familyName</h1>
+            <p class="internal-hero-lead">@familySummary</p>
+            <div class="internal-hero-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Contact Engineering</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb" class="breadcrumbs">
+    <div class="container">
+        <ol class="breadcrumbs__list">
+            <li class="breadcrumbs__item"><a href="/" class="breadcrumbs__link">Home</a></li>
+            <li class="breadcrumbs__item"><a href="/products" class="breadcrumbs__link">Products</a></li>
+            <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">@familyName</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Section 2: Product Information & Product Group Listing -->
+<div class="container section family-content-section">
+    <div class="product-info-notice" role="region" aria-label="Product Information">
+        <div class="product-info-notice__badge">Product Information</div>
+        <div class="product-info-notice__content">
+            <p>Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application. For project planning or technical inquiries, <a href="/contact-us" class="product-info-notice__link">contact USAP engineering</a>.</p>
+        </div>
+    </div>
+
+    <div class="family-groups-header">
+        <span class="eyebrow">PRODUCT CATALOG</span>
+        <h2 class="section-heading">Products and Models in This Family</h2>
+        <p class="section-lead">The following product groups and configurations are cataloged for @familyName:</p>
+    </div>
+
+    <div class="family-groups-grid">
+        @foreach (var group in Model.ProductGroups)
+        {
+            <div class="card card--ambient family-group-card" id="@group.SectionAnchor">
+                <div class="card-body">
+                    <h3 class="family-group-card__title">@group.Name</h3>
+                    <p class="family-group-card__description">@group.ShortDescription</p>
+                    <div class="family-group-card__models">
+                        <span class="family-group-card__models-label">Models and Configurations:</span>
+                        <ul class="family-group-card__models-list">
+                            @foreach (var productModel in group.Models)
+                            {
+                                if (!string.IsNullOrWhiteSpace(productModel.ModelCode))
+                                {
+                                    <li><code>@productModel.ModelCode</code> <span class="family-group-card__config">(@productModel.Configuration)</span></li>
+                                }
+                                else
+                                {
+                                    <li><span class="family-group-card__config">@productModel.Configuration <span class="text-muted">(No published model number)</span></span></li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="family-back-nav">
+        <a href="/products" class="btn btn-outline">&larr; Return to All Product Families</a>
     </div>
 </div>
+
+@if (Model.FamilySlug == "antenna-rotator-control-systems")
+{
+    <!-- Rotator Product Visuals Section -->
+    <section class="section family-visuals-section" aria-labelledby="rotator-visuals-heading">
+        <div class="container">
+            <div class="section-intro">
+                <span class="eyebrow">Product Visuals</span>
+                <h2 id="rotator-visuals-heading" class="section-heading">Rotator &amp; Controller Hardware</h2>
+                <p class="section-lead">Source-guided technical visualizations based on published USAP engineering materials.</p>
+            </div>
+
+            <div class="rotator-visuals-grid">
+                <figure class="card card--ambient rotator-visual-card">
+                    <div class="rotator-visual-card__media">
+                        <img src="/images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png"
+                             alt="R3500 heavy-duty rotator paired with a DRC-4 digital controller in an equipment bench configuration."
+                             width="1600"
+                             height="1000"
+                             loading="lazy"
+                             decoding="async"
+                             class="rotator-visual-card__img" />
+                    </div>
+                    <figcaption class="rotator-visual-card__caption">
+                        <h3 class="rotator-visual-card__title">R3500 / DRC-4 System Relationship</h3>
+                        <p class="rotator-visual-card__text">Heavy-duty mechanical rotator paired with the DRC-4 rackmount digital rotator controller.</p>
+                    </figcaption>
+                </figure>
+
+                <figure class="card card--ambient rotator-visual-card">
+                    <div class="rotator-visual-card__media">
+                        <img src="/images/products/usap-drc3-source-guided-product-visual-a3s-v1.png"
+                             alt="DRC-3 tabletop digital rotator controller with front-panel controls and display."
+                             width="1600"
+                             height="1000"
+                             loading="lazy"
+                             decoding="async"
+                             class="rotator-visual-card__img" />
+                    </div>
+                    <figcaption class="rotator-visual-card__caption">
+                        <h3 class="rotator-visual-card__title">DRC-3 Digital Rotator Controller</h3>
+                        <p class="rotator-visual-card__text">Tabletop digital controller unit with front-panel controls, digital readout, and interface connections.</p>
+                    </figcaption>
+                </figure>
+
+                <figure class="card card--ambient rotator-visual-card">
+                    <div class="rotator-visual-card__media">
+                        <img src="/images/products/usap-drc4-source-guided-product-visual-a3s-v1.png"
+                             alt="DRC-4 19-inch rackmount digital rotator controller with illuminated front panel."
+                             width="1600"
+                             height="1000"
+                             loading="lazy"
+                             decoding="async"
+                             class="rotator-visual-card__img" />
+                    </div>
+                    <figcaption class="rotator-visual-card__caption">
+                        <h3 class="rotator-visual-card__title">DRC-4 Digital Rotator Controller</h3>
+                        <p class="rotator-visual-card__text">Standard 19-inch rackmount digital rotator controller designed for base-station and central-control installations.</p>
+                    </figcaption>
+                </figure>
+            </div>
+
+            <p class="rotator-visuals-note">
+                <em>Note: Visualizations are source-guided models based on published USAP materials. Current enclosure designs, connectors, and mounting configurations must be confirmed with USAP engineering.</em>
+            </p>
+        </div>
+    </section>
+}
+
+<!-- Section 3: Shared Closing CTA -->
+<section class="closing-cta closing-cta--default family-closing-cta" aria-labelledby="closing-cta-heading">
+    <div class="container">
+        <div class="closing-cta-content">
+            <span class="eyebrow">Technical Support</span>
+            <h2 id="closing-cta-heading">Inquire About @familyName</h2>
+            <p>Speak with USAP engineering regarding specific frequency bands, mounting configurations, or custom engineering requirements for your deployment.</p>
+            <div class="closing-cta-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Contact USAP</a>
+            </div>
+        </div>
+    </div>
+</section>

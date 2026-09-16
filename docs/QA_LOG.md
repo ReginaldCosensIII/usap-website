@@ -223,3 +223,422 @@ To prevent recurrence:
   * Clean Release build (0 errors, 0 warnings).
   * Isolated Release server verified on port 5099 with HTTP 200 on all 6 routes.
   * Zero horizontal overflow across all 6 viewports (390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080).
+
+---
+
+## QA-007 — USAP-PRODUCTS-001-C1 Verification: Structured Six-Family Catalog, Responsive Products Landing Page, and Family Route Placeholders
+
+* **Date:** 2026-09-12
+* **Milestone / Task:** USAP-PRODUCTS-001-C1 (Product Catalog Foundation & Landing Page Implementation)
+* **Scope:**
+  * Implementation of strongly-typed catalog domain models and `ProductCatalogService` singleton in DI.
+  * Enforcement and execution of 8 automated validation rules asserting catalog integrity at startup/construction.
+  * Delivery of production-ready `/products` landing page using shared `.internal-hero`, 3-col/2-col/1-col responsive family card grid, source-constrained selection guidance, and shared closing CTA.
+  * Reservation of 6 canonical family routes via `Pages/Products/Family.cshtml` with shared `.internal-hero`, breadcrumb trail, provisional warning notice, and representative product groups.
+  * Elimination of soft-404 defect: slug validation against `IProductCatalogService` returns HTTP 404 for unrecognized slugs.
+  * Zero exposure of disputed specifications on the landing page (held in metadata `ConflictHolds`).
+  * Preservation of Contact Us and Request a Quote form models, handlers, validation attributes, antiforgery tokens, honeypot, reCAPTCHA, and submission behavior.
+  * Verification that Technical Resources hero asset remains store-only and unreferenced.
+* **Catalog Validation Test Results (Milestone C1/C1A):**
+  * Test suite executed via standalone test runner (`scratch/CatalogValidationTests`):
+    1. Family count != 6 (tested 5 and 7 families) -> Threw `Catalog must define exactly 6 families` [PASS].
+    2. Out of order family sequence -> Threw `Family at position 1 must be 'log-periodic-antennas'` [PASS].
+    3. Wrong group count in catalog (15 groups instead of 16) -> Threw `Catalog must define exactly 16 distinct product groups` [PASS].
+    4. Group misassignment / swap (tested assigning LP-1402-1403 to Log Periodic Antennas instead of LP-1018ba) -> Threw `Family 'log-periodic-antennas' group mismatch at index 2: expected 'lp-1018ba', found 'lp-1402-1403'` [PASS].
+    5. Wrong per-family group distribution (tested 6 in LP instead of 5) -> Threw `Family 'log-periodic-antennas' must contain exactly 5 groups` [PASS].
+    6. Duplicate group ID / cross-family duplicate -> Threw `Duplicate product group ID detected: 'lp-high-power'` [PASS].
+    7. Unknown family referenced by product group -> Threw `references unknown family 'unknown-family-xyz'` [PASS].
+    8. Unknown product group referenced by resource -> Threw `references unknown product group 'non-existent-group'` [PASS].
+    9. Named models count != 30 -> Threw `Catalog must contain exactly 30 named model/configuration codes` [PASS].
+    10. T-3002 child configuration missing -> Threw `T-3002 group must contain configuration child model '3002FB'` [PASS].
+    11. Live service instantiation -> 6 families in approved canonical order, 16 product groups distributed 5 / 3 / 1 / 1 / 5 / 1, exact ordered group IDs per family verified, LP-1112MR primarily in Log Periodic, LP-1402-1403 in Portable & Transportable, 1910 in Portable & Transportable, APERIODIC sole Aperiodic group, 5 rotators/controllers in Rotator & Control, T-3002 sole Tower group with 4 child configurations, 30 named models + 1 unnamed aperiodic line, conservative family summaries verified [PASS].
+* **HTTP Route Status Verification (Isolated Release Server, Port 5099):**
+  * `/`: HTTP 200 OK
+  * `/products`: HTTP 200 OK
+  * `/products/log-periodic-antennas`: HTTP 200 OK
+  * `/products/portable-transportable-antennas`: HTTP 200 OK
+  * `/products/aperiodic-loop-antennas`: HTTP 200 OK
+  * `/products/nvis-antennas`: HTTP 200 OK
+  * `/products/antenna-rotator-control-systems`: HTTP 200 OK
+  * `/products/tower-systems-accessories`: HTTP 200 OK
+  * `/products/invalid-route-slug`: HTTP 404 Not Found (re-executed via `/not-found`) [PASS]
+  * `/about-us`: HTTP 200 OK
+  * `/contact-us`: HTTP 200 OK
+  * `/request-a-quote`: HTTP 200 OK
+  * `/technical-resources`: HTTP 200 OK
+* **DOM & Catalog Card Inspection:**
+  * Exactly 6 family cards rendered in approved display order:
+    1. Log Periodic Antennas (`/products/log-periodic-antennas`) - Media: Image (`usap-home-featured-product-lp-1017.png`)
+    2. Portable & Transportable Antenna Systems (`/products/portable-transportable-antennas`) - Media: Image (`usap-home-featured-product-transportable-hf.png`)
+    3. Aperiodic Loop Antennas (`/products/aperiodic-loop-antennas`) - Media: Deliberate Native Placeholder (`.product-family-card__placeholder`)
+    4. NVIS Antennas (`/products/nvis-antennas`) - Media: Deliberate Native Placeholder (`.product-family-card__placeholder`)
+    5. Antenna Rotator & Control Systems (`/products/antenna-rotator-control-systems`) - Media: Image (`usap-home-featured-product-rotator-controls.png`)
+    6. Tower Systems & Accessories (`/products/tower-systems-accessories`) - Media: Deliberate Native Placeholder (`.product-family-card__placeholder`)
+  * Exactly one clear link per card with accessible `.sr-only` family name extension.
+  * 3 selection-help cards verified under semantic heading hierarchy (`h1` -> `h2` -> `h3`).
+  * Shared closing CTA rendered with Request a Quote and Contact Engineering buttons.
+* **Genuine Keyboard Focus Verification:**
+  * Dispatched browser Tab sequence from document top to first family card link.
+  * Tab sequence: `#1 .skip-link` -> `#2 .site-brand` -> `#3-#7 nav links` -> `#8 .nav-cta` -> `#9 .product-family-card__link`.
+  * Target link: `document.activeElement` confirmed as `<a class="btn btn-secondary btn-sm product-family-card__link" href="/products/log-periodic-antennas">`.
+  * `matchesFocusVisible: true`.
+  * Computed outline: `3px solid rgb(0, 87, 184)` with `outline-offset: 2px`.
+  * Captured full viewport evidence (`07_family_card_keyboard_focus_viewport_1440x900.png`) and card-crop evidence (`07_family_card_keyboard_focus_card_crop.png`).
+* **Responsive & Horizontal Overflow Verification:**
+  * Tested viewports: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * `document.documentElement.scrollWidth <= window.innerWidth` across all viewports on `/products` and family routes. Zero horizontal overflow detected.
+* **Local Image & Media Decoding Verification:**
+  * Total images on `/products`: 4 (Brand logo SVG + 3 approved product PNG cutouts).
+  * All images decoded with `complete === true` and positive natural dimensions. Zero broken local images.
+* **Reduced Motion & No-JS Usability:**
+  * `prefers-reduced-motion: reduce`: Computed transition durations on cards and buttons suppressed to `0.00001s` (`1e-05s`).
+  * JavaScript execution disabled: Exactly 6 cards, all links, and content render and navigate without JavaScript.
+* **Console & Network Errors:**
+  * Zero browser console errors.
+  * Zero unhandled network failures.
+* **Build & Code Formatting Evidence:**
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Only pre-existing `IDE0011` warnings in `Program.cs` reported. Zero warnings in new/modified files.
+  * `git diff --check`: Clean (0 whitespace errors).
+
+---
+
+## QA-008 — USAP-PRODUCTS-001-C1B Verification: Product Catalog Visual and Semantic Refinement
+
+* **Date:** 2026-09-13
+* **Milestone / Task:** USAP-PRODUCTS-001-C1B (Product Catalog Visual and Semantic Refinement)
+* **Scope:**
+  * Relocation of breadcrumbs out of `.internal-hero--family` to the top of the main content area directly below the hero on all six product-family routes. Semantic `<nav aria-label="Breadcrumb">` with ordered list, light-background styling, linked Home & Products ancestors, and non-linked `aria-current="page"` current family.
+  * Entire surface of all six `/products` family cards made clickable via semantic `.stretched-link` pattern: exactly one real anchor per card (`.product-family-card__link`), one logical Tab stop per card, no JavaScript click handlers.
+  * Replaced filled button CTA (`.btn.btn-secondary.btn-sm`) with restrained editorial card link (`.card-link`) displaying `Explore Family →`, aligned at the bottom of the card body, with accessible family-specific label (`aria-label="Explore @family.Name"`).
+  * Enforced uniform card content alignment: CSS grid/flexbox equal-height cards per row, bottom-aligned CTAs across varying title and summary lengths, natural responsive wrapping.
+  * Edge-to-edge 16:10 media frames (`aspect-ratio: 16 / 10`, `overflow: hidden`, `object-fit: cover`, `object-position: center`) without inset padding or gutters; identical frame geometry for images and native placeholders.
+  * Accent restraint: removed red top border (`card--accent-top-red`) from ordinary family cards; removed repeated navy left border (`card--accent-left-navy`) from product-group cards on family pages.
+  * Corrected native placeholder terminology: badge updated to `PRODUCT IMAGERY IN DEVELOPMENT`, caption updated to `Design placeholder — replacement imagery pending USAP review.`
+  * Removed internal checkpoint and milestone terminology (`Checkpoint C1`, `Milestone C1`, `Milestone C2`, `provisional`) from public pages; replaced with restrained public `Product Information` notice linking to USAP engineering.
+  * Full-card focus-visible outline: `3px solid rgb(0, 87, 184)` with `outline-offset: 2px` via `:has(.product-family-card__link:focus-visible)`.
+  * Candidate image alt text: Replaced exact-model assertions with concise family-level descriptions ("Log periodic antenna array in a field installation.", "Transportable HF antenna system in a field setting.", "Antenna rotator and digital controller components.").
+  * Selection-assistance copy: Audited cards on `/products` against canonical research and workbook. Replaced draft copy with source-constrained text and removed unsubstantiated terms ("long-term continuous duty", "terrain obstacle mitigation", "low-noise", "precision", "microprocessor", "modular aluminum").
+  * Preservation of canonical C1A baseline: exactly 6 families, 16 groups distributed `5 / 3 / 1 / 1 / 5 / 1`, 30 named models + 1 unnamed, existing validation rules, true HTTP 404 on invalid slugs.
+  * Preservation of Contact Us and Request a Quote form behavior, security controls, and Technical Resources store-only asset status.
+* **Catalog Validation Test Results (Milestone C1/C1A Baseline Preserved):**
+  * All 11 positive and negative catalog integrity tests pass in `CatalogValidationTests`:
+    1. Family count assertion [PASS]
+    2. Family sequence assertion [PASS]
+    3. Distinct product group count assertion (16 groups) [PASS]
+    4. Group assignment integrity assertion [PASS]
+    5. Group distribution assertion (5 / 3 / 1 / 1 / 5 / 1) [PASS]
+    6. Duplicate group ID detection [PASS]
+    7. Unknown family reference detection [PASS]
+    8. Unknown product group reference detection [PASS]
+    9. Named models count assertion (30 named models) [PASS]
+    10. T-3002 child configuration validation [PASS]
+    11. Live service instantiation and conservative summaries verification [PASS]
+* **HTTP Route Status Verification (Isolated Release Server, Port 5099):**
+  * `/`: HTTP 200 OK
+  * `/products`: HTTP 200 OK
+  * `/products/log-periodic-antennas`: HTTP 200 OK
+  * `/products/portable-transportable-antennas`: HTTP 200 OK
+  * `/products/aperiodic-loop-antennas`: HTTP 200 OK
+  * `/products/nvis-antennas`: HTTP 200 OK
+  * `/products/antenna-rotator-control-systems`: HTTP 200 OK
+  * `/products/tower-systems-accessories`: HTTP 200 OK
+  * `/products/invalid-route-slug`: HTTP 404 Not Found (executed via custom `/not-found` handler) [PASS]
+  * `/about-us`: HTTP 200 OK
+  * `/contact-us`: HTTP 200 OK
+  * `/request-a-quote`: HTTP 200 OK
+  * `/technical-resources`: HTTP 200 OK
+* **Breadcrumb Placement & Semantic Audit:**
+  * Zero breadcrumbs found inside `.internal-hero--family` across all six family pages.
+  * Exactly one semantic breadcrumb found in the main content container directly below the hero on each family page.
+  * Breadcrumb container: `<nav class="breadcrumb-trail" aria-label="Breadcrumb">`.
+  * Hierarchy: `<ol class="breadcrumb-trail__list">` with 3 items:
+    1. `<li><a class="breadcrumb-trail__link" href="/">Home</a></li>`
+    2. `<li><a class="breadcrumb-trail__link" href="/products">Products</a></li>`
+    3. `<li><span class="breadcrumb-trail__current" aria-current="page">[Family Name]</span></li>`
+* **Card Clickability, Links, and Tab-Stop Audit:**
+  * Exactly 1 real anchor per family card (`.product-family-card__link`). Zero buttons inside cards.
+  * Single Tab stop per card confirmed during keyboard navigation.
+  * Stretched-link hit testing confirmed: clicking representative coordinates within media frame, eyebrow, heading, summary, body whitespace, and CTA all resolve to target family link.
+  * CTA rendered as editorial `.card-link` with `aria-label="Explore [Family Name]"`.
+  * Desktop row CTA bottom alignment verified: Row 1 cards bottom edge at 1256px, Row 2 cards bottom edge at 1823px across all cards in each row.
+* **Media Frame Dimensions & Fit Evidence:**
+  * Computed aspect ratio on all family-card media frames: 16:10 (`aspect-ratio: 16 / 10`, computed 388 × 242.5 px at 1440px viewport).
+  * Media frames run edge-to-edge to top, left, and right borders of card (`overflow: hidden`, 0 inset padding).
+  * Native design placeholder frames compute to identical dimensions as image frames.
+  * Computed image styles: `object-fit: cover`, `object-position: center`, `display: block`.
+* **Accent Restraint Evidence:**
+  * Normal product-family cards: `border-top`: `1px solid rgba(15, 32, 60, 0.1)` (no red top border).
+  * Normal product-group cards: `border-left`: `1px solid rgba(15, 32, 60, 0.1)` (no navy left border).
+  * Deliberate notices: `.product-info-notice` retains informational amber accent border.
+* **Placeholder & Milestone Terminology Verification:**
+  * Placeholder badge text: `PRODUCT IMAGERY IN DEVELOPMENT`.
+  * Placeholder caption text: `Design placeholder — replacement imagery pending USAP review.`
+  * Zero occurrences of `Checkpoint C1`, `C1A`, `C1B`, `Milestone C1`, or `Milestone C2` in rendered HTML across all pages.
+* **Genuine Keyboard Focus Verification:**
+  * Tab navigation to family card link activates full-card focus ring: `outline: 3px solid rgb(0, 87, 184)` with `outline-offset: 2px` via `:has(.product-family-card__link:focus-visible)`.
+  * CTA displays active focus underline and arrow shift.
+* **Responsive Viewport & Overflow Verification:**
+  * Tested viewports: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * Zero horizontal overflow detected on any page across all viewports (`scrollWidth <= innerWidth`).
+* **Console & Network Errors:**
+  * Zero browser console errors across all routes.
+  * Zero unhandled network failures across all routes.
+* **Reduced Motion & No-JS Usability:**
+  * `prefers-reduced-motion: reduce`: Transition durations suppressed to `0.00001s` (`1e-05s`), `transform: none` enforced.
+  * JavaScript execution disabled: Full card grid, images, placeholders, and links render and navigate cleanly.
+* **Build & Code Formatting Evidence:**
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Errors, 0 Warnings (Exit code 0).
+  * Isolated Debug build: 0 Errors, 0 Warnings (Exit code 0). Standard Debug build notes PID 7976 locking `USAP.Web.exe` (user-owned server preserved).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Verified; zero warnings in new or modified files. Only pre-existing `IDE0011` warnings in `Program.cs`.
+  * `git diff --check`: Clean (0 whitespace errors).
+
+---
+
+## QA-009 — Task USAP-CATALOG-001 Verification: Products Landing Page & A2F Candidate Asset Integration
+
+* **Date:** 2026-09-15
+* **Task / Milestone:** USAP-CATALOG-001 (Products Landing Page and Reusable Catalog Foundation)
+* **Scope & Implementation Summary:**
+  * Intake and cryptographic integrity verification of canonical review package archive: `project-inputs/USAP_Product_Catalog_A2F_Review_Package_2026-09-15.zip` (10,950,498 bytes, SHA-256: `0831c27bb1a66bf4ef2841a92fae94eb2c1316fcf1d1d3a9be2cab546eabced5`).
+  * Promotion of seven project-selected candidate assets into `src/USAP.Web/wwwroot/images/products/` with byte-identical hash preservation verified against `HASH_PRESERVATION_REGISTER.csv`:
+    1. Products landing hero: Direction C (`usap-products-landing-hero-direction-c-candidate-v1.png`, 2048 × 768 px, 1,946,738 B, SHA-256: `E9F75AABACA46D8395A1B9CC5C998B469EFC55791EEBA7A08926320A96071EAD`)
+    2. Log Periodic Antennas: Reference-grounded visual (`usap-family-card-log-periodic-family-visual-v1.png`, 1600 × 1000 px, 1,387,964 B, SHA-256: `03B191AB25844A40C0FD5B8045FFD264327734BB265BA5DFFCF3305EA0A9CF7F`)
+    3. Portable & Transportable Antenna Systems: Stylized placeholder (`usap-family-card-portable-transportable-placeholder-v1.png`, 1600 × 1000 px, 1,773,360 B, SHA-256: `DDF0E92CC340520A441162607911BAA755A74610DB5087090C437A966A30E947`)
+    4. Aperiodic Loop Antennas: Element visual (`usap-family-card-aperiodic-loop-element-v1.png`, 1600 × 1000 px, 2,098,672 B, SHA-256: `9CF71EA8DF4DDD1126FFA8F5C80D64304647EF2B82F21517553C9C945398E03F`)
+    5. NVIS Antennas: Family visual (`usap-family-card-nvis-1942-family-visual-v1.png`, 1600 × 1000 px, 2,102,661 B, SHA-256: `839A933F73EA1B3F77FE6B2459342F36A5B9211BAE45F7C459D677E0209ACDA0`)
+    6. Antenna Rotator & Control Systems: Lower-risk indicator Candidate B (`usap-family-card-rotator-control-lower-risk-placeholder-v2.png`, 1600 × 1000 px, 1,888,491 B, SHA-256: `5B0C8F2B71EF2CFEEF7ED81D091A79329B482AA23345B5616F75663C6378B682`)
+    7. Tower Systems & Accessories: Generalized tower fallback Candidate B (`usap-family-card-tower-systems-nonconfigurational-fallback-v2.png`, 1600 × 1000 px, 2,006,234 B, SHA-256: `32A2CAC6B2DC9B6227D21295801CCEF3EDF1E2DBC8D562419DA02FCE565C09C8`)
+  * Catalog service extension: `IProductCatalogService.GetLandingHeroAsset()` and implementation in `ProductCatalogService.cs`. Family asset metadata updated with new image paths, classifications, and approved alt text.
+  * Products landing page Razor integration: `@Model.HeroAsset` wired to semantic `<img>` in `.internal-hero--products` with `width="2048" height="768"`, `fetchpriority="high"`, and `decoding="async"`. Family cards wired to `width="1600" height="1000"`, `loading="lazy"`, `decoding="async"`. Fallback placeholder markup preserved.
+  * Responsive CSS styling: Added `.internal-hero--products .internal-hero-image { object-position: 75% center; }` on desktop and `object-position: 80% center;` at `<64rem` (mobile/tablet), ensuring antenna elements display clearly on the right while the left gradient guarantees WCAG AAA text contrast.
+* **Catalog Validation Suite Results (11 Positive & Negative Tests Pass):**
+  * Console test runner executed on Release build of `CatalogValidationTests`:
+    1. Live Catalog Initialization & Structure [PASS]
+    2. Negative: Family count < 6 (5 families) [PASS]
+    3. Negative: Family count > 6 (7 families) [PASS]
+    4. Negative: Out of order family sequence [PASS]
+    5. Negative: Wrong group count in catalog (15 instead of 16) [PASS]
+    6. Negative: Misassigned group reference (LP-1402-1403 in LP) [PASS]
+    7. Negative: Wrong per-family group distribution (6 in LP, 2 in Portable) [PASS]
+    8. Negative: Duplicate group ID detection [PASS]
+    9. Negative: Product group references unknown family [PASS]
+    10. Negative: Resource references unknown product group [PASS]
+    11. Negative: Named models count != 30 [PASS]
+    12. Negative: T-3002 child configuration missing [PASS]
+* **Static Asset HTTP Delivery (Port 5099):**
+  * All 7 promoted images returned HTTP 200 OK with `Content-Type: image/png` and exact byte counts matching source files.
+* **HTTP Route Status Verification (Isolated Release Server, Port 5099):**
+  * `/`: HTTP 200 OK
+  * `/products`: HTTP 200 OK
+  * `/products/log-periodic-antennas`: HTTP 200 OK
+  * `/products/portable-transportable-antennas`: HTTP 200 OK
+  * `/products/aperiodic-loop-antennas`: HTTP 200 OK
+  * `/products/nvis-antennas`: HTTP 200 OK
+  * `/products/antenna-rotator-control-systems`: HTTP 200 OK
+  * `/products/tower-systems-accessories`: HTTP 200 OK
+  * `/products/invalid-route-slug`: HTTP 404 Not Found (executed via custom `/not-found` handler) [PASS]
+  * `/about-us`: HTTP 200 OK
+  * `/contact-us`: HTTP 200 OK
+  * `/request-a-quote`: HTTP 200 OK
+  * `/technical-resources`: HTTP 200 OK
+* **DOM Structure & Visual Audit (Headless Chrome CDP):**
+  * Hero image element: `.internal-hero--products .internal-hero-image` confirmed present with correct src, alt, width (2048), height (768), `fetchpriority="high"`, and `decoding="async"`.
+  * Six product-family cards confirmed present, each containing media frame (`aspect-ratio: 16 / 10`), card image with width (1600), height (1000), `loading="lazy"`, `decoding="async"`, and single `.stretched-link` anchor.
+  * Selection guidance section (`.selection-help-section`) and closing CTA (`.closing-cta`) confirmed present.
+* **Image Decoding Evidence:**
+  * All 7 images evaluated via browser CDP: `complete === true`, `naturalWidth` and `naturalHeight` match intrinsic source dimensions (Hero: 2048×768; Cards: 1600×1000). Zero rendering errors or broken image icons.
+* **Responsive Viewport & Overflow Audit:**
+  * Viewports tested: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * Zero horizontal overflow detected on any viewport (`document.documentElement.scrollWidth <= window.innerWidth`).
+  * Hero focal positioning verified: `80% 50%` on mobile/tablet (390px, 768px); `75% 50%` on desktop (1024px, 1025px, 1440px, 1920px).
+* **Keyboard Focus & Navigation Audit:**
+  * Natural sequential Tab navigation successfully traversed all 6 family cards.
+  * Each card link activation applied full-card focus ring (`outline: 3px solid rgb(0, 87, 184)`) via `:has(.product-family-card__link:focus-visible)`.
+  * Exactly 1 Tab stop per card confirmed.
+* **Accessibility, Reduced Motion & Console Hygiene:**
+  * `prefers-reduced-motion: reduce`: Transition durations suppressed to `1e-05s`.
+  * Browser console errors: 0.
+  * Network failures: 0.
+* **Build & Code Hygiene Verification:**
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Clean in new/modified code; actual exit code 1 due to 19 pre-existing baseline `IDE0011` brace warnings in `Program.cs`.
+  * `git diff --check`: Clean (0 whitespace errors).
+
+---
+
+## QA-010 — Checkpoint USAP-CATALOG-001-QA1 Verification: Evidence-Safety, Screenshot Repair, and Review Package Portability
+
+* **Date:** 2026-09-15
+* **Task / Milestone:** Checkpoint USAP-CATALOG-001-QA1 (Evidence-Safety and Review-Package Repair)
+* **Scope & Implementation Summary:**
+  * **Products Landing Page Preservation:** Verified that `/products` layout, 6-card order, responsive styles, focal positions, and approved A2F imagery remain visually unchanged.
+  * **Exact A2F Alt Text Preservation:** Verified live in DOM and `ProductCatalogService.cs`:
+    1. Products Hero: `Technical visualization of antenna systems and engineering studies in a blue outdoor landscape.`
+    2. Log Periodic: `Log periodic antenna array in an outdoor installation.`
+    3. Portable & Transportable: `Portable antenna system deployed on a guyed field mast.`
+    4. Aperiodic Loop: `Aperiodic loop antenna element on a transportable tripod.`
+    5. NVIS: `Field-deployed NVIS antenna system with a central mast and broad wire footprint.`
+    6. Rotator & Control: `Heavy-duty antenna rotator with a translucent tabletop controller study.`
+    7. Tower Systems: `Technical study of tower, mast, rotation, feedline, and installation components.`
+  * **A2F Classifications Aligned:** Aligned all records to:
+    - Products hero: `conceptual family visual`
+    - Log Periodic: `family-level conceptual/reference-grounded visual`
+    - Portable & Transportable: `conceptual family placeholder`
+    - Aperiodic Loop: `reference-grounded single-element visualization`
+    - NVIS: `1942-family-level reference-grounded visualization`
+    - Rotator & Control: `reference-grounded rotator with illustrative controller study`
+    - Tower Systems: `design fallback — non-configurational family study`
+    - Confirmed Log Periodic is not identified as an LP-1017 photograph and no candidate is represented as exact product photography.
+  * **Evidence-Safe Family Route Shells:**
+    - Active disclaimer notice wired to all 6 family routes in `Pages/Products/Family.cshtml`:
+      > *"The models and configurations below are references from USAP’s published materials. Current availability, specifications, compatibility, and supported configurations require confirmation from USAP engineering."*
+    - Section header updated to: `PUBLISHED PRODUCT REFERENCES` / `Models Referenced in This Family` with label `Published Model References:`.
+    - Qualified all 16 groups and 30 models in `ProductCatalogService.cs` to remove unsubstantiated current-status assertions.
+    - All 6 families, 16 group IDs, and 30 canonical model codes preserved intact.
+  * **Browser Evidence & Prohibited Term Audit:**
+    - Headless Chrome audit evaluated all 6 family routes (`family_pages_status_notice_audit.json`). Verified 100% presence of status notice, correct section headers, and 0 occurrences of prohibited terms ("currently available", "current product", "currently offered", "currently supported", "approved product", "available now").
+  * **Input-Directory Hygiene:**
+    - `USAP_Product_Catalog_A2F_Review_Package_2026-09-15.zip`: verified in `project-inputs/` (57,753,091 bytes).
+    - `USAP_Product_Catalog_A3_Family_Hero_Review_Package_2026-09-15.zip`: verified in `project-input/` (34,654,781 bytes).
+    - Both directories exist on disk and are strictly ignored in `.gitignore`. Retaining both entries documented as mandatory. A3 archive remains unextracted and unintegrated.
+  * **Review Screenshot Repairs:**
+    - `02_six_family_grid_1440px.png`: Repaired with expanded document bounding rect; full 6-card grid (3x2) captured with 0 blank clipping (1072x1103 px).
+    - `04_six_family_grid_768px.png`: Repaired with expanded document bounding rect; full 6-card grid (2x3) captured with 0 blank clipping (720x1570 px).
+    - `07_family_card_keyboard_focus_card_crop.png`: Repaired with centered active card and 15px outline padding; complete 3px focus outline visible (371x567 px).
+    - Full-page screenshots for all 6 family routes (`06a` through `06f`) regenerated showing evidence-safe copy.
+  * **Exact Command Results & Formatter Disclosure:**
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: Exit code 0 (0 errors, 0 warnings).
+    - `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Actual exit code 1. Exactly 19 pre-existing baseline `IDE0011` brace warnings on `if` statements in `Program.cs` lines 16-35. Zero format warnings introduced in any new or modified file.
+    - `git diff --check`: Exit code 0 (Clean, 0 whitespace errors).
+    - `git status --short --branch`: Exit code 0 (`## feat/product-catalog-and-family-pages`, 100% unstaged and uncommitted).
+  * **Portable Review Package:**
+    - Created `USAP-CATALOG-001-QA1-review-package.zip` (18,518,622 bytes, SHA-256: `7C036448B82042E262338F1D67A6CD0A90852A47720E518D12AC6A6601798677`).
+    - Staged outside repository root in artifact directory.
+    - Verified 100% forward-slash entry paths (`/`) for cross-platform portability.
+    - Validated ZIP integrity via CRC `testzip()` and extraction.
+    - Manifest verified: 36 covered files (excluding `MANIFEST.txt` itself), 0 missing, 0 extra, 0 mismatched.
+    - Textual source review snapshot included (`source_changes.diff`).
+
+---
+
+## QA-011 — Checkpoint USAP-CATALOG-001-QA2 Verification: Current-Site Catalog Policy Alignment, Natural Product Titles, and A3 Hash Resolution
+
+* **Date:** 2026-09-15
+* **Task / Milestone:** Checkpoint USAP-CATALOG-001-QA2 (Current-Site Catalog Policy Alignment)
+* **Scope & Implementation Summary:**
+  * **Current-Site Catalog Policy Alignment:**
+    - In accordance with project lead decision, current public USAP website is recognized as authority for catalog inclusion pending client list.
+    - Retained all 16 canonical groups, 30 named models, and 1 unnamed line across the 6 families.
+    - Removed repeated word `Reference` or `References` from all 16 public product group titles.
+    - Restored natural first-party product names and concise, first-party grounded descriptions without repetitive boilerplate.
+    - Stated current-site published relationships (R3500/DRC-4 pairing, DRC-3 with R3501/R3503) without converting them into guarantees of current purchase availability.
+  * **Public Section Language Replacement:**
+    - Eyebrow: `PRODUCT CATALOG`
+    - Heading: `Products and Models in This Family`
+    - Lead: `The following product groups and configurations are cataloged for <familyName>:`
+    - Model List Label: `Models and Configurations:`
+    - Shared Notice: `Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application.`
+  * **Four-Dimensional Catalog Metadata Separation:**
+    - Domain records (`ProductGroupRecord`, `ProductModelRecord`) cleanly distinguish:
+      1. *Source presence:* Listed on current USAP website
+      2. *Commercial availability:* Not confirmed
+      3. *Client approval:* Pending
+      4. *Specification status:* Confirmed from current HTML / Provisional / HoldDisputedSpecs
+    - Public display contains zero "legacy" or "historical" badges.
+  * **Technical Resource Preservation for Lifecycle Classification:**
+    - All 19 discovered datasheets and revisions preserved in catalog records.
+    - Architectural capability for future lifecycle classification documented without deleting documentation or pages.
+  * **A3 Archive Hash Discrepancy Resolution:**
+    - Read-only hash recalculation on `project-input/USAP_Product_Catalog_A3_Family_Hero_Review_Package_2026-09-15.zip`:
+      - Length: `34,654,781` bytes
+      - SHA-256: `D5C60786BABE6533DA5DB1A30947649F621D038B410DDB7D7DD4DF41A96B4E79`
+    - Confirmed repository copy is the exact validated archive; previous `61a5ac...` was a typographical error in prior reporting.
+    - ZIP CRC integrity passed. The archive contains 46 total ZIP entries: 10 directory entries and 36 regular files. Of the 36 regular files, 35 are covered by `usap-product-catalog-a3/SHA256_MANIFEST.txt`, plus the manifest file itself. Archive remains unextracted and unintegrated.
+  * **Automated Browser Audit Results (`family_pages_status_notice_audit.json`):**
+    - Evaluated all 6 family routes in headless Chrome CDP:
+      1. Log Periodic: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+      2. Portable & Transportable: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+      3. Aperiodic Loop: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+      4. NVIS: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+      5. Rotator & Control: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+      6. Tower Systems: Notice=PASS, Eyebrow=PASS, Heading=PASS, ModelsLabel=PASS, NoRefTitle=PASS, ProhibitedWords=[] [PASS]
+    - Total cataloged groups across routes: 16
+    - Total cataloged models across routes: 31 (30 named + 1 unnamed)
+  * **Repaired & Regenerated Review Screenshots:**
+    - `02_six_family_grid_1440px.png` (1072×1103 px): Full 6-card grid in 3×2 layout visible with 0 blank clipping.
+    - `04_six_family_grid_768px.png` (720×1570 px): Full 6-card grid in 2×3 layout visible with 0 blank clipping.
+    - `07_family_card_keyboard_focus_card_crop.png` (371×567 px): Active card centered with 15px padding, full 3px outline visible.
+    - `06a`–`06f`: All 6 family routes captured at full scrollHeight displaying natural catalog titles and updated notice.
+    - `01`, `03`, `05`, `07_viewport`, `08_responsive_*`: Full suite captured across 6 viewports.
+  * **Commands & Formatter Verification:**
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: Clean (Exit Code 0).
+    - `dotnet run` on CatalogValidationTests: 12 / 12 verification scenarios pass (1 positive catalog initialization/structure scenario, 11 negative integrity scenarios) (Exit Code 0).
+    - `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Actual exit code 1. Exactly 19 pre-existing baseline `IDE0011` brace warnings in `Program.cs` lines 16-35. Zero warnings in new/modified code.
+    - `git diff --check`: Clean (Exit Code 0).
+    - `git status --short --branch`: The branch is correct (`feat/product-catalog-and-family-pages`) and the working tree contains the expected unstaged and uncommitted catalog changes; the staging area is empty.
+  * **Portable Review Package Metrics:**
+    - Package: `USAP-CATALOG-001-QA2R-review-package.zip`
+    - Purpose: External review evidence package staged and verified in the artifact directory.
+    - Contents: Review screenshots (including repaired 02, 04, 07 crop, and 06a–06f), machine-readable audit and test evidence, build and formatting results, asset hash registers, untracked files register, git status, and complete source snapshot.
+    - Source Snapshot: `source_changes.diff` includes the complete tracked git diff and synthetic `/dev/null` sections for all 7 untracked catalog C# source files.
+    - Untracked Files Register: `UNTRACKED_FILES_REGISTER.txt` enumerates all 14 untracked files (5 models, 2 services, 7 PNG assets) with sizes, SHA-256 hashes, and classifications.
+    - Integrity: 100% forward-slash paths, ZIP CRC `testzip()` passed with 0 corruptions, 100% manifest match upon clean extraction.
+    - Package Metrics: Final outer archive size, SHA-256 checksum, manifest-covered file count, and total entry count are reported in the external return report to avoid circular checksum dependencies.
+
+
+---
+
+## QA-012 — Checkpoint USAP-CATALOG-001-C2 Verification: Family Asset Integration, Card Unification, Guided Selection, and FAQ Completion
+
+* **Date:** 2026-09-16
+* **Task / Milestone:** Checkpoint USAP-CATALOG-001-C2 (Family Asset Integration, Card Unification, Guided Selection, and FAQ Completion)
+* **Scope & Implementation Summary:**
+  * **Asset Promotion & Domain Integration:**
+    - Promoted 16 approved asset derivatives from A3 and A3S into `src/USAP.Web/wwwroot/images/products/` with 100% byte-identical hash preservation against source archives:
+      - 1 Family Card: Rotator & Control Candidate B (`usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png`). Strictly rejected Candidate A.
+      - 6 Desktop Family Heroes (1536×576) & 6 Mobile Family Heroes (768×768): Log Periodic (A3 Candidate A V2), Portable & Transportable (A3S), Aperiodic Loop (A3 Candidate A V1), NVIS (A3 Candidate A V2), Rotator & Control (A3S), Tower Systems & Accessories (A3S).
+      - 3 Dedicated Rotator Visuals (1600×1000): DRC-3, DRC-4, and R3500/DRC-4 relationship.
+    - Domain model updated with explicit `ResponsiveHeroAsset` classifications without defaults.
+    - Approval status across all promoted assets: `provisional — USAP review pending`.
+  * **Responsive Hero `<picture>` & Non-Overlapping Breakpoint:**
+    - `<picture>` element with `<source media="(max-width: 47.999rem)" ...>` avoids 768px layout collisions with desktop `@media (min-width: 48rem)`.
+    - Programmatic browser audit verified selected resource: 390px and 767px select 768×768 mobile crop; 768px, 1024px, and 1440px select 1536×576 desktop image. At 768px, image choice and layout breakpoint strictly agree.
+    - Restrained copy-safe left overlay (`.internal-hero-overlay--family`) and per-family focal positions preserved.
+  * **Card Unification & Homepage Section 5 Integration:**
+    - Created shared partial component `Pages/Shared/_ProductFamilyCard.cshtml` implementing stretched-link single Tab-stop pattern.
+    - Homepage Section 5 updated via `IProductCatalogService.GetFeaturedFamilies()` displaying 4 canonical families linking to `/products/{slug}`, with section-level `View All Products` linking to `/products`.
+    - Obsolete `.product-card` and `.product-media` CSS rules audited and removed from `homepage.css`.
+    - Context-sensitive min-height custom properties (`--family-card-eyebrow-min-height`, `--family-card-title-min-height`, `--family-card-summary-min-height`) tuned for 3-column (2.25/3.25/4.5rem) and 4-column (2.75/4.25/5.5rem) contexts, with mobile reset to `auto`.
+    - Equal row heights, bottom-aligned CTAs, no line-clamping, no ellipses, no clipping verified.
+    - Computed style audit confirms 100% parity across borders, radii, shadows, media ratios, typography, hover elevation, and focus rings.
+  * **Actionable Engineering Guidance & FAQ:**
+    - Reworked Guidance section into 3 actionable pathways (Deployment & Mobility, Coverage & Propagation, Positioning & Infrastructure) with cross-family links.
+    - Replaced duplicate 2-button CTA with a restrained inline continuation notice linking to `#products-faq` and `#closing-cta-heading`.
+    - Implemented 6-question Product Selection FAQ on `/products` using native semantic `<details>`/`<summary>` without JavaScript. Suppressed marker rotation under `prefers-reduced-motion`.
+  * **Dedicated Rotator Product Visuals Section:**
+    - 3 `<figure>`/`<figcaption>` cards on `/products/antenna-rotator-control-systems` with single restrained section note.
+  * **DRC-4 Branding Limitation Documented:**
+    - The horizontal controller-face wordmark is source-derived and provisional. It is not an approved official alternate logo lockup. Documented for future replacement when vector brand artwork is supplied.
+  * **Automated Browser & Regression Route Coverage (10 routes verified):**
+    - HTTP 200 OK: `/`, `/products`, `/products/log-periodic-antennas`, `/products/portable-transportable-antennas`, `/products/aperiodic-loop-antennas`, `/products/nvis-antennas`, `/products/antenna-rotator-control-systems`, `/products/tower-systems-accessories`, `/about-us`, `/technical-resources`, `/contact-us`, `/request-a-quote`.
+    - HTTP 404 Not Found: `/products/invalid-slug` (verified via custom 404 handler).
+    - Zero console errors across all routes.
+    - Zero network 4xx/5xx failures.
+    - Zero horizontal overflow across 6 viewports (390, 767, 768, 1024, 1440, 1920).
+    - Exactly 1 Tab stop per card, hit-testing validated.
+    - Complete absence of A3R or superseded asset requests verified.
+  * **Commands & Formatter Verification:**
+    - `dotnet restore USAP.Web.sln`: Clean (Exit Code 0).
+    - `dotnet build USAP.Web.sln --configuration Debug --no-restore`: Clean (Exit Code 0, 0 warnings, 0 errors).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: Clean (Exit Code 0, 0 warnings, 0 errors).
+    - `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Actual exit code 1. Exactly 19 pre-existing baseline `IDE0011` brace warnings in `Program.cs` lines 16-35. Zero warnings introduced in any new or modified file.
+    - `dotnet run` on CatalogValidationTests: 18 / 18 scenarios pass (12 baseline scenarios + 6 new C2 responsive hero and featured family contract scenarios) (Exit Code 0).
+    - `git diff --check`: Clean (Exit Code 0).
+    - `git status --short --branch`: Clean (`## feat/product-catalog-and-family-pages`, 100% unstaged and uncommitted).
+  * **Review Package & Artifacts:**
+    - Portable review package `USAP-CATALOG-001-C2-review-package.zip` generated in artifact directory.
+    - 17 review screenshots captured.
+    - Source snapshot `source_changes.diff` includes tracked git diff and synthetic `/dev/null` sections for untracked source files.
+    - Untracked files register, asset hash registers, audit summaries, and build results included.
+    - 100% forward-slash paths, CRC `testzip()` passed with 0 corruptions, 100% manifest match upon clean extraction.

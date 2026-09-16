@@ -361,6 +361,108 @@ A standardized two-column layout applied to `/contact-us` and `/request-a-quote`
 
 ---
 
+## Product Catalog & Family Card Foundation (Milestone C1 / USAP-CATALOG-001)
+
+Standardized catalog presentation patterns established in Milestone C1 and refined in `USAP-CATALOG-001` in `src/USAP.Web/wwwroot/css/site.css` (Section 6C).
+
+### Products Landing Hero (`.internal-hero--products`)
+
+- **Candidate Asset:** Direction C (`usap-products-landing-hero-direction-c-candidate-v1.png`, 2048 × 768 px).
+- **Structure:** Semantic `<img>` rendered within the `.internal-hero-media` wrapper before `.internal-hero-overlay`.
+- **Loading & Performance:** Configured with `fetchpriority="high"`, `decoding="async"`, `width="2048"`, and `height="768"` to prevent layout shift and optimize largest contentful paint (LCP).
+- **Focal Positioning:** `object-fit: cover; object-position: 75% center;` on desktop viewports (≥64rem / 1024px), shifting to `object-position: 80% center;` on mobile/tablet viewports (<64rem). This shifts the focal antenna array geometry into the right-hand view area, keeping the left ~35% clear for the hero heading, eyebrow, and introductory text.
+- **Contrast & Legibility:** Left-to-right navy gradient overlay (`.internal-hero-overlay`) maintains text contrast exceeding WCAG AAA (>7:1) across all breakpoints.
+- **Graceful Degradation:** The hero wrapper retains its solid `--color-brand-navy` background, ensuring immediate text contrast and structure if the image is disabled or still loading.
+
+### Six-Family Grid Layout (`.products-family-grid`)
+
+- **Desktop (≥64rem / 1024px):** 3-column CSS Grid (`grid-template-columns: repeat(3, 1fr)`).
+- **Tablet (48rem–63.9375rem / 768px–1023px):** 2-column CSS Grid (`grid-template-columns: repeat(2, 1fr)`).
+- **Mobile (<48rem / <768px):** 1-column layout (`grid-template-columns: 1fr`).
+- **Gap:** Uniform `--space-6` (1.5rem / 24px) spacing across rows and columns.
+- **Zero Overflow:** Strictly verified zero horizontal overflow across 390px, 768px, 1024px, 1025px, 1440px, and 1920px viewports.
+
+### Product Family Card (`.product-family-card` / `_ProductFamilyCard.cshtml`)
+
+A shared reusable card component implemented in `Pages/Shared/_ProductFamilyCard.cshtml`, utilized uniformly by the `/products` landing grid (3-column) and the homepage Section 5 featured products grid (4-column):
+
+| Class | Role | Styling & Behavior |
+|---|---|---|
+| `.product-family-card` | Card shell | Extends `.card.card--interactive` with restrained neutral border (red top border removed), flex-column layout, relative positioning, and 100% height for equal row heights. Entire card surface is clickable via stretched link. Full-card 3px focus-visible outline (`--focus-ring`). |
+| `.product-family-card__media` | 16:10 media frame | Edge-to-edge 16:10 aspect ratio (`aspect-ratio: 16 / 10`), zero inset padding, running flush to top and side edges with `overflow: hidden`. |
+| `.product-family-card__img` | Product photography | Edge-to-edge frame coverage with `object-fit: cover; object-position: center; display: block; padding: 0;`. Intrinsic dimensions set to `width="1600" height="1000"` (16:10 native aspect ratio), with `loading="lazy"` and `decoding="async"`. Restrained scale zoom (`scale(1.03)`) on card hover and keyboard focus (suppressed under `prefers-reduced-motion: reduce`). |
+| `.product-family-card__placeholder` | Native design placeholder | Deliberate CSS fallback for families without candidate imagery or when imagery fails to load. 16:10 edge-to-edge geometry, dark navy gradient, technical blueprint dot grid (`.card-placeholder-pattern`), antenna SVG wireframe, `PRODUCT IMAGERY IN DEVELOPMENT` status badge, and `Design placeholder — replacement imagery pending USAP review.` caption. |
+| `.product-family-card__body` | Content area | Flex-grow column with `--space-6` padding. Equal-height alignment pushes action wrapper to card bottom. |
+| `.product-family-card__eyebrow` | Category tag | Uppercase 12px bold label in `--color-text-link` (#004a99). Height governed by `--family-card-eyebrow-min-height`. |
+| `.product-family-card__title` | Family name | Semantic `<h3>` heading in `--color-brand-navy` (#0d1b2e) with `--leading-snug`. Height governed by `--family-card-title-min-height`. |
+| `.product-family-card__summary` | Family description | Factual, conservative summary without disputed engineering claims. Height governed by `--family-card-summary-min-height`. Flex-grow pushes action link to card footer. |
+| `.card-link.stretched-link` | Interactive target & CTA | Exactly one real anchor per card with `.stretched-link::after` overlay covering the entire card surface. Restrained editorial text-link with visible `Explore Family →` text, animated arrow translation on hover, and accessible family-specific name (`aria-label="Explore @family.Name"`). Exactly one Tab stop per card. |
+
+#### Context-Sensitive Height Normalization Tokens
+
+To ensure equal card row heights and bottom CTA alignment across varying column widths without line-clamping, ellipses, clipping, or per-card font-size reductions, context-sensitive CSS custom properties are applied at the container level and reset to `auto` on mobile:
+
+| Token | 3-Column Context (`.products-family-grid` ≥768px) | 4-Column Context (`.home-featured-products .products-grid` ≥1024px) | Mobile Context (<768px) |
+|---|---|---|---|
+| `--family-card-eyebrow-min-height` | `2.25rem` | `2.75rem` | `auto` |
+| `--family-card-title-min-height` | `3.25rem` | `4.25rem` | `auto` |
+| `--family-card-summary-min-height` | `4.5rem` | `5.5rem` | `auto` |
+
+### Responsive Picture Hero Component (`.internal-hero--family`)
+
+Family pages (`Pages/Products/Family.cshtml`) implement a responsive `<picture>` hero banner:
+
+- **Non-Overlapping Breakpoint:** `<source media="(max-width: 47.999rem)" ...>` routes viewports below 768px to the 768×768 mobile crop, while viewports at 48rem/768px and above receive the 1536×576 desktop image, agreeing with desktop CSS `@media (min-width: 48rem)`.
+- **Loading Performance:** `fetchpriority="high"`, `decoding="async"`, and explicit intrinsic `width` and `height` attributes to eliminate cumulative layout shift.
+- **Copy-Safe Contrast Overlay (`.internal-hero-overlay--family`):** Dark gradient overlay (`linear-gradient(to right, rgba(13, 27, 46, 0.88) 0%, rgba(13, 27, 46, 0.72) 40%, rgba(13, 27, 46, 0.25) 75%, transparent 100%)`) ensures WCAG AA text contrast for headings and breadcrumbs against complex antenna imagery.
+- **Per-Family Focal Positions:** Tailored focal alignments (e.g., `center 40%` for Log Periodic, `center 45%` for Portable, `center 42%` for Rotator & Control) to preserve structural antenna and controller geometry across breakpoints.
+
+### Engineering Guidance Section (`.selection-help-section`)
+
+- Background surface `.color-surface-subtle` with top and bottom dividers.
+- 3-column desktop grid, 1-column mobile layout.
+- Restrained ambient cards without heavy left accent borders (`.card.card--ambient`).
+- 3 actionable pathways: Deployment & Mobility, Coverage & Propagation, and Positioning & Infrastructure, providing cross-family selection links.
+- **Single Conversion Destination:** Competing 2-button CTA removed; replaced with an inline continuation notice (`.guidance-continuation`) directing users to `#products-faq` and the existing `#closing-cta-heading` closing CTA.
+
+### Product Selection FAQ Component (`.faq-list`)
+
+- Pure semantic HTML implementation using native `<details>` and `<summary>` elements without JavaScript dependencies.
+- Styled surface (`var(--color-surface)`), border (`var(--card-border)`), and border-radius (`var(--radius-md)`).
+- Accessible keyboard focus and toggle disclosure with smooth chevron rotation indicator (`transform: rotate(90deg)` on `details[open]`).
+- Animation suppressed under `prefers-reduced-motion: reduce`.
+
+### Dedicated Rotator Product Visuals Grid (`.rotator-visuals-grid`)
+
+- Dedicated hardware figure section on `/products/antenna-rotator-control-systems`.
+- 3-column responsive grid of `<figure>` cards with 16:10 aspect ratio, subtle border, rounded corners, and `<figcaption>` product descriptions.
+- Single restrained section-level notice explaining images are source-guided visualizations based on published USAP materials.
+
+### Product-Group Cards (`.family-group-card`)
+
+- Restrained neutral border (`var(--card-border)`), white surface, and ambient hover elevation.
+- Navy left accent border (`card--accent-left-navy`) removed per C1B accent restraint rule, reserving color accents for designated notice and guidance components.
+
+### Breadcrumb Navigation (`.breadcrumbs`)
+
+- Semantic `<nav aria-label="Breadcrumb">` landmark positioned immediately below the hero banner as the first element in the page content area.
+- Aligned to the main content container (`.container`) at the upper-left edge.
+- Rendered on the light page background with high-contrast link styling (`--color-text-link`), neutral slash separators (`/`), and standard visible focus rings (`--focus-ring`).
+- Ordered list structure with linked `Home` and `Products` ancestors and current family item as non-linked text with `aria-current="page"`.
+
+### Product Information Notice (`.product-info-notice`)
+
+- Warning-accented notice box (`border-left: 4px solid #f59e0b`, background `#fff8f0`) with `role="region"` and `aria-label="Product Information"`.
+- Clean public-facing current-site aligned disclaimer:
+  > *"Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application."*
+- Followed by natural product catalog section headers:
+  - Eyebrow: `PRODUCT CATALOG`
+  - Heading: `Products and Models in This Family`
+  - Label: `Models and Configurations:`
+- Completely free of internal milestone or checkpoint terminology, and strictly excludes unconfirmed present-availability claims.
+
+---
+
 ## Form control foundations
 
 | Class | Purpose |

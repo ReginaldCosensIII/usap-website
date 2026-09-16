@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using USAP.Web.Services;
+using USAP.Web.Services.Catalog;
 using USAP.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.AddOptions<SiteSettings>()
     .ValidateOnStart();
 
 builder.Services.AddScoped<IInquiryMessageComposer, InquiryMessageComposer>();
+builder.Services.AddSingleton<IProductCatalogService, ProductCatalogService>();
 
 if (builder.Environment.IsDevelopment())
 {

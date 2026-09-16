@@ -1,21 +1,205 @@
-@page
+@page "/products"
 @model USAP.Web.Pages.Products.IndexModel
 @{
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
         Title = "Antenna Products & Systems",
-        Description = "Explore HF, VHF, and UHF antenna systems, rotator and control equipment, and related product families from United States Antenna Products.",
+        Description = "Explore USAP's six core antenna system families, including log periodic arrays, portable and transportable systems, aperiodic loops, NVIS solutions, rotators, and towers.",
         CanonicalPath = "/products",
         Robots = "index, follow",
         OpenGraphType = "website"
     };
 }
 
-<div class="container section">
-    <h1>Products</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Product family listing will be implemented in the Catalog &amp; Resources task.</p>
-        <p>Up to six approved product families are planned. Product names, specifications, and imagery are pending client-supplied content.</p>
-        <p>See <code>docs/CONTENT_AND_ASSETS.md</code> for outstanding client-input requirements.</p>
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--products" aria-labelledby="products-hero-title">
+    <div class="internal-hero-bg" aria-hidden="true"></div>
+    <img class="internal-hero-image"
+         src="@Model.HeroAsset.ImagePath"
+         alt="@Model.HeroAsset.AltText"
+         width="2048"
+         height="768"
+         fetchpriority="high"
+         decoding="async" />
+    <div class="internal-hero-overlay" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">Product Catalog</span>
+            <h1 id="products-hero-title" class="internal-hero-title">Antenna Products &amp; Systems</h1>
+            <p class="internal-hero-lead">Engineered for defense, government, and commercial communications. Explore USAP's structured product families spanning tactical HF, transportable systems, directional receiving loops, NVIS arrays, and antenna positioning systems.</p>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- Section 2: Six Product Families Grid -->
+<section class="section products-families-section" aria-labelledby="catalog-families-heading">
+    <div class="container">
+        <div class="section-intro">
+            <span class="eyebrow">Catalog Overview</span>
+            <h2 id="catalog-families-heading" class="section-heading">Product Families</h2>
+            <p class="section-lead">Select an antenna family below to review system configurations, operational characteristics, and available models.</p>
+        </div>
+
+        <div class="products-family-grid">
+            @foreach (var family in Model.Families)
+            {
+                <partial name="_ProductFamilyCard" model="family" />
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: Selection Help / Guidance Section -->
+<section class="section selection-help-section" aria-labelledby="selection-help-heading">
+    <div class="container">
+        <div class="section-intro">
+            <span class="eyebrow">Engineering Guidance</span>
+            <h2 id="selection-help-heading" class="section-heading">Selecting the Right Antenna System</h2>
+            <p class="section-lead">USAP provides antenna systems across diverse propagation modes and installation requirements. Consider these key operational criteria when evaluating options for your application.</p>
+        </div>
+
+        <div class="selection-help-grid">
+            <div class="card card--ambient selection-help-card">
+                <div class="card-body">
+                    <span class="eyebrow selection-help-card__eyebrow">Deployment &amp; Mobility</span>
+                    <h3 class="selection-help-card__title">Field vs. Fixed Installation</h3>
+                    <p class="selection-help-card__text">Evaluate field-deployable masts and transportable antenna packages versus permanent tower-mounted base installations based on deployment speed, transport constraints, and site infrastructure.</p>
+                    <div class="selection-help-card__links">
+                        <span class="selection-help-card__links-label">Relevant Families:</span>
+                        <ul class="selection-help-card__links-list">
+                            <li><a href="/products/portable-transportable-antennas">Portable &amp; Transportable Antennas</a></li>
+                            <li><a href="/products/log-periodic-antennas">Log Periodic Antennas</a></li>
+                            <li><a href="/products/tower-systems-accessories">Tower Systems &amp; Accessories</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card--ambient selection-help-card">
+                <div class="card-body">
+                    <span class="eyebrow selection-help-card__eyebrow">Coverage &amp; Propagation</span>
+                    <h3 class="selection-help-card__title">Directional, Omnidirectional &amp; NVIS</h3>
+                    <p class="selection-help-card__text">Select directional log periodics for high gain over long circuits, omnidirectional configurations for multi-point coverage, or NVIS arrays for regional communications without skip zones in mountainous terrain.</p>
+                    <div class="selection-help-card__links">
+                        <span class="selection-help-card__links-label">Relevant Families:</span>
+                        <ul class="selection-help-card__links-list">
+                            <li><a href="/products/log-periodic-antennas">Log Periodic Antennas</a></li>
+                            <li><a href="/products/nvis-antennas">NVIS Antennas</a></li>
+                            <li><a href="/products/aperiodic-loop-antennas">Aperiodic Loop Antennas</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card--ambient selection-help-card">
+                <div class="card-body">
+                    <span class="eyebrow selection-help-card__eyebrow">Positioning &amp; Infrastructure</span>
+                    <h3 class="selection-help-card__title">Rotation, Control &amp; Support</h3>
+                    <p class="selection-help-card__text">Pair directional arrays with heavy-duty rotators, digital bench or rackmount controllers, compatible tower sections, and matching mast hardware for complete system reliability.</p>
+                    <div class="selection-help-card__links">
+                        <span class="selection-help-card__links-label">Relevant Families:</span>
+                        <ul class="selection-help-card__links-list">
+                            <li><a href="/products/antenna-rotator-control-systems">Antenna Rotator &amp; Control Systems</a></li>
+                            <li><a href="/products/tower-systems-accessories">Tower Systems &amp; Accessories</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="guidance-continuation">
+            <p class="guidance-continuation__text">
+                <strong>Not sure which family fits your operational requirements?</strong>
+                Review our <a href="#products-faq">Product Selection FAQ</a> below or <a href="#closing-cta-heading">consult with USAP engineering</a> for tailored technical guidance.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Section 4: Product Selection FAQ -->
+<section class="section faq-section" id="products-faq" aria-labelledby="faq-heading">
+    <div class="container">
+        <div class="section-intro">
+            <span class="eyebrow">Frequently Asked Questions</span>
+            <h2 id="faq-heading" class="section-heading">Product Selection FAQ</h2>
+            <p class="section-lead">Answers to common engineering questions regarding antenna selection, deployment options, and system integration.</p>
+        </div>
+
+        <div class="faq-list">
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">How do I choose between a directional log periodic and an omnidirectional antenna?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>Directional log periodic antennas provide focused forward gain and high front-to-back discrimination across wide frequency bands for point-to-point or sector communications, often paired with an antenna rotator. Omnidirectional antennas provide continuous 360-degree coverage without mechanical steering, suitable for multi-party networks, tactical base stations, or broadcast environments communicating with units in multiple directions.</p>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">What is NVIS and when should it be considered?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>Near Vertical Incidence Skywave (NVIS) radiates RF energy at steep angles (70&deg; to 90&deg;) to reflect off the ionosphere directly downward, providing gap-free tactical HF coverage over regional distances (typically 0 to 400 miles / 0 to 650 km) without skip zones, even in rugged, mountainous terrain or heavily forested valleys.</p>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">Are USAP portable antenna systems suitable for rapid field deployment?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>Yes. USAP portable and transportable antenna systems are engineered for rapid field assembly with tactical masts, guy hardware, and transportable packaging, supporting quick setup and teardown for emergency response, expeditionary operations, or tactical defense networks.</p>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">Can USAP antenna rotators and controllers integrate with existing mast or tower hardware?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>USAP mechanical rotators and digital rotator controllers (such as the R3500 series and DRC-3/DRC-4) are designed for integration with standard tower sections, mast hardware, and commercial or military antenna arrays. Exact mounting dimensions, torque specifications, and cable runs should be verified with engineering before installation.</p>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">Does USAP provide customized antenna designs or frequency coverage?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>Yes. USAP engineering works with commercial, industrial, and defense customers to adapt existing antenna designs, specify custom frequency coverage, or develop complete integrated systems including rotators, towers, and feedline hardware.</p>
+                </div>
+            </details>
+
+            <details class="faq-item">
+                <summary class="faq-summary">
+                    <span class="faq-question">How do I request technical specifications or formal pricing?</span>
+                    <span class="faq-icon" aria-hidden="true"></span>
+                </summary>
+                <div class="faq-content">
+                    <p>You can submit a quotation request through our online <a href="/request-a-quote">Request a Quote</a> form or contact our engineering team directly via <a href="/contact-us">Contact Engineering</a> with your operational parameters, frequency ranges, and mounting requirements.</p>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- Section 5: Shared Closing CTA -->
+<section class="closing-cta closing-cta--default products-closing-cta" aria-labelledby="closing-cta-heading">
+    <div class="container">
+        <div class="closing-cta-content">
+            <span class="eyebrow">System Consultation</span>
+            <h2 id="closing-cta-heading">Ready to Discuss Your Antenna Requirements?</h2>
+            <p>Share your application requirements, frequency coverage needs, or deployment constraints. USAP engineering can help you evaluate available antenna and positioning options.</p>
+            <div class="closing-cta-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Contact Engineering</a>
+            </div>
+        </div>
+    </div>
+</section>

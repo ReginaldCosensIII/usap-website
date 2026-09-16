@@ -263,3 +263,213 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 - Created a supplemental provenance directory `project-input/USAP_Contact_Hero_Revision_2026-09-12/` containing a byte-for-byte copy of the revised asset, `CHECKSUMS.sha256` (`B020AD39E6A8CEFD15C584DCA9B77503070CDE8FD0C33B63C6A556F645CD71E4`), and explanatory `README.md`.
 - Maintained status as pending USAP/client visual approval.
 **Reason:** Checkpoint USAP-CONTACT-ASSETS-001-C2 to eliminate medical misinterpretation while preserving unified design-system styling and runtime stability.
+
+---
+
+## DEC-024 — Six-Family Product Catalog Taxonomy, Canonical 16-Group Distribution, Repository-Native Catalog Service, and Responsive Landing Page Foundation in Milestone C1
+
+**Date:** 2026-09-12
+**Decision:**
+- Approved six-family taxonomy established in exact canonical display order with exact 5 / 3 / 1 / 1 / 5 / 1 product-group distribution (16 distinct groups total):
+  1. `Log Periodic Antennas` (`/products/log-periodic-antennas`): 5 groups (`lp-high-power`, `lp-1017`, `lp-1018ba`, `lp-1019`, `lp-1112mr`). Conservative summary: "Broadband directional antenna systems spanning HF through UHF applications."
+  2. `Portable & Transportable Antenna Systems` (`/products/portable-transportable-antennas`): 3 groups (`v-4213`, `lp-1402-1403`, `1910`). Conservative summary: "Field-deployable antenna systems covering HF and VHF communications."
+  3. `Aperiodic Loop Antennas` (`/products/aperiodic-loop-antennas`): 1 group (`aperiodic`, unnamed model line). Conservative summary: "Receive-focused fixed and transportable loop-array solutions."
+  4. `NVIS Antennas` (`/products/nvis-antennas`): 1 group (`1942`, covering models 1942-RT, 1942-TA, 1942-GM, with low-power variants on conflict hold). Conservative summary: "Near Vertical Incidence Skywave antenna configurations for HF communications."
+  5. `Antenna Rotator & Control Systems` (`/products/antenna-rotator-control-systems`): 5 groups (`r3500`, `r3501`, `r3503`, `drc-3`, `drc-4`). Conservative summary: "Mechanical rotators and digital control systems for directional antenna installations."
+  6. `Tower Systems & Accessories` (`/products/tower-systems-accessories`): 1 group (`t-3002`, covering parent and child ordering configurations 3002FA, 3002FB, 3002SS, 3002SS-80). Conservative summary: "Tower, mast, rotation, feedline, and installation configurations for large antenna systems."
+- LP-1112MR is primarily classified under Log Periodic Antennas, preserving public catalog convention, with transportable characteristics captured in metadata. LP-1402/LP-1403 is classified under Portable & Transportable Antenna Systems.
+- Catalog contains exactly 30 named model/configuration codes and 1 unnamed Aperiodic Loop product-line record.
+- Three active family card imagery cutouts are designated as "project-selected reference-grounded candidate — USAP approval pending", with native placeholder frames maintained for the remaining three families.
+- Implemented strongly typed domain models (`CatalogAsset`, `ProductFamilyRecord`, `ProductGroupRecord`, `ProductModelRecord`, `ProductResourceRecord`) and singleton service `ProductCatalogService` registered in DI via `IProductCatalogService`.
+- Strict startup/construction validation implemented enforcing exact 6 families, unique IDs/slugs, sequential display order (1..6), valid slug regex, exact per-family group distribution (5/3/1/1/5/1), ordered group ID matching, 30 named models + 1 unnamed, and valid family/product/resource relationships.
+- Replaced provisional `/products` scaffold with production-ready landing page utilizing shared `.internal-hero`, 3-col/2-col/1-col responsive card grid, source-constrained selection-help section, and shared closing CTA.
+- Reserved six canonical family routes via `Pages/Products/Family.cshtml` using shared `.internal-hero` placeholders, breadcrumbs, provisional notice banner, and audited product groups; invalid slugs return HTTP 404 (eliminating previous soft-404 gap).
+- Full product detail pages and specification tables deferred to Milestone C2. Disputed specifications (LP-1001 impedance, LP-1017 radiation angle, V-4213 wind rating, etc.) are strictly excluded from landing page copy.
+- Public site legacy redirects and PDF migration deferred to Milestone C3.
+**Reason:** Milestone USAP-PRODUCTS-001-C1 structured catalog foundation, canonical 16-group research inventory alignment, and landing page implementation.
+
+---
+
+## DEC-025 — Product Catalog Visual and Semantic Refinements: Relocated Breadcrumbs, Stretched-Link Entire Card Activation, Restrained Editorial CTA, 16:10 Edge-to-Edge Media Frames, Accent Restraint, and Public Guidance Notice (Milestone C1B)
+
+**Date:** 2026-09-13
+**Decision:**
+- **Relocated Breadcrumbs:** Removed breadcrumb navigation from inside the dark `.internal-hero--family` banner across all six product-family routes. Rendered semantic `<nav aria-label="Breadcrumb">` directly below the hero as the first element in the page-content area, aligned with `.container`, styled for light page backgrounds, with high-contrast links, neutral `/` separators, visible 3px focus rings, and non-linked current family item (`aria-current="page"`).
+- **Entire Family Card Clickable:** Implemented accessible `.stretched-link` pattern (`.stretched-link::after` absolute overlay with `z-index: 2`) on each landing page family card. The entire visible card surface (media frame, eyebrow, heading, summary, body padding, visible CTA) activates the family route without JavaScript event handlers, preserving native browser navigation, single Tab stop per card, context menus, and destination display in status bar.
+- **Editorial Card Link CTA:** Replaced filled button styling (`.btn.btn-secondary.btn-sm`) on family cards with a restrained editorial text-link and arrow pattern (`Explore Family →`). Aligned at the bottom of the card body via flexbox (`margin-top: auto`), with accessible family-specific name (`aria-label="Explore @family.Name"`). Visibly responds to card hover and keyboard focus with color shift and directional arrow translation.
+- **Uniform Card Alignment:** Standardized card body flexbox layout ensuring equal row heights and bottom-aligned CTAs across varied title and summary text lengths without text truncation or line clamping.
+- **16:10 Edge-to-Edge Media Frames:** Removed inset white padding and side gutters from family-card media frames. Set `aspect-ratio: 16 / 10` with `overflow: hidden` and `object-fit: cover; object-position: center; display: block; padding: 0;`. Applied identical geometry to native design placeholders. Maintained subtle image scale zoom (`scale(1.03)`) on card hover and keyboard focus, fully suppressed under `prefers-reduced-motion: reduce`.
+- **Accent Restraint:** Removed red top borders (`card--accent-top-red`) from normal family cards and repeated navy left borders (`card--accent-left-navy`) from product-group cards. Reserved accent borders strictly for intentionally designated notice and guidance components (such as the engineering selection help cards and product information notices). Catalog cards use neutral borders (`var(--card-border)`), white surfaces, and subtle elevation.
+- **Deliberate Design Placeholder Terminology:** Distinguished native CSS design placeholders from production photography and candidate imagery. Updated visible badges to `PRODUCT IMAGERY IN DEVELOPMENT` and captions to `Design placeholder — replacement imagery pending USAP review.`
+- **Public Guidance Notice:** Completely eliminated internal milestone and checkpoint terminology (`Checkpoint C1`, `Milestone C1`, `Milestone C2`, `provisional route reservation`) from rendered public pages. Replaced with restrained `Product Information` notice advising visitors that detailed specifications, datasheets, dimension diagrams, and radiation patterns are being audited for publication, providing a direct link to USAP engineering.
+- **Asset Discipline:** Confirmed that the separately generated A2 asset package was deliberately not imported for C1B, preserving current repository imagery and native design placeholders to evaluate visual and semantic foundations independently.
+**Reason:** Checkpoint USAP-PRODUCTS-001-C1B visual and semantic refinement.
+
+---
+
+## DEC-026 — Candidate Image Alt Text and Source-Constrained Selection Guidance Refinement (Milestone C1B Follow-Up)
+
+**Date:** 2026-09-13
+**Decision:**
+- **Candidate-Image Alt Text:** Replaced exact-model assertions on active family card images with concise, visually descriptive family-level alt text that accurately describes what is visually present without asserting unapproved product identity:
+  - Log Periodic: "Log periodic antenna array in a field installation."
+  - Portable & Transportable: "Transportable HF antenna system in a field setting."
+  - Rotator & Control: "Antenna rotator and digital controller components."
+- **Source-Constrained Selection-Assistance Copy:** Audited the three selection-assistance cards on `/products` against canonical research inputs. Replaced draft copy with conservative, source-constrained descriptions:
+  - Deployment & Mobility: "Compare field-deployable antenna configurations with fixed base-station installations based on transportation, setup, and operating requirements."
+  - Radiation Profile: "Compare directional log periodic, omnidirectional, NVIS, and receive-focused loop-array configurations based on the intended communications requirement."
+  - Integration & Hardware: "Consider mechanical rotators, digital controllers, tower or mast support, feedline, and installation hardware as part of the complete antenna system."
+  - Specifically removed unsubstantiated claims: "long-term continuous duty", "terrain obstacle mitigation", "low-noise", "precision", "microprocessor", and "modular aluminum".
+- **Preserved C1/C1A/C1B Foundations:** Retained all six families, 16 groups (5/3/1/1/5/1), 30 named models, 11 validation tests, 13 route statuses (including true invalid-slug 404), stretched-link card activation, breadcrumb placement, and unstaged Git discipline.
+**Reason:** Checkpoint USAP-PRODUCTS-001-C1B follow-up review corrections.
+
+---
+
+## DEC-027 — Products Landing Page Hero Direction C and Six Family-Card Candidate Asset Integration (Task USAP-CATALOG-001)
+
+**Date:** 2026-09-15
+**Decision:**
+- **Selected A2F Candidate Asset Set:** Promoted seven project-selected assets from `project-inputs/USAP_Product_Catalog_A2F_Review_Package_2026-09-15.zip` into `src/USAP.Web/wwwroot/images/products/` with byte-identical hash preservation:
+  1. Products Landing Hero: Direction C (`usap-products-landing-hero-direction-c-candidate-v1.png`, 2048 × 768 px).
+  2. Log Periodic Antennas: Reference-grounded family visual (`usap-family-card-log-periodic-family-visual-v1.png`, 1600 × 1000 px).
+  3. Portable & Transportable Antenna Systems: Stylized placeholder visual (`usap-family-card-portable-transportable-placeholder-v1.png`, 1600 × 1000 px).
+  4. Aperiodic Loop Antennas: Reference-grounded element visual (`usap-family-card-aperiodic-loop-element-v1.png`, 1600 × 1000 px).
+  5. NVIS Antennas: Reference-grounded family visual (`usap-family-card-nvis-1942-family-visual-v1.png`, 1600 × 1000 px).
+  6. Antenna Rotator & Control Systems: Conceptual lower-risk indicator Candidate B (`usap-family-card-rotator-control-lower-risk-placeholder-v2.png`, 1600 × 1000 px).
+  7. Tower Systems & Accessories: Structural mast/tower illustration Candidate B (`usap-family-card-tower-systems-nonconfigurational-fallback-v2.png`, 1600 × 1000 px).
+- **Candidate Selection Rationale:**
+  - Hero Direction C selected over Directions A and B because its left ~35% provides a deep-navy gradient area ensuring WCAG AAA text contrast for the hero title, eyebrow, and introductory text, while the right ~65% showcases antenna geometry and blueprint motifs.
+  - Rotator Candidate B selected over Candidate A (rejected for depicting unverified specific chassis/hardware features) and Candidate C (rejected for excessive abstraction).
+  - Tower Candidate B selected over Candidate A (rejected for depicting an unverified specific 3002SS hardware configuration).
+- **Provisional Status & Replacement Contract:** All seven assets are classified as provisional review candidates pending formal USAP product-owner visual approval. None represent certified or verified production hardware photography. They are architecturally decoupled in `IProductCatalogService` so they can be replaced by client-approved photography without requiring markup or layout changes.
+- **Archive Integrity:** Unselected candidate directions (Hero A/B, Rotator A/C, Tower A), comparison sheets, and internal review derivatives remain strictly within the ignored intake archive and are not tracked or served in `wwwroot`.
+- **Preserved Foundations:** The authorized C1/C1A/C1B taxonomy (6 families, 16 groups, 30 models), 16:10 edge-to-edge geometry, stretched-link navigation, breadcrumb placement, and native CSS design placeholder fallbacks are 100% preserved.
+**Reason:** Task USAP-CATALOG-001 Products landing page and provisional asset integration.
+
+---
+
+## DEC-028 — Evidence-Safe Family Route Shells, A2F Classification Alignment, Input-Directory Hygiene, and QA Evidence Repair (Checkpoint USAP-CATALOG-001-QA1)
+
+**Date:** 2026-09-15
+**Decision:**
+- **Evidence-Safe Family Route Shells:**
+  - Added shared public disclaimer notice across all six family routes in `Pages/Products/Family.cshtml`:
+    *"The models and configurations below are references from USAP’s published materials. Current availability, specifications, compatibility, and supported configurations require confirmation from USAP engineering."*
+  - Replaced section eyebrow with `PUBLISHED PRODUCT REFERENCES`, heading with `Models Referenced in This Family`, and model label with `Published Model References:`.
+  - Audited and qualified all 16 product group titles, descriptions, and model configuration strings in `ProductCatalogService.cs` to remove unsubstantiated current-status claims, unverified controller pairings (R3500/DRC-4), unverified controller support (DRC-3/DRC-4), unverified wind/capacity claims (R3503, V-4213), and single-element vs array confusion (Aperiodic Loop).
+  - Preserved all 6 families, 16 canonical group IDs, and 30 canonical model codes.
+- **A2F Asset Classification Alignment:**
+  - Aligned all documentation and return reporting to exact A2F classifications:
+    1. Products hero: `conceptual family visual`
+    2. Log Periodic: `family-level conceptual/reference-grounded visual`
+    3. Portable & Transportable: `conceptual family placeholder`
+    4. Aperiodic Loop: `reference-grounded single-element visualization`
+    5. NVIS: `1942-family-level reference-grounded visualization`
+    6. Rotator & Control: `reference-grounded rotator with illustrative controller study`
+    7. Tower Systems: `design fallback — non-configurational family study`
+  - Preserved approved live alt texts byte-for-byte in `ProductCatalogService.cs`. Confirmed the Log Periodic asset is not identified as an LP-1017 photograph and no candidate is represented as exact product photography.
+- **Input-Directory Hygiene & Archive Locations:**
+  - Located `USAP_Product_Catalog_A2F_Review_Package_2026-09-15.zip` in `project-inputs/` (plural, 57,753,091 bytes).
+  - Located `USAP_Product_Catalog_A3_Family_Hero_Review_Package_2026-09-15.zip` in `project-input/` (singular, 34,654,781 bytes).
+  - Both directories exist on disk and are strictly ignored in `.gitignore`. Retaining both rules is mandatory due to historical intake directory naming conventions across milestones. A3 archive remains unextracted and unintegrated.
+- **Review Evidence Repair:**
+  - Repaired defective screenshots: `02_six_family_grid_1440px.png` and `04_six_family_grid_768px.png` (expanded viewport height and enabled `captureBeyondViewport` to capture complete 6-card grids without blank clipping); `07_family_card_keyboard_focus_card_crop.png` (centered active card bounding rect with 15px padding to fully show the 3px focus outline).
+  - Captured browser audit verifying status notice visibility and absence of prohibited current-status terms across all 6 family routes.
+- **Review Package Portability:**
+  - Generated portable ZIP `USAP-CATALOG-001-QA1-review-package.zip` outside repository with forward-slash entry paths, SHA-256 manifest, separately stated file count, textual source diff snapshot (`source_changes.diff`), and verified archive integrity.
+**Reason:** Conditional architectural review findings remediation for USAP-CATALOG-001.
+
+---
+
+## DEC-029 — Current-Site Catalog Policy Alignment, Natural Product Titles, Four-Dimensional Metadata Separation, and A3 Hash Resolution (Checkpoint USAP-CATALOG-001-QA2)
+
+**Date:** 2026-09-15
+**Decision:**
+- **Binding Catalog Policy (Current-Site Authority):**
+  - Directed by project lead decision: until USAP provides a controlled product list, the current public USAP website is the authority for which products belong in the catalog.
+  - Every product or configuration listed on the current USAP website remains included in the catalog (all 16 groups, 30 named models, 1 unnamed line).
+  - Products are not assumed to be currently manufactured, stocked, or available for purchase, nor are they labeled retired, discontinued, legacy, or obsolete unless explicitly stated by USAP or the current site.
+  - Current HTML product pages control public product naming and general descriptions.
+- **Natural Public Catalog Tone & Section Language:**
+  - Removed repeated archival word `Reference` or `References` from all 16 public product group titles.
+  - Standardized on natural first-party product names: `High-Power HF Log Periodics`, `LP-1017 Log Periodic`, `LP-1018BA Broadband Log Periodic`, `LP-1019 Series`, `LP-1112MR Transportable Log Periodic`, `V-4213 Portable Discone`, `LP-1402 / LP-1403 Transportable Log Periodics`, `1910 Tactical Dipoles`, `USAP Aperiodic Loop Antenna`, `1942 NVIS Series`, `R3500 Heavy Duty Rotator with DRC-4 Rotator Control Unit`, `R3501 Universal Rotator System`, `R3503 Heavy Duty Rotating System`, `DRC-3 Digital Rotator Controller`, `DRC-4 Digital Rotator Controller`, `T-3002 RLPA Tower System`.
+  - Replaced section eyebrow with `PRODUCT CATALOG`, heading with `Products and Models in This Family`, lead with `The following product groups and configurations are cataloged for <familyName>:`, and model list label with `Models and Configurations:`.
+  - Rewrote shared notice across all six family routes to:
+    > *"Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application."*
+  - Replaced repetitive "Published catalog reference for..." descriptions with concise, useful descriptions grounded in current HTML product pages.
+  - Maintained documented published relationships: R3500/DRC-4 pairing and DRC-3 compatibility with R3501/R3503 presented as current-site published relationships without purchase guarantees.
+- **Four-Dimensional Catalog Metadata Separation:**
+  - Distinct dimensions established in domain models (`ProductGroupRecord`, `ProductModelRecord`):
+    1. *Source presence:* Listed on current USAP website
+    2. *Commercial availability:* Not confirmed
+    3. *Client approval:* Pending
+    4. *Specification status:* Confirmed from current HTML / Provisional / HoldDisputedSpecs
+  - No legacy or historical badges are rendered publicly at this time.
+- **Preservation of Technical Resources for Later Lifecycle Classification:**
+  - All 19 discovered datasheets and revisions remain cataloged and linked to their respective product groups.
+  - Documented future lifecycle capability allowing products to transition to legacy/support classification without deleting product pages, specifications, downloads, revision history, or support documentation.
+- **A3 Archive Hash Verification & Discrepancy Resolution:**
+  - Conducted read-only inspection of `project-input/USAP_Product_Catalog_A3_Family_Hero_Review_Package_2026-09-15.zip`.
+  - Recalculated outer SHA-256: `D5C60786BABE6533DA5DB1A30947649F621D038B410DDB7D7DD4DF41A96B4E79`.
+  - Byte length: `34,654,781` bytes.
+  - Confirmed the repository copy matches the expected archive hash exactly. The previously reported hash (`61a5ac...`) was an erroneous record in earlier return materials.
+  - ZIP CRC integrity passed. The archive contains 46 total ZIP entries: 10 directory entries and 36 regular files. Of the 36 regular files, 35 are covered by `usap-product-catalog-a3/SHA256_MANIFEST.txt`, plus the manifest file itself. Archive remains strictly unextracted, unmodified, and unintegrated pending human lead authorization.
+- **Review Package & Validation:**
+  - Portable review package `USAP-CATALOG-001-QA2R-review-package.zip` generated for external verification.
+  - Integrity: 100% forward-slash paths, ZIP CRC test passed, 100% manifest verification passed on clean extraction.
+  - Final package metrics (exact byte size, SHA-256 checksum, manifest-covered file count, and total entry count) are reported in the external return report to avoid circular checksum dependencies.
+**Reason:** Binding catalog-governance policy alignment from human project lead.
+
+
+---
+
+## DEC-030 — Family Asset Integration, Card Unification, Guided Selection, and FAQ Completion (Checkpoint USAP-CATALOG-001-C2)
+
+**Date:** 2026-09-16
+**Decision:**
+- **Promotion of 16 Assets from A3 and A3S Archives:**
+  - Integrated 16 approved asset derivatives into `src/USAP.Web/wwwroot/images/products/`:
+    1. Card Asset: Promoted Rotator & Control Candidate B (`usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png`). Strictly rejected A3S Candidate A.
+    2. Desktop & Mobile Family Heroes (6 pairs, 1536×576 desktop and 768×768 mobile):
+       - Log Periodic: Retained A3 Candidate A V2 (`usap-family-log-periodic-antennas-hero-candidate-a-v2-desktop-preview.png`, `usap-family-log-periodic-antennas-hero-candidate-a-v2-mobile-crop.png`).
+       - Portable & Transportable: Promoted A3S (`usap-family-portable-transportable-hero-a3s-desktop-1536x576.png`, `usap-family-portable-transportable-hero-a3s-mobile-768x768.png`).
+       - Aperiodic Loop: Retained A3 Candidate A V1 (`usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-desktop-preview.png`, `usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-mobile-crop.png`).
+       - NVIS: Retained A3 Candidate A V2 (`usap-family-nvis-antennas-hero-candidate-a-v2-desktop-preview.png`, `usap-family-nvis-antennas-hero-candidate-a-v2-mobile-crop.png`).
+       - Rotator & Control: Promoted A3S (`usap-family-rotator-control-hero-a3s-desktop-1536x576.png`, `usap-family-rotator-control-systems-hero-a3s-mobile-768x768.png`).
+       - Tower Systems & Accessories: Promoted A3S (`usap-family-tower-systems-hero-a3s-desktop-1536x576.png`, `usap-family-tower-systems-hero-a3s-mobile-768x768.png`).
+    3. Dedicated Rotator Hardware Visuals (3 assets, 1600×1000):
+       - Promoted A3S DRC-3 (`usap-drc3-source-guided-product-visual-a3s-v1.png`), DRC-4 (`usap-drc4-source-guided-product-visual-a3s-v1.png`), and R3500/DRC-4 relationship study (`usap-r3500-drc4-source-guided-relationship-a3s-v1.png`).
+  - Strict source-to-public traceability: All 16 assets were verified programmatically against source archive paths and copied without re-encoding, preserving exact byte counts and SHA-256 hashes.
+- **Explicit Domain Model Classifications (No Misleading Defaults):**
+  - Created `ResponsiveHeroAsset` record requiring explicit `AssetClassification` and `ApprovalStatus`:
+    - Log Periodic hero: `conceptual/reference-grounded family visual`
+    - Aperiodic Loop hero: `reference-grounded single-element visualization`
+    - NVIS hero: `1942-family-level reference-grounded visualization`
+    - Portable & Transportable hero: `source-guided photorealistic product visualization`
+    - Rotator & Control hero: `source-guided photorealistic product visualization`
+    - Tower Systems & Accessories hero: `source-guided photorealistic product visualization`
+    - Rotator product-specific visuals: `source-guided photorealistic product visualization`
+  - Approval status across all promoted assets: `provisional — USAP review pending`.
+- **Responsive `<picture>` Implementation & Non-Overlapping Breakpoint:**
+  - Implemented `<picture>` in `Pages/Products/Family.cshtml` using `<source media="(max-width: 47.999rem)" ...>` to align cleanly with desktop CSS `@media (min-width: 48rem)` without an overlapping 48rem/768px collision.
+  - Browser verification at 390px, 767px, 768px, 1024px, 1440px confirmed exact agreement: 768px loads the 1536×576 desktop image in desktop layout; 767px and below load the 768×768 mobile crop.
+  - Preserved copy-safe left overlay and per-family focal positions in `site.css`.
+- **Unified Product Family Card & Homepage Section 5 Integration:**
+  - Created `Pages/Shared/_ProductFamilyCard.cshtml` implementing the stretched-link single Tab-stop pattern.
+  - Homepage Section 5 updated to inject `IProductCatalogService` and display 4 canonical featured families (Log Periodic, Portable & Transportable, Rotator & Control, Tower Systems & Accessories) linking directly to `/products/{slug}`, while preserving the section-level `View All Products` action routing to `/products`.
+  - Audited and retired obsolete `.product-card` and `.product-media` CSS rules in `homepage.css`.
+  - Context-sensitive card custom properties (`--family-card-eyebrow-min-height`, `--family-card-title-min-height`, `--family-card-summary-min-height`) tuned separately for 3-column (`.products-family-grid`) and 4-column (`.home-featured-products .products-grid`) layouts.
+  - Automated DOM and computed-style audits confirmed 100% parity across borders, radii, shadows, media ratios, typography, hover elevation, focus rings, and bottom-aligned CTAs, with complete equal-row-height alignment and mobile `auto` height reset.
+- **Actionable Engineering Guidance & Lead-Gen Streamlining:**
+  - Refactored Engineering Guidance into 3 actionable pathways: Deployment & Mobility, Coverage & Propagation, Positioning & Infrastructure.
+  - Broadened Deployment & Mobility to reference multiple families (Portable, Log Periodic, Tower Systems).
+  - Replaced duplicate 2-button lead-gen CTA with a restrained inline continuation notice (`.guidance-continuation`) linking to `#products-faq` and `#closing-cta-heading`, preserving a single clear primary lead-conversion destination.
+- **Native Product Selection FAQ:**
+  - Implemented 6-question FAQ on `/products` using native semantic `<details>` and `<summary>` without JavaScript.
+  - Suppressed marker rotation under `prefers-reduced-motion`.
+- **Dedicated Rotator Product Visuals Section:**
+  - Implemented 3-card figure grid on `/products/antenna-rotator-control-systems` highlighting DRC-3, DRC-4, and R3500/DRC-4 relationship.
+  - Added single restrained section note explaining images are source-guided visualizations based on published USAP materials, avoiding repetitive disclaimers under each visual.
+- **DRC-4 Branding Limitation Documented:**
+  - The horizontal controller-face wordmark is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector brand artwork is supplied.
+**Reason:** Checkpoint USAP-CATALOG-001-C2 approved scope execution and implementation amendments.

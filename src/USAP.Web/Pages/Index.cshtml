@@ -178,54 +178,10 @@
         </div>
 
         <div class="products-grid">
-            <article class="home-card product-card">
-                <div class="product-media">
-                    <img src="~/images/homepage/products/usap-home-featured-product-lp-1017.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
-                </div>
-                <div class="home-card-content product-content">
-                    <h3>HF Log Periodic Antennas</h3>
-                    <p>Commercial and high-power HF log periodic antenna models for fixed and rotating system requirements.</p>
-                    <div class="home-card-action product-action">
-                        <a href="/products" class="home-card-link">View Family</a>
-                    </div>
-                </div>
-            </article>
-            <article class="home-card product-card">
-                <div class="product-media">
-                    <img src="~/images/homepage/products/usap-home-featured-product-transportable-hf.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
-                </div>
-                <div class="home-card-content product-content">
-                    <h3>Transportable HF Antennas</h3>
-                    <p>Transportable HF log periodic and broadband dipole systems for temporary, semi-permanent, or field deployment.</p>
-                    <div class="home-card-action product-action">
-                        <a href="/products" class="home-card-link">View Family</a>
-                    </div>
-                </div>
-            </article>
-            <article class="home-card product-card">
-                <div class="product-media">
-                    <img src="~/images/homepage/products/usap-home-featured-product-rotator-controls.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
-                </div>
-                <div class="home-card-content product-content">
-                    <h3>Rotator &amp; Control Systems</h3>
-                    <p>Rotator systems and digital control equipment for positioning and operating compatible antenna installations.</p>
-                    <div class="home-card-action product-action">
-                        <a href="/products" class="home-card-link">View Family</a>
-                    </div>
-                </div>
-            </article>
-            <article class="home-card product-card">
-                <div class="product-media">
-                    <img src="~/images/homepage/products/usap-home-featured-product-v-4213.png" alt="" width="600" height="337" loading="lazy" decoding="async" />
-                </div>
-                <div class="home-card-content product-content">
-                    <h3>VHF/UHF Antenna Systems</h3>
-                    <p>Log periodic and portable discone antenna systems for VHF and UHF applications in fixed or transportable configurations.</p>
-                    <div class="home-card-action product-action">
-                        <a href="/products" class="home-card-link">View Family</a>
-                    </div>
-                </div>
-            </article>
+            @foreach (var family in Model.FeaturedFamilies)
+            {
+                <partial name="_ProductFamilyCard" model="family" />
+            }
         </div>
 
         <div class="section-actions center">

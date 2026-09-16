@@ -7,6 +7,7 @@
 # Project-specific: intake directory must never be tracked
 # ---------------------------------------------------------------------------
 project-inputs/
+project-input/
 
 # ---------------------------------------------------------------------------
 # Visual Studio local/user files
