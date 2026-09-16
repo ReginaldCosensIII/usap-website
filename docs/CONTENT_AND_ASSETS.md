@@ -42,8 +42,8 @@ Wireframes are structural and responsive references. The high-fidelity design co
 | Page | Route | Status |
 |---|---|---|
 | Home | `/` | 🟡 Provisional implementation. Final client copy, imagery, branding, and approval remain pending. |
-| Products listing | `/products` | 🟡 Stub — up to six approved families pending |
-| Product family detail | `/products/{familySlug}` | ❌ All product data pending |
+| Products listing | `/products` | ✅ Structured 6-family catalog landing page implemented with A2F provisional candidate assets (USAP-CATALOG-001). Detail pages deferred to C2. |
+| Product family detail | `/products/{familySlug}` | 🟡 Minimal route placeholders with shared hero, breadcrumbs, and audited group listing implemented (Milestone C1). True 404 for invalid slugs. Full specifications and datasheets deferred to C2. |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
 | About Us | `/about-us` | 🟡 Provisionally complete with reference-grounded imagery integrated; uses shared hero and closing CTA. Final client approval, company history, and manufacturing details pending. |
 | Contact Us | `/contact-us` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
@@ -173,6 +173,124 @@ Copy on `/about-us` is strictly anchored to published factual statements from th
   * Approved government, military, or commercial project examples
   * Approved customer history or case studies
   * These items must not be invented and remain pending client delivery.
+
+---
+
+## Product Catalog & Product Family Content & Assets (USAP-CATALOG-001)
+
+Documented in `USAP-CATALOG-001` (incorporating canonical C1/C1A/C1B foundation and A2F candidate asset integration). Establishes the authoritative repository-native catalog baseline, promoted provisional candidate assets, and conservative copy guidelines.
+
+### A2F Product Catalog Review Package Intake
+
+Canonical archive preserved in repository root (gitignored):
+`project-inputs/USAP_Product_Catalog_A2F_Review_Package_2026-09-15.zip` (10,950,498 bytes).
+SHA-256: `0831c27bb1a66bf4ef2841a92fae94eb2c1316fcf1d1d3a9be2cab546eabced5`
+Archive structure: 54 total entries containing hero candidates (Directions A, B, C), family-card visual candidates, comparison sheets, and internal review derivatives. Verified byte-identical and integrity-checked on intake.
+
+### Promoted Provisional Candidate Assets in `wwwroot/images/products/`
+
+All seven promoted assets were integrated into `src/USAP.Web/wwwroot/images/products/` without alteration from their canonical review package files. Each asset retains byte-identical hash preservation against `HASH_PRESERVATION_REGISTER.csv`:
+
+| Asset / Role | Relative Path in `src/USAP.Web/wwwroot/` | Dimensions | Size | SHA-256 | Classification | Approved Alt Text | Prohibited Claims & Restrictions | Replacement Requirements |
+|---|---|---|---|---|---|---|---|---|
+| Products Landing Hero (Direction C) | `images/products/usap-products-landing-hero-direction-c-candidate-v1.png` | 2048 × 768 | 1,946,738 B | `E9F75AABACA46D8395A1B9CC5C998B469EFC55791EEBA7A08926320A96071EAD` | conceptual family visual | Technical visualization of antenna systems and engineering studies in a blue outdoor landscape. | Do not present as an exact depiction of a specific USAP installation, measured test range, or proprietary USAP design. | Replace if client provides approved high-resolution hero photography. |
+| Log Periodic Antennas Card | `images/products/usap-family-card-log-periodic-family-visual-v1.png` | 1600 × 1000 | 1,387,964 B | `03B191AB25844A40C0FD5B8045FFD264327734BB265BA5DFFCF3305EA0A9CF7F` | family-level conceptual/reference-grounded visual | Log periodic antenna array in an outdoor installation. | Do not identify as a photograph of LP-1017 or any specific named USAP model (LP-1001, LP-1002, LP-1005, LP-1018BA, LP-1019, LP-1112MR). | Replace when USAP provides approved product photography. |
+| Portable & Transportable Card | `images/products/usap-family-card-portable-transportable-placeholder-v1.png` | 1600 × 1000 | 1,773,360 B | `DDF0E92CC340520A441162607911BAA755A74610DB5087090C437A966A30E947` | conceptual family placeholder | Portable antenna system deployed on a guyed field mast. | Do not identify as V-4213, LP-1402, LP-1403, or 1910 hardware. | Replace when USAP provides approved product photography. |
+| Aperiodic Loop Antennas Card | `images/products/usap-family-card-aperiodic-loop-element-v1.png` | 1600 × 1000 | 2,098,672 B | `9CF71EA8DF4DDD1126FFA8F5C80D64304647EF2B82F21517553C9C945398E03F` | reference-grounded single-element visualization | Aperiodic loop antenna element on a transportable tripod. | Do not identify as a complete multi-element array installation or a specific named model. | Replace when USAP provides approved product photography. |
+| NVIS Antennas Card | `images/products/usap-family-card-nvis-1942-family-visual-v1.png` | 1600 × 1000 | 2,102,661 B | `839A933F73EA1B3F77FE6B2459342F36A5B9211BAE45F7C459D677E0209ACDA0` | 1942-family-level reference-grounded visualization | Field-deployed NVIS antenna system with a central mast and broad wire footprint. | Do not claim depiction of exact 1942-RT, 1942-TA, or 1942-GM field hardware. | Replace when USAP provides approved product photography. |
+| Antenna Rotator & Control Systems Card | `images/products/usap-family-card-rotator-control-lower-risk-placeholder-v2.png` | 1600 × 1000 | 1,888,491 B | `5B0C8F2B71EF2CFEEF7ED81D091A79329B482AA23345B5616F75663C6378B682` | reference-grounded rotator with illustrative controller study | Heavy-duty antenna rotator with a translucent tabletop controller study. | Do not present as DRC-3, DRC-4, R3500, R3501, or R3503 production hardware, or imply a confirmed bundle/pairing. | Replace when USAP provides approved product photography. |
+| Tower Systems & Accessories Card | `images/products/usap-family-card-tower-systems-nonconfigurational-fallback-v2.png` | 1600 × 1000 | 2,006,234 B | `32A2CAC6B2DC9B6227D21295801CCEF3EDF1E2DBC8D562419DA02FCE565C09C8` | design fallback — non-configurational family study | Technical study of tower, mast, rotation, feedline, and installation components. | Do not represent as T-3002 or specific 3002FA/FB/SS hardware configuration. | Replace when USAP provides approved product photography. |
+
+### Candidate Selection Rationale & Alternatives Retained Exclusively in Archive
+
+1. **Products Landing Hero:** Direction C (`usap-products-landing-hero-direction-c-candidate-v1.png`) was selected because its left ~35% provides a clean, deep-navy gradient zone with high text contrast for the hero heading, eyebrow, and introductory text, while the right ~65% displays an intricate antenna array and technical blueprint background. Direction A and Direction B placed high-contrast antenna geometry across the left third, degrading text readability.
+2. **Antenna Rotator & Control Systems:** Candidate B (`usap-family-card-rotator-control-lower-risk-placeholder-v2.png`) was selected as a lower-risk conceptual indicator. Candidate A was rejected because it depicted specific, unverified rotator chassis features. Candidate C was rejected due to excessive abstract minimalism.
+3. **Tower Systems & Accessories:** Candidate B (`usap-family-card-tower-systems-nonconfigurational-fallback-v2.png`) was selected as a generalized structural mast/tower illustration. Candidate A was rejected because it purported to depict a specific 3002SS hardware configuration that has not been confirmed by client engineering.
+4. **Archived-Only Assets:** Direction A, Direction B, Rotator Candidates A and C, Tower Candidate A, all comparison sheets, and internal review derivatives remain strictly within the intake ZIP archive and must never be served or tracked in `wwwroot`.
+
+### Promoted Assets from A3 and A3S Archives (Checkpoint USAP-CATALOG-001-C2)
+
+Under Checkpoint USAP-CATALOG-001-C2, 16 approved asset derivatives were promoted into `src/USAP.Web/wwwroot/images/products/` from the verified `project-input/USAP_Product_Catalog_A3_Family_Hero_Review_Package_2026-09-15.zip` and `project-input/USAP_Product_Catalog_A3S_Production_Quality_Regeneration_2026-09-16.zip` source archives.
+
+Every promoted file was copied without re-encoding, preserving exact byte counts and SHA-256 hashes. Domain records in `ProductCatalogService.cs` assign explicit asset classifications without generic defaults, and all promoted assets carry the provisional approval status `provisional — USAP review pending`.
+
+#### Complete C2 Promoted Asset Register & Traceability
+
+| Role / Target Path in `src/USAP.Web/wwwroot/` | Source Archive Path | Dimensions | Size (Bytes) | SHA-256 Checksum | Explicit Classification | Approved Alt Text | Approval Status |
+|---|---|---|---|---|---|---|---|
+| `images/products/usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png` | A3S `usap-product-catalog-a3s/family-cards/usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png` | 1600 × 1000 | 2,551,119 | `AC7C826572FE585C409036C4D0566229B948684B3858D383883C9C1C5A804D76` | source-guided photorealistic product visualization | Heavy-duty antenna rotator with a digital rotator controller on an engineering bench. | provisional — USAP review pending |
+| `images/products/usap-family-log-periodic-antennas-hero-candidate-a-v2-desktop-preview.png` | A3 `usap-product-catalog-a3/log-periodic-antennas/desktop/usap-family-log-periodic-antennas-hero-candidate-a-v2-desktop-preview.png` | 1536 × 576 | 893,358 | `0BA2204D408A4D8B2E437846942D1F5EDC90F1B39EDD55F166003632DBF5355E` | conceptual/reference-grounded family visual | High-power HF log periodic antenna installation in an open field setting. | provisional — USAP review pending |
+| `images/products/usap-family-log-periodic-antennas-hero-candidate-a-v2-mobile-crop.png` | A3 `usap-product-catalog-a3/log-periodic-antennas/mobile/usap-family-log-periodic-antennas-hero-candidate-a-v2-mobile-crop.png` | 768 × 768 | 638,090 | `D89517E347B2D5C9461AF4C095FAF858A5E42A59095AED8E2B0632FF251688D0` | conceptual/reference-grounded family visual | Close-up view of log periodic antenna elements and boom structure. | provisional — USAP review pending |
+| `images/products/usap-family-portable-transportable-hero-a3s-desktop-1536x576.png` | A3S `usap-product-catalog-a3s/family-heroes/portable-transportable-antennas/desktop/usap-family-portable-transportable-hero-a3s-desktop-1536x576.png` | 1536 × 576 | 1,072,125 | `73F8CC6FD728EA4742314FC6047CF4749C7D2C2F67CCA96BABF2D6D1B98910A8` | source-guided photorealistic product visualization | Portable and transportable tactical antenna system deployed in a field environment. | provisional — USAP review pending |
+| `images/products/usap-family-portable-transportable-hero-a3s-mobile-768x768.png` | A3S `usap-product-catalog-a3s/family-heroes/portable-transportable-antennas/mobile/usap-family-portable-transportable-hero-a3s-mobile-768x768.png` | 768 × 768 | 766,967 | `A6A2E594B0138403B6E67520910753DBEE7A0AF2409CC1F3A978AA49A39E214C` | source-guided photorealistic product visualization | Tactical portable antenna mast and hub assembly in a field setting. | provisional — USAP review pending |
+| `images/products/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-desktop-preview.png` | A3 `usap-product-catalog-a3/aperiodic-loop-antennas/desktop/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-desktop-preview.png` | 1536 × 576 | 1,067,436 | `1D131D8425D14C7153BD5DE3E337BD5BFF72F97E2CE362019C37FBFD703F4B5D` | reference-grounded single-element visualization | Aperiodic loop receiving antenna element deployed in a quiet monitoring environment. | provisional — USAP review pending |
+| `images/products/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-mobile-crop.png` | A3 `usap-product-catalog-a3/aperiodic-loop-antennas/mobile/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-mobile-crop.png` | 768 × 768 | 844,502 | `DE6DA702204DEF2B49FEE0B020A575C9D6F5A14E72A74684C2D6C4DBFE9F74C8` | reference-grounded single-element visualization | Compact aperiodic loop antenna element mounted on a portable support. | provisional — USAP review pending |
+| `images/products/usap-family-nvis-antennas-hero-candidate-a-v2-desktop-preview.png` | A3 `usap-product-catalog-a3/nvis-antennas/desktop/usap-family-nvis-antennas-hero-candidate-a-v2-desktop-preview.png` | 1536 × 576 | 1,078,517 | `2F3A924F959CB0107BCEA10A0A4A8757E18B98A12F39B2DA678703AC39CA9A60` | 1942-family-level reference-grounded visualization | 1942 series NVIS antenna installation configured for regional high-angle HF communications. | provisional — USAP review pending |
+| `images/products/usap-family-nvis-antennas-hero-candidate-a-v2-mobile-crop.png` | A3 `usap-product-catalog-a3/nvis-antennas/mobile/usap-family-nvis-antennas-hero-candidate-a-v2-mobile-crop.png` | 768 × 768 | 812,182 | `98AC134C2904596F7C452EC1EBE42015526237F95F14F3170B7D53E69DBA0F6B` | 1942-family-level reference-grounded visualization | Central mast and radiator feedpoint geometry of an NVIS antenna system. | provisional — USAP review pending |
+| `images/products/usap-family-rotator-control-hero-a3s-desktop-1536x576.png` | A3S `usap-product-catalog-a3s/family-heroes/rotator-control-systems/desktop/usap-family-rotator-control-hero-a3s-desktop-1536x576.png` | 1536 × 576 | 1,215,960 | `17E35BACC4233BBA412CA82E3424DD8F3967D8A8BF92EAE6A2494E9D2F778C2C` | source-guided photorealistic product visualization | Heavy-duty antenna rotator unit and rack-mount digital control equipment. | provisional — USAP review pending |
+| `images/products/usap-family-rotator-control-systems-hero-a3s-mobile-768x768.png` | A3S `usap-product-catalog-a3s/family-heroes/rotator-control-systems/mobile/usap-family-rotator-control-systems-hero-a3s-mobile-768x768.png` | 768 × 768 | 943,383 | `2A6584442A38D9305E7FE24D2524A253371169A926AC2CC3A39CB1FB5380DF85` | source-guided photorealistic product visualization | Digital rotator controller unit front panel and controls. | provisional — USAP review pending |
+| `images/products/usap-family-tower-systems-hero-a3s-desktop-1536x576.png` | A3S `usap-product-catalog-a3s/family-heroes/tower-systems-accessories/desktop/usap-family-tower-systems-hero-a3s-desktop-1536x576.png` | 1536 × 576 | 1,110,766 | `2A38F547A2438D014796F92F90C38CA1BF503265309FB8CC941AAFE4E78497CB` | source-guided photorealistic product visualization | Commercial antenna tower installation with rotatable LP array and feedline integration. | provisional — USAP review pending |
+| `images/products/usap-family-tower-systems-hero-a3s-mobile-768x768.png` | A3S `usap-product-catalog-a3s/family-heroes/tower-systems-accessories/mobile/usap-family-tower-systems-hero-a3s-mobile-768x768.png` | 768 × 768 | 858,515 | `AD3C05CF8C196CEF33493157B76307FE3FE5F158DC4E82606F3F9BB67F3354D6` | source-guided photorealistic product visualization | Tower mast lattice structure and rotational hardware interface. | provisional — USAP review pending |
+| `images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png` | A3S `usap-product-catalog-a3s/product-visuals/rotator-control/usap-r3500-drc4-source-guided-relationship-a3s-v1.png` | 1600 × 1000 | 2,286,839 | `3EA85E13ED17635D9773EEF34D8DCC828F4ECB61F131241B48B5E4A46585708A` | source-guided photorealistic product visualization | R3500 heavy-duty rotator unit with paired DRC-4 digital control unit on an engineering bench. | provisional — USAP review pending |
+| `images/products/usap-drc3-source-guided-product-visual-a3s-v1.png` | A3S `usap-product-catalog-a3s/product-visuals/rotator-control/usap-drc3-source-guided-product-visual-a3s-v1.png` | 1600 × 1000 | 1,966,126 | `F78F5720EF3E061F935FED86C0C61002EC570FBB22539C31DC3B294AF7D2B47B` | source-guided photorealistic product visualization | DRC-3 digital rotator controller front panel with LED position readout and tactile controls. | provisional — USAP review pending |
+| `images/products/usap-drc4-source-guided-product-visual-a3s-v1.png` | A3S `usap-product-catalog-a3s/product-visuals/rotator-control/usap-drc4-source-guided-product-visual-a3s-v1.png` | 1600 × 1000 | 2,051,887 | `4F3636E7F8409D8C8D20ACAFB561CC0837B0A887888D2E722AB8262D6497D6A5` | source-guided photorealistic product visualization | DRC-4 digital rotator controller front panel with graphical display and precision controls. | provisional — USAP review pending |
+
+#### Selection Decisions & Rejections
+
+1. **Rotator & Control Family Card:** Candidate B (`usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png`) is promoted into service. Candidate A is strictly rejected because it purports to depict unverified rotator internal mechanics.
+2. **Family Hero Composition:** Breakpoint-sensitive right-anchored contained image (~65% desktop, ~75% tablet) blended with left-anchored navy gradient overlay. Renders 1536×576 desktop and 768×768 mobile crop via semantic `<picture>` with `(max-width: 47.999rem)` boundary. Zero cropping or white letterboxing across all viewports.
+3. **Dedicated Card Partials (16:10 Aspect Ratio):** `_HomeProductFamilyCard.cshtml` and `_ProductFamilyCard.cshtml` preserve approved 16:10 media presentation, single keyboard Tab stop, and `.stretched-link` activation.
+4. **Relocated Rotator Product Visuals (C2R):** The 3 product-specific visuals (DRC-3, DRC-4, and R3500/DRC-4 relationship) are integrated directly into their respective group disclosures via the non-destructive `AssociatedAsset` property on `ProductGroupRecord`, eliminating the standalone visual section.
+5. **Strict Terminology Compliance:**
+   - DRC-3: "Large industrial antenna-rotator control enclosure with display and control components." (Prohibits tabletop, wall-mounted, cabinet-mounted, mast-mounted, and defense claims).
+   - DRC-4: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls." (Prohibits rackmount, rack-mount, 19-inch, and unverified precision claims).
+   - R3500/DRC-4: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization." (No bundle or availability guarantee).
+6. **DRC-4 Controller Face Branding Limitation:** The horizontal controller-face wordmark depicted on the DRC-4 front panel is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector or high-resolution brand artwork is supplied by USAP.
+7. **Technical Document Publication Policy (C2R):** Publication is default-deny. Only 6 provisional/preferred provisional records are exposed: `doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`. All conflicting or candidate-only documents remain withheld. Current first-party PDF links remain a provisional dependency requiring migration prior to WordPress decommissioning.
+
+### Deferred Individual-Product Asset Matrix (16 Product Groups — C2R1)
+
+The individual-product asset strategy cleanly isolates deployed provisional assets from deferred future research and generation. Exactly three Rotator groups currently have associated visuals deployed; the remaining 13 product groups require a dedicated, separate asset-research and generation checkpoint.
+
+**Optional Imagery Architecture:** Disclosures containing an associated asset (`AssociatedAsset != null`) render the `<figure>` with responsive media; disclosures without an associated asset render a clean text-first layout with zero blank media containers, zero generic silhouettes, and zero placeholder frames. No backlog or governance terminology is exposed in public page markup.
+
+| Family | Group ID | Product Group Name | Associated Asset Currently Available | First-Party PDF / Public Source for Future Research | Asset Review & Generation Status |
+|---|---|---|---|---|---|
+| Log Periodic Antennas | `lp-high-power` | High Power Log Periodic Antennas | None | `LP-High-Power.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1017` | LP-1017 Series Log Periodic Antennas | None | `LP-1017.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1018ba` | LP-1018BA Directional Log Periodic Antenna | None | `LP-1018BA.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1019` | LP-1019 Series Log Periodic Antennas | None | `LP-1019.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1112mr` | LP-1112MR Tactical Log Periodic Antenna | None | `LP-1112MR.pdf`, current public site visual | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `v-4213` | V-4213 Portable Discone Antenna System | None | `V-4213.pdf` | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `lp-1402-1403` | LP-1402 & LP-1403 Tactical Mast-Mounted Antennas | None | `LP-1402-1403.pdf` | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `1910` | 1910 Transportable Log Periodic Antenna System | None | `1910-OCT-2016.pdf`, `1910-OCT-2024.pdf` | Separate asset-research and generation checkpoint required |
+| Aperiodic Loop Antennas | `aperiodic` | Aperiodic Loop Antenna Systems | None | `Aperiodic-Loop.pdf` | Separate asset-research and generation checkpoint required |
+| NVIS Antennas | `1942` | 1942 Series NVIS Antenna System | None | `1942-NVIS.pdf` | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `r3500` | R3500 Heavy-Duty Antenna Rotator Series | `/images/products/usap-rotator-hardware-r3500-drc4-bench-source-guided-v1.png` | First-party rotator catalog & engineering datasheets | Available (source-guided technical visualization deployed) |
+| Rotator & Control Systems | `r3501` | R3501 Medium-Duty Antenna Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `r3503` | R3503 Elevation Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `drc-3` | DRC-3 Industrial Digital Rotator Controller | `/images/products/usap-rotator-controller-drc3-large-enclosure-candidate-a-v1.png` | First-party DRC-3 manual & enclosure photo | Available (source-guided technical visualization deployed) |
+| Rotator & Control Systems | `drc-4` | DRC-4 Tabletop Digital Rotator Controller | `/images/products/usap-rotator-controller-drc4-tabletop-front-detail-v1.png` | First-party DRC-4 datasheet & manual | Available (source-guided technical visualization deployed) |
+| Tower Systems & Accessories | `t-3002` | T-3002 Heavy Duty Tower Systems & Accessories | None | `T-3002-OCT2016.pdf` | Separate asset-research and generation checkpoint required |
+
+### Current-Site Catalog Policy Alignment & Metadata Separation (QA2 / C2)
+
+- **Binding Authority:** Until USAP provides a controlled product list, the current public USAP website is the authority for which products belong in the catalog. Every product or configuration listed on the current site remains cataloged.
+- **Four-Dimensional Catalog Metadata:** The catalog architecture cleanly distinguishes:
+  1. *Source presence:* Listed on current USAP website (all 16 groups, 30 named models, 1 unnamed line).
+  2. *Commercial availability:* Not confirmed (no assumption of current manufacturing, stocking, or purchase availability).
+  3. *Client approval:* Pending (formal USAP client review required before production launch).
+  4. *Specification status:* Confirmed from current HTML / Provisional / HoldDisputedSpecs.
+- **Tone & Section Language:** All public product and group titles use natural names consistent with current first-party pages (the archival word `Reference` or `References` has been completely eliminated). Section eyebrow is `PRODUCT CATALOG`, heading is `Products and Models in This Family`, and model label is `Models and Configurations:`.
+- **Shared Availability Notice:**
+  > *"Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application."*
+- **Preservation of Technical Resources for Later Lifecycle Classification:**
+  All 19 discovered product datasheets and revisions remain cataloged and linked to their respective product groups. The catalog is architected to support future lifecycle reclassification (e.g., active vs legacy/support) without deleting product pages, specifications, downloads, revision history, or support documentation.
+- **Disputed Technical Values & Published Relationships:**
+  - R3500/DRC-4 and DRC-3 with R3501/R3503 are presented as current-site published relationships without guaranteeing current purchase availability.
+  - Conflicting specifications (LP-1001 impedance, LP-1017 angle, LP-1112MR power/gain, V-4213 wind rating, LP-1402/1403 power, 1910 datasheets, 1942 low-power variants) remain internally tracked in `ConflictHolds` and project documentation. Provisional display follows current HTML while omitting misleading disputed values.
+- **Architectural Isolation:** All asset paths, dimensions, alt text, and classifications are centralized in `ProductCatalogService.cs`. The Razor templates bind to `@Model.HeroAsset` and `@family.Asset`, ensuring assets can be swapped without touching page markup or layout styles.
+- **Native Placeholder Fallback:** The native CSS design placeholder markup (`.product-family-card__placeholder` with dot grid, antenna wireframe, and `PRODUCT IMAGERY IN DEVELOPMENT` badge) is preserved in `Index.cshtml` as an explicit fallback.
 
 ---
 

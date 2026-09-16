@@ -1,21 +1,217 @@
 @page "/products/{familySlug}"
 @model USAP.Web.Pages.Products.FamilyModel
 @{
+    var familyName = Model.Family?.Name ?? "Product Family";
+    var familyEyebrow = Model.Family?.CardEyebrow ?? "Product Family";
+    var familySummary = Model.Family?.CardSummary ?? "Antenna system information and product-family details from United States Antenna Products.";
+
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
-        Title = "Antenna Product Family",
-        Description = "Review antenna system information and product-family details from United States Antenna Products.",
-        CanonicalPath = Request.Path.Value,
+        Title = familyName,
+        Description = familySummary,
+        CanonicalPath = $"/products/{Model.FamilySlug}",
         Robots = "noindex, follow",
         OpenGraphType = "website"
     };
 }
 
-<div class="container section">
-    <h1>Product Family</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Displaying stub for family: <code>@Html.Encode(Model.FamilySlug)</code></p>
-        <p>Product family detail pages will be implemented in the Catalog &amp; Resources task.</p>
-        <p>Family names, specifications, and imagery are pending client-supplied content.</p>
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--family internal-hero--family-@Model.FamilySlug" aria-labelledby="family-hero-title">
+    @if (Model.Family?.ResponsiveHero != null)
+    {
+        var hero = Model.Family.ResponsiveHero;
+        <picture class="internal-hero-picture">
+            <source media="(max-width: 47.999rem)"
+                    srcset="@hero.MobileImagePath"
+                    width="@hero.MobileWidth"
+                    height="@hero.MobileHeight" />
+            <img src="@hero.DesktopImagePath"
+                 alt="@hero.AltText"
+                 class="internal-hero-img"
+                 width="@hero.DesktopWidth"
+                 height="@hero.DesktopHeight"
+                 fetchpriority="high"
+                 decoding="async" />
+        </picture>
+    }
+    else
+    {
+        <div class="internal-hero-bg" aria-hidden="true"></div>
+    }
+    <div class="internal-hero-overlay internal-hero-overlay--family" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">@familyEyebrow</span>
+            <h1 id="family-hero-title" class="internal-hero-title">@familyName</h1>
+            <p class="internal-hero-lead">@familySummary</p>
+            <div class="internal-hero-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Contact Engineering</a>
+            </div>
+        </div>
     </div>
+</section>
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb" class="breadcrumbs">
+    <div class="container">
+        <ol class="breadcrumbs__list">
+            <li class="breadcrumbs__item"><a href="/" class="breadcrumbs__link">Home</a></li>
+            <li class="breadcrumbs__item"><a href="/products" class="breadcrumbs__link">Products</a></li>
+            <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">@familyName</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Section 2: Product Group Listing -->
+<div class="container section family-content-section">
+    <div class="family-groups-header">
+        <span class="eyebrow">PRODUCT CATALOG</span>
+        <h2 class="section-heading">Products and Models in This Family</h2>
+        <p class="section-lead">The following product groups and configurations are cataloged for @familyName:</p>
+    </div>
+
+    <div class="family-groups-list">
+        @foreach (var group in Model.ProductGroups)
+        {
+            var approvedDocs = Model.GetApprovedResources(group.Id);
+            <details class="product-group-disclosure" id="@group.SectionAnchor">
+                <summary class="product-group-summary">
+                    <div class="product-group-summary__header">
+                        <div class="product-group-summary__main">
+                            <h3 class="product-group-summary__heading">@group.Name</h3>
+                            <p class="product-group-summary__desc">@group.ShortDescription</p>
+                            <div class="product-group-summary__meta">
+                                <span class="product-group-badge product-group-badge--configs">
+                                    @(group.Models.Count == 1 ? "1 Configuration" : $"{group.Models.Count} Configurations")
+                                </span>
+                                @if (approvedDocs.Count > 0)
+                                {
+                                    <span class="product-group-badge product-group-badge--docs">
+                                        @(approvedDocs.Count == 1 ? "Technical Document" : "Technical Documents")
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="product-group-summary__action">
+                            <span class="product-group-summary__action-label product-group-summary__action-label--closed">View details</span>
+                            <span class="product-group-summary__action-label product-group-summary__action-label--open">Hide details</span>
+                            <span class="product-group-summary__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="disclosure-arrow">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </summary>
+                <div class="product-group-disclosure__content">
+                    <div class="product-group-disclosure__inner">
+                        @if (group.AssociatedAsset != null)
+                        {
+                            <figure class="product-group-disclosure__figure">
+                                <div class="product-group-disclosure__media">
+                                    <img src="@group.AssociatedAsset.ImagePath"
+                                         alt="@group.AssociatedAsset.AltText"
+                                         width="1600"
+                                         height="1000"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="product-group-disclosure__img" />
+                                </div>
+                                <figcaption class="product-group-disclosure__caption">
+                                    @group.AssociatedAsset.AltText
+                                </figcaption>
+                            </figure>
+                        }
+
+                        <div class="product-group-disclosure__models">
+                            <h4 class="product-group-disclosure__subheading">Models &amp; Configurations</h4>
+                            <ul class="product-group-disclosure__models-list">
+                                @foreach (var productModel in group.Models)
+                                {
+                                    <li>
+                                        @if (!string.IsNullOrWhiteSpace(productModel.ModelCode))
+                                        {
+                                            <strong class="product-group-disclosure__model-code"><code>@productModel.ModelCode</code></strong>
+                                        }
+                                        <span class="product-group-disclosure__config">@productModel.Configuration</span>
+
+                                        @if (productModel.SpecificationStatus == "HoldDisputedSpecs" || group.SpecificationStatus == "HoldDisputedSpecs")
+                                        {
+                                            <span class="product-group-disclosure__spec-note text-muted">Specifications subject to engineering confirmation.</span>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(productModel.SpecificationsSummary))
+                                        {
+                                            <span class="product-group-disclosure__spec">&mdash; @productModel.SpecificationsSummary</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+
+                        @if (approvedDocs.Count > 0)
+                        {
+                            <div class="product-group-disclosure__resources">
+                                <h4 class="product-group-disclosure__subheading">Technical Documents</h4>
+                                <ul class="product-group-disclosure__resource-list">
+                                    @foreach (var doc in approvedDocs)
+                                    {
+                                        <li>
+                                            <a href="@doc.CurrentSourceUrl" target="_blank" rel="noopener noreferrer" class="product-group-disclosure__resource-link">
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resource-icon">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                                </svg>
+                                                <span>@doc.Title</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="product-group-disclosure__action">
+                            <a href="/contact-us" class="card-link product-group-disclosure__contact-link">
+                                <span class="card-link__text">Inquire about @group.Name with USAP Engineering</span>
+                                <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        }
+    </div>
+
+    <div class="family-back-nav">
+        <a href="/products" class="btn btn-outline">&larr; Return to All Product Families</a>
+    </div>
+
+    <aside class="configuration-support-notice" role="region" aria-label="Configuration Support">
+        <div class="configuration-support-content">
+            <span class="configuration-support-eyebrow">CONFIGURATION SUPPORT</span>
+            <h2 class="configuration-support-heading">Technical Guidance &amp; Application Planning</h2>
+            <p>Product configurations, compatibility, documentation, and availability vary by application and project requirements. Contact USAP engineering for help identifying appropriate models, supporting hardware, and current technical information for your project.</p>
+        </div>
+        <div class="configuration-support-action">
+            <a href="/contact-us" class="btn btn-secondary">Contact Engineering</a>
+        </div>
+    </aside>
 </div>
+
+<!-- Section 3: Shared Closing CTA -->
+<section class="closing-cta closing-cta--default family-closing-cta" aria-labelledby="closing-cta-heading">
+    <div class="container">
+        <div class="closing-cta-content">
+            <span class="eyebrow">Technical Support</span>
+            <h2 id="closing-cta-heading">Inquire About @familyName</h2>
+            <p>Speak with USAP engineering regarding specific frequency bands, mounting configurations, or custom engineering requirements for your deployment.</p>
+            <div class="closing-cta-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Contact USAP</a>
+            </div>
+        </div>
+    </div>
+</section>

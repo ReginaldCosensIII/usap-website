@@ -1,0 +1,41 @@
+@model USAP.Web.Models.Catalog.ProductFamilyRecord
+
+<article class="card card--interactive product-family-card" id="family-@Model.Slug">
+    <div class="product-family-card__media">
+        @if (!Model.CardAsset.IsPlaceholder)
+        {
+            <img src="@Model.CardAsset.ImagePath"
+                 alt="@Model.CardAsset.AltText"
+                 class="product-family-card__img"
+                 width="1600"
+                 height="1000"
+                 loading="lazy"
+                 decoding="async" />
+        }
+        else
+        {
+            <div class="card-img-placeholder product-family-card__placeholder" role="img" aria-label="@Model.Name — Design placeholder, imagery in development">
+                <div class="card-placeholder-pattern" aria-hidden="true"></div>
+                <div class="card-placeholder-content">
+                    <svg class="card-placeholder-icon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 2v20M7 7l5-5 5 5M4 12l8-8 8 8M2 17l10-10 10 10" />
+                    </svg>
+                    <span class="card-placeholder-badge">@Model.CardAsset.BadgeText</span>
+                    <span class="card-placeholder-caption">@Model.CardAsset.Caption</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="card-body product-family-card__body">
+        <span class="eyebrow product-family-card__eyebrow">@Model.CardEyebrow</span>
+        <h3 class="product-family-card__title">@Model.DisplayTitle</h3>
+        <p class="product-family-card__summary">@Model.CardSummary</p>
+        <div class="product-family-card__action-wrapper">
+            <a href="@Model.Route" class="card-link product-family-card__link stretched-link" aria-label="Explore @Model.Name">
+                <span class="card-link__text">Explore Family</span>
+                <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
+    </div>
+</article>
