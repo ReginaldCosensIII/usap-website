@@ -122,8 +122,33 @@ public class ProductCatalogService : IProductCatalogService
         "tower-systems-accessories"
     };
 
+    private static readonly HashSet<string> ApprovedResourceIds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "doc-lp-high-power",
+        "doc-lp-1018ba",
+        "doc-lp-1019",
+        "doc-1910-2024",
+        "doc-aperiodic",
+        "doc-t-3002-oct2016"
+    };
+
     public IReadOnlyList<ProductFamilyRecord> GetFeaturedFamilies() =>
         FeaturedFamilyIds.Select(id => _familiesById[id]).ToList();
+
+    public IReadOnlyList<ProductResourceRecord> GetApprovedResourcesForGroup(string groupId)
+    {
+        if (string.IsNullOrWhiteSpace(groupId))
+        {
+            return Array.Empty<ProductResourceRecord>();
+        }
+
+        return _resources
+            .Where(r => string.Equals(r.ProductGroupId, groupId, StringComparison.OrdinalIgnoreCase)
+                        && ApprovedResourceIds.Contains(r.Id)
+                        && (string.Equals(r.ApprovalStatus, "Provisional", StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(r.ApprovalStatus, "PreferredProvisional", StringComparison.OrdinalIgnoreCase)))
+            .ToList();
+    }
 
     public static void ValidateCatalog(
         IReadOnlyList<ProductFamilyRecord> families,
@@ -428,6 +453,23 @@ public class ProductCatalogService : IProductCatalogService
                 throw new InvalidOperationException($"Resource '{resource.Id}' references unknown product group '{resource.ProductGroupId}'.");
             }
         }
+
+        // 9. AssociatedAsset validation
+        foreach (var group in productGroups)
+        {
+            if (group.AssociatedAsset != null)
+            {
+                if (string.IsNullOrWhiteSpace(group.AssociatedAsset.ImagePath) || !group.AssociatedAsset.ImagePath.StartsWith("/images/products/"))
+                {
+                    throw new InvalidOperationException($"Product group '{group.Id}' has invalid AssociatedAsset ImagePath '{group.AssociatedAsset.ImagePath}'.");
+                }
+
+                if (string.IsNullOrWhiteSpace(group.AssociatedAsset.AltText))
+                {
+                    throw new InvalidOperationException($"Product group '{group.Id}' has AssociatedAsset without AltText.");
+                }
+            }
+        }
     }
 
     private static (
@@ -482,7 +524,7 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "Portable & Transportable Antenna Systems",
                 DisplayOrder: 2,
                 CardEyebrow: "Rapid Deployment / HF & VHF",
-                CardTitle: "Portable & Transportable Antenna Systems",
+                CardTitle: "Portable & Transportable",
                 CardSummary: "Field-deployable antenna systems covering HF and VHF communications.",
                 CardAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-family-card-portable-transportable-placeholder-v1.png",
@@ -587,11 +629,11 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "Antenna Rotator & Control Systems",
                 DisplayOrder: 5,
                 CardEyebrow: "Mechanical Rotators & Digital Controllers",
-                CardTitle: "Antenna Rotator & Control Systems",
+                CardTitle: "Rotator & Control Systems",
                 CardSummary: "Mechanical rotators and digital control systems for directional antenna installations.",
                 CardAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png",
-                    AltText: "Heavy-duty R3500 antenna rotator paired with a rackmount DRC-4 digital controller.",
+                    AltText: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization.",
                     IsPlaceholder: false),
                 HeroAsset: null,
                 Route: "/products/antenna-rotator-control-systems",
@@ -616,7 +658,7 @@ public class ProductCatalogService : IProductCatalogService
                     MobileImagePath: "/images/products/usap-family-rotator-control-systems-hero-a3s-mobile-768x768.png",
                     MobileWidth: 768,
                     MobileHeight: 768,
-                    AltText: "Heavy-duty antenna rotator paired with a rackmount digital controller on an engineering bench.",
+                    AltText: "Heavy-duty antenna rotator paired with a tabletop digital controller on an engineering bench.",
                     AssetClassification: "source-guided photorealistic product visualization",
                     ApprovalStatus: "provisional — USAP review pending"
                 )
@@ -847,7 +889,7 @@ public class ProductCatalogService : IProductCatalogService
                     new ProductModelRecord("1942-TA-LP", "Low-power transportable configuration", "Low-power configuration named only in PDF", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
                     new ProductModelRecord("1942-GM-LP", "Low-power ground-mount configuration", "Low-power configuration named only in PDF", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
                 },
-                ShortDescription: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz, providing gap-free short-to-medium range communications in roof-top, transportable, and ground-mount configurations.",
+                ShortDescription: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz for short-to-medium-range communications in roof-top, transportable, and ground-mount configurations.",
                 CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-1943-rt-1942-ta-1942-gm/",
                 ApprovalStatus: "ClientConfirmation",
                 SourceNotes: "Legacy URL slug typo says 1943. 1942-RT-LP, 1942-TA-LP, and 1942-GM-LP are PDF-only low-power configurations on conflict hold pending confirmation.",
@@ -867,13 +909,17 @@ public class ProductCatalogService : IProductCatalogService
                 {
                     new ProductModelRecord("R3500", "Medium-to-heavy-duty rotator unit paired with DRC-4", "4,300 in-lb rotating torque; 10,000 lb vertical load capacity; worm gear drive", "ClientConfirmation", SpecificationStatus: "Confirmed from current HTML")
                 },
-                ShortDescription: "Heavy-duty antenna rotator unit paired with the DRC-4 digital controller unit, providing 4,300 in-lb rotating torque and 10,000 lb vertical load capacity for directional antenna positioning.",
+                ShortDescription: "Heavy-duty antenna rotator unit paired with the tabletop DRC-4 digital controller, providing 4,300 in-lb rotating torque and 10,000 lb vertical load capacity for directional antenna positioning.",
                 CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-r3500/",
                 ApprovalStatus: "ClientConfirmation",
                 SourceNotes: "Confirm current DRC 4 bundle and product naming.",
                 ConflictHolds: new[] { "DRC 4 bundle compatibility and product naming confirmation" },
                 ResourceIds: new[] { "doc-r3500" },
-                SpecificationStatus: "Confirmed from current HTML"
+                SpecificationStatus: "Confirmed from current HTML",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png",
+                    AltText: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization.",
+                    IsPlaceholder: false)
             ),
             new(
                 Id: "r3501",
@@ -921,13 +967,17 @@ public class ProductCatalogService : IProductCatalogService
                 {
                     new ProductModelRecord("DRC-3", "Digital rotator controller for R3501 and R3503 systems", "Microprocessor-based controller for R3501 and R3503 rotator systems", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
                 },
-                ShortDescription: "Microprocessor-based digital rotator controller designed for precise azimuth control and position readout with USAP R3501 and R3503 rotator systems.",
+                ShortDescription: "Large industrial antenna-rotator control enclosure with display and control components.",
                 CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/drc-3/",
                 ApprovalStatus: "HoldDisputedSpecs",
                 SourceNotes: "Do not publish OS/software, remote-user, or Internet-control claims until USAP confirms current support and security.",
                 ConflictHolds: new[] { "Operating system, software support, and remote-user/Internet-control claims unverified" },
                 ResourceIds: new[] { "doc-drc-3" },
-                SpecificationStatus: "HoldDisputedSpecs"
+                SpecificationStatus: "HoldDisputedSpecs",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/usap-drc3-source-guided-product-visual-a3s-v1.png",
+                    AltText: "Large industrial antenna-rotator control enclosure with display and control components.",
+                    IsPlaceholder: false)
             ),
             new(
                 Id: "drc-4",
@@ -939,13 +989,17 @@ public class ProductCatalogService : IProductCatalogService
                 {
                     new ProductModelRecord("DRC-4", "Digital rotator controller unit paired with R3500", "Standalone and PC control digital rotator controller paired with R3500", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
                 },
-                ShortDescription: "Digital rotator controller unit paired with the R3500 rotator, supporting standalone front-panel operation and external PC interface control.",
+                ShortDescription: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.",
                 CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/drc-4/",
                 ApprovalStatus: "HoldDisputedSpecs",
                 SourceNotes: "Do not publish software, serial/USB, or remote-access compatibility claims until confirmed.",
                 ConflictHolds: new[] { "Software, serial/USB, and remote-access compatibility claims unverified" },
                 ResourceIds: new[] { "doc-drc-4" },
-                SpecificationStatus: "HoldDisputedSpecs"
+                SpecificationStatus: "HoldDisputedSpecs",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/usap-drc4-source-guided-product-visual-a3s-v1.png",
+                    AltText: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.",
+                    IsPlaceholder: false)
             ),
 
             // 6. Tower Systems & Accessories (1 group)

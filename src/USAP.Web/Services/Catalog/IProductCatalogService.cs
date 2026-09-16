@@ -11,4 +11,5 @@ public interface IProductCatalogService
     ProductGroupRecord? GetProductGroupById(string id);
     CatalogAsset GetLandingHeroAsset();
     IReadOnlyList<ProductFamilyRecord> GetFeaturedFamilies();
+    IReadOnlyList<ProductResourceRecord> GetApprovedResourcesForGroup(string groupId);
 }

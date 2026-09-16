@@ -18,4 +18,8 @@ public record ProductFamilyRecord(
     IReadOnlyList<string> ConflictHolds,
     IReadOnlyList<string> ProductGroupIds,
     ResponsiveHeroAsset? ResponsiveHero = null
-);
+)
+{
+    public string DisplayTitle =>
+        string.IsNullOrWhiteSpace(CardTitle) ? Name : CardTitle;
+}

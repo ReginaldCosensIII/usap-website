@@ -15,5 +15,6 @@ public record ProductGroupRecord(
     IReadOnlyList<string> ResourceIds,
     string SourcePresence = "Listed on current USAP website",
     string CommercialAvailability = "Not confirmed",
-    string SpecificationStatus = "Confirmed from current HTML"
+    string SpecificationStatus = "Confirmed from current HTML",
+    CatalogAsset? AssociatedAsset = null
 );

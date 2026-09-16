@@ -471,5 +471,67 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
   - Implemented 3-card figure grid on `/products/antenna-rotator-control-systems` highlighting DRC-3, DRC-4, and R3500/DRC-4 relationship.
   - Added single restrained section note explaining images are source-guided visualizations based on published USAP materials, avoiding repetitive disclaimers under each visual.
 - **DRC-4 Branding Limitation Documented:**
-  - The horizontal controller-face wordmark is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector brand artwork is supplied.
 **Reason:** Checkpoint USAP-CATALOG-001-C2 approved scope execution and implementation amendments.
+
+---
+
+## DEC-031: Product Catalog Presentation, Alignment, and Architecture Refinement (C2R / C2R1 / C2R2)
+
+**Date:** 2026-09-16
+**Status:** Approved by Human Project Lead
+**Deciders:** Human Project Lead (Reggie, CES), System Engineer / Planning Agent, Implementation Agent
+**Context:** Checkpoint `USAP-CATALOG-001-C2` established a solid data foundation (canonical 5/3/1/1/5/1 family hierarchy, 16 product groups, 30 named models, slug routing with 404 validation). However, independent project lead and stakeholder review identified presentation, governance, and architectural refinements required before client review. These requirements were formalized in the approved `USAP-CATALOG-001-C2R`, `USAP-CATALOG-001-C2R1`, and `USAP-CATALOG-001-C2R2` implementation instructions.
+**Decisions:**
+1. **Catalog Model Architecture Preservation:**
+   - Preserved existing positional record signatures in `ProductFamilyRecord`, `ProductGroupRecord`, `ProductModelRecord`, and `ProductResourceRecord`.
+   - Added computed fallback property `DisplayTitle => string.IsNullOrWhiteSpace(CardTitle) ? Name : CardTitle;` on `ProductFamilyRecord`.
+   - Added non-destructive optional property `CatalogAsset? AssociatedAsset = null` to `ProductGroupRecord`.
+2. **Authorized Homepage Family Selection:**
+   - Restored the 4 authorized homepage families: 1. Log Periodic Antennas, 2. Portable & Transportable, 3. Rotator & Control Systems, 4. Tower Systems & Accessories.
+   - Restored balanced 2×2 desktop/tablet and 1×4 mobile layout using dedicated `_HomeProductFamilyCard.cshtml`.
+3. **Dedicated Card-Partial Architecture:**
+   - Implemented `Pages/Shared/_HomeProductFamilyCard.cshtml` for the homepage 2×2 grid and `Pages/Shared/_ProductFamilyCard.cshtml` for the `/products` 3×2 grid.
+   - Both components preserve 16:10 media aspect ratio, single keyboard Tab stop, complete-card click activation via `.stretched-link`, and zero interactive element nesting.
+4. **Compact Catalog Card Rhythm & Shared Component Reservations (C2R2):**
+   - Replaced oversized C2R1 vertical reservations (`2.25lh`, `2.4lh`, `5lh` producing ~626px cards) with the compact, content-driven component contract at multi-column breakpoints (`48rem` and `64rem`):
+     - `--family-card-eyebrow-min-height: 2lh;` (reserves exactly 2 lines for eyebrow)
+     - `--family-card-title-min-height: 2lh;` (reserves exactly 2 lines for heading)
+     - `--family-card-summary-min-height: auto;` (allows summary to take its natural content height)
+     - Bottom CTA alignment preserved across cards in each row using the card body flex layout and `margin-top: auto` on `.product-family-card__action-wrapper`. Surplus space is not distributed via `justify-content: space-between`.
+   - Verified live before/after card measurements:
+     - 1440px Desktop: Row 1 reduced from 626.05px to 526.75px (-99.30px reduction); Row 2 reduced from 626.05px to 553.00px (-73.05px reduction). Both rows exceed the >= 60px height reduction requirement.
+     - Row 1: Summary top (1106.20px / 1106.17px / 1106.17px) aligned within 0.0313px (<= 1px requirement); CTA top (1178.70px) aligned within 0.0000px; card heights equal (526.75px).
+     - Row 2: Summary top (1656.92px / 1656.95px / 1656.95px) aligned within 0.0313px; CTA top (1755.70px) aligned within 0.0000px; card heights equal (553.00px).
+     - NVIS summary top (1656.92px) aligns with Rotator (1656.95px) and Tower (1656.95px) within 0.0313px.
+     - 768px Tablet (2-column): Pairs 1 and 2 reduced from 586.20px to 511.73px (-74.47px reduction); Pair 3 reduced from 586.20px to 536.67px (-49.53px reduction). Summary tops and CTA tops aligned within <= 0.0625px across all pairs.
+     - 390px Mobile (single-column): All vertical reservations remain `auto`, natural content height preserved with zero horizontal overflow.
+5. **Rich Collapsed Product Summaries (C2R1):**
+   - Redesigned `<summary class="product-group-summary">` to communicate rich context in collapsed state: product-group heading (`<h3>`), concise short description, configuration count badge, technical document indicator (rendered only when approved documents exist), and a visible "View details" action with disclosure indicator.
+   - Zero interactive elements nested within `<summary>`.
+   - Expanded body retains models, configurations, approved technical documents, associated visual (if present), and Contact Engineering CTA, while removing duplicate description text.
+6. **Configuration Support Placement (C2R1):**
+   - Moved Configuration Support panel to the bottom of the family-page content flow: (1) Product catalog heading -> (2) Product disclosures -> (3) Return to All Product Families -> (4) Configuration Support panel -> (5) Shared closing CTA.
+7. **Robust Reversible Disclosure Animation (C2R1):**
+   - Progressive enhancement script `disclosure.js` starts opening and closing transitions from current rendered height and opacity without jumping on rapid repeated clicks.
+   - All inline styles and animations clean up on completion, preserving natural responsive layout and zoom.
+   - `prefers-reduced-motion: reduce` toggles natively and immediately without animation. Applies identically to product disclosures and FAQ items.
+8. **Approved Card Display Titles:**
+   - Card titles explicitly configured: `Log Periodic Antennas`, `Portable & Transportable`, `Aperiodic Loop Antennas`, `NVIS Antennas`, `Rotator & Control Systems`, `Tower Systems & Accessories`.
+   - Canonical `Name` property preserved untouched for `<h1>`, breadcrumbs, and internal catalog records.
+9. **Source-Supported Rotator & Controller Terminology:**
+   - DRC-3 description: `Large industrial antenna-rotator control enclosure with display and control components.` Prohibited claims (tabletop, wall-mounted, cabinet-mounted, mast-mounted, defense systems) purged.
+   - DRC-4 description: `Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.` Prohibited claims (rackmount, 19-inch, precision controller) purged.
+   - R3500/DRC-4 relationship: `Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization.`
+10. **Product Group Disclosures & Associated Asset Relocation:**
+    - Replaced standalone rotator hardware visual section by moving assets directly into their respective group disclosures (`r3500`, `drc-3`, `drc-4`) via `AssociatedAsset`. The 13 non-rotator groups render no blank media slots or placeholder frames.
+    - Specifications on hold (`HoldDisputedSpecs`) withheld from public display; internal governance fields (`ConflictHolds`, `SourceNotes`) never exposed.
+11. **Technical Document Publication Allowlist:**
+    - Enforced default-deny allowlist policy via `IProductCatalogService.GetApprovedResourcesForGroup(groupId)`.
+    - Provisional publication limited to 6 approved records: `doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`.
+12. **Breakpoint-Sensitive Hero Presentation:**
+    - Right-anchored image containment (~65% width on desktop, ~75% on tablet) with left-anchored navy gradient overlay. Zero cropping or white letterboxing across 1920px, 1440px, 1024px, 768px, 767px, and 390px viewports.
+13. **Deferred Individual-Product Asset Matrix (C2R1):**
+    - Established documented 16-group asset status in `CONTENT_AND_ASSETS.md` isolating the 3 deployed rotator visuals from the 13 groups requiring separate asset research and generation.
+14. **Conservative Public Copy for 1942 NVIS Series (C2R2):**
+    - Removed unsupported "gap-free" claim from NVIS collapsed short description in `ProductCatalogService.cs`. Applied restrained public wording: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz for short-to-medium-range communications in roof-top, transportable, and ground-mount configurations." Zero operational performance guarantees or unverified claims introduced.
+**Reason:** Binding implementation amendments of USAP-CATALOG-001-C2R, USAP-CATALOG-001-C2R1, and USAP-CATALOG-001-C2R2 approved execution plan.

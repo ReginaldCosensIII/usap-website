@@ -642,3 +642,91 @@ To prevent recurrence:
     - Source snapshot `source_changes.diff` includes tracked git diff and synthetic `/dev/null` sections for untracked source files.
     - Untracked files register, asset hash registers, audit summaries, and build results included.
     - 100% forward-slash paths, CRC `testzip()` passed with 0 corruptions, 100% manifest match upon clean extraction.
+
+---
+
+## QA-013 — USAP-CATALOG-001-C2R / C2R1 / C2R2 Verification: Product Catalog Alignment, Compact Rhythm, Rich Summaries, and Evidence Remediation
+
+* **Date:** 2026-09-16
+* **Milestone / Task:** USAP-CATALOG-001-C2R / USAP-CATALOG-001-C2R1 / USAP-CATALOG-001-C2R2 (Catalog Card Alignment, Compact Rhythm, Product Disclosure Summary, Support Placement, and Evidence Remediation)
+* **Scope & Implementation:**
+  * Strict preservation of domain model architecture (`ProductFamilyRecord`, `ProductGroupRecord`, `ProductModelRecord`, `ProductResourceRecord`). `ProductModelRecord.cs` restored to checkpoint version.
+  * Addition of non-destructive `DisplayTitle` fallback property on `ProductFamilyRecord` and `AssociatedAsset` on `ProductGroupRecord`.
+  * Dedicated card partial strategy: `_HomeProductFamilyCard.cshtml` (2×2 desktop/tablet, 1×4 mobile) and `_ProductFamilyCard.cshtml` (3×2 desktop, 2×3 tablet, 1×6 mobile) with 16:10 aspect ratio and single Tab-stop click activation.
+  * Compact Catalog Card Rhythm & Shared Reservations (C2R2): Replaced oversized C2R1 vertical reservations (`2.25lh`, `2.4lh`, `5lh` producing ~626px cards) with the compact, content-driven component contract on multi-column breakpoints (`48rem` and `64rem`):
+    - `--family-card-eyebrow-min-height: 2lh;` (reserves exactly 2 lines for eyebrow)
+    - `--family-card-title-min-height: 2lh;` (reserves exactly 2 lines for heading)
+    - `--family-card-summary-min-height: auto;` (allows summary to take natural content height)
+    - Bottom CTA alignment preserved across cards in each row using card body flex layout and `margin-top: auto` on `.product-family-card__action-wrapper`. Surplus space is not distributed via `justify-content: space-between`.
+  * Live Card Compaction & Alignment Verification:
+    - 1440px Desktop: Row 1 reduced from 626.05px to 526.75px (-99.30px reduction); Row 2 reduced from 626.05px to 553.00px (-73.05px reduction), both exceeding the >= 60px height reduction requirement.
+    - Row 1: Summary top (1106.20px / 1106.17px / 1106.17px) aligned within 0.0313px (<= 1px requirement); CTA top (1178.70px) aligned within 0.0000px; card heights equal (526.75px).
+    - Row 2: Summary top (1656.92px / 1656.95px / 1656.95px) aligned within 0.0313px; CTA top (1755.70px) aligned within 0.0000px; card heights equal (553.00px).
+    - NVIS summary top (1656.92px) aligns with Rotator (1656.95px) and Tower (1656.95px) within 0.0313px.
+    - 768px Tablet (2-column): Pairs 1 and 2 reduced from 586.20px to 511.73px (-74.47px reduction); Pair 3 reduced from 586.20px to 536.67px (-49.53px reduction). Summary tops and CTA tops aligned within <= 0.0625px across all pairs.
+    - 390px Mobile (single-column): All vertical reservations remain `auto`, natural content height preserved with zero horizontal overflow.
+  * Conservative Public Copy for 1942 NVIS Series (C2R2): Removed unsupported "gap-free" claim from NVIS collapsed short description in `ProductCatalogService.cs`. Applied restrained public wording: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz for short-to-medium-range communications in roof-top, transportable, and ground-mount configurations." Zero operational performance guarantees or unverified claims.
+  * Rich Collapsed Product Summaries (C2R1): Redesigned `<summary class="product-group-summary">` to expose `<h3>` heading, concise public description, configuration count badge, approved technical document badge (rendered only when approved documents exist), and visible "View details" action with disclosure indicator. Zero nested interactive elements inside `<summary>`.
+  * Expanded disclosure body preserves models, allowed specifications, approved technical document links, Contact Engineering CTA, and associated visuals (for the 3 rotator groups). Clean text layout with zero empty media containers or placeholders for the other 13 groups. Duplicate description removed from body.
+  * Configuration Support Placement (C2R1): Moved to the bottom of the family-page content flow: (1) Product catalog heading -> (2) Product disclosures -> (3) Return to All Product Families -> (4) Configuration Support panel -> (5) Shared closing CTA.
+  * Robust Reversible Disclosure Animation (C2R1): Progressive enhancement in `disclosure.js` starts transitions from current rendered height and opacity without jumping on rapid repeated clicks. All inline styles and animations clean up on completion. `prefers-reduced-motion: reduce` toggles natively and immediately without animation.
+  * Approved card display titles verified across all 6 families; canonical `Name` preserved for `<h1>`, breadcrumbs, and records.
+  * Strict terminology compliance: DRC-3 ("Large industrial antenna-rotator control enclosure with display and control components.") and DRC-4 ("Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.") with all prohibited claims purged.
+  * Relocation of rotator visual assets into respective group disclosures (`r3500`, `drc-3`, `drc-4`).
+  * Withholding of disputed specifications (`HoldDisputedSpecs`) and zero public exposure of governance fields.
+  * Technical document default-deny allowlist (6 approved documents: `doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`).
+  * Deferred individual-product asset matrix documented in `CONTENT_AND_ASSETS.md` covering all 16 groups.
+* **Catalog Validation Suite (20 / 20 Scenarios Passing):**
+  * Execution: `dotnet run --project "scratch/CatalogValidationTests/CatalogValidationTests.csproj" --configuration Release --no-restore` (Exit Code 0).
+  * Assertions verified:
+    1. Canonical 6 families in order, 16 groups distributed 5/3/1/1/5/1, 30 named models + 1 unnamed line record, summaries verified.
+    2. Exact 4 featured homepage families in order.
+    3. DisplayTitle fallback property and exact card titles across all 6 families.
+    4. Canonical names preserved untouched.
+    5. AssociatedAsset mapping: attached to r3500, drc-3, drc-4; null on other 13 groups.
+    6. Exact DRC-3 and DRC-4 descriptions; zero prohibited terms found.
+    7. Approved technical documents allowlist returns exact 6 approved records, excludes unapproved records.
+    8. 13 negative validation tests (family counts, group counts, model counts, swaps, invalid heroes, invalid asset paths) throw expected exceptions.
+* **Rapid Toggle & Animation Robustness Verification:**
+  * Rapid 4-click activation test executed: initialOpen = false, finalOpen = false, expectedOpen = false, passed = true.
+  * Post-animation cleanup: `inlineHeightClean = true`, `inlineOverflowClean = true`.
+  * Reduced motion test (`prefers-reduced-motion: reduce`): `reducedMotionHandled = true` (instantaneous toggle without animation).
+* **Family Disclosures & Content Audit:**
+  * All 16 product groups audited with exact matching DOM selectors:
+    * Non-null group titles: 16/16.
+    * Concise collapsed summaries present: 16/16.
+    * Content wrappers present: 16/16.
+    * Models & configurations counted: 16/16.
+    * Approved resources counted: 16/16.
+    * Associated images present: exactly 3 (`r3500`, `drc-3`, `drc-4`); exactly 0 for remaining 13 groups.
+    * Zero nested interactive elements inside `<summary>`: 16/16.
+    * Leaked governance fields (`ConflictHolds`, `SourceNotes`, `HoldDisputedSpecs`, `ProjectSelected...`, `provisional — USAP review pending`): 0 violations.
+    * Configuration Support placement order valid on all 6 family pages: TRUE.
+* **Focused Browser Screenshots Captured (C2R2):**
+  * Pre-capture verification: scroll into view, bounding rect materially visible, layout stabilized, image decode complete (`complete && naturalWidth > 0`), `currentSrc` verified.
+  * Focused inventory:
+    * `01_catalog_grid_compact_1440px.png`: Full `/products` grid at 1440px showing compact layout.
+    * `02_catalog_row2_nvis_rotator_tower_alignment_1440px.png`: Second card row at 1440px, clearly showing NVIS, Rotator, and Tower alignment.
+    * `03_catalog_grid_768px.png`: Full `/products` grid at 768px showing balanced 2-column layout and pairwise alignment.
+    * `04_catalog_cards_mobile_390px.png`: Product cards at 390px confirming mobile remains compact and unchanged.
+    * `05_catalog_card_keyboard_focus_compact.png`: Prominent keyboard focus outline (`outline: 3px solid rgb(0, 87, 184)`) on focused card link after compaction.
+* **Live DOM Horizontal Overflow Audit (48 Live DOM Measurements):**
+  * Measured directly from live browser DOM via Chrome DevTools Protocol (`document.documentElement.scrollWidth`, `document.documentElement.clientWidth`, `document.body.scrollWidth`, `document.body.clientWidth`).
+  * Tested across all 6 viewports: 390, 767, 768, 1024, 1440, 1920 px.
+  * Tested across all 8 required routes: `/`, `/products`, `/products/log-periodic-antennas`, `/products/portable-transportable-antennas`, `/products/aperiodic-loop-antennas`, `/products/nvis-antennas`, `/products/antenna-rotator-control-systems`, `/products/tower-systems-accessories`.
+  * Calculation: `hasHorizontalOverflow = documentElement.scrollWidth > documentElement.clientWidth || body.scrollWidth > body.clientWidth`.
+  * Result: 48 / 48 tests passed (0 overflow failures, `c2r2_overflow_evidence.json`).
+* **Console & Network Logs:**
+  * Console errors: 0 (`c2r2_console_errors.json`).
+  * Network failures (4xx/5xx): 0 (`c2r2_network_failures.json`).
+* **Route Status Verification:**
+  * 12 HTTP-200 routes and 1 HTTP-404 route verified passing (`c2r2_route_status_results.json`).
+* **Packaged Diff Encoding Verification (C2R2):**
+  * Subprocess Git output captured as raw binary bytes and written without intermediate CP-1252 decoding.
+  * Corrupted characters scan (U+00C3, U+00E2, U+00C2, U+FFFD): Exactly 0 instances found in modified repository files and generated `source_changes.diff`.
+* **Build & Code Quality:**
+  * `dotnet build USAP.Web.sln --configuration Release`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet build USAP.Web.sln --configuration Debug -p:OutputPath="..."`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Exit code 1 (attributed strictly to baseline `IDE0011` brace warnings in `Program.cs` lines 16-35; zero formatting issues in modified files).
+  * `git diff --check`: Clean (0 whitespace errors).

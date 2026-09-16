@@ -238,9 +238,40 @@ Every promoted file was copied without re-encoding, preserving exact byte counts
 #### Selection Decisions & Rejections
 
 1. **Rotator & Control Family Card:** Candidate B (`usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png`) is promoted into service. Candidate A is strictly rejected because it purports to depict unverified rotator internal mechanics.
-2. **Family Hero Composition:** Desktop heroes (1536×576) and mobile heroes (768×768) are rendered via semantic `<picture>` elements with media boundary `(max-width: 47.999rem)` to prevent 768px layout collisions.
-3. **Dedicated Rotator Product Visuals:** The 3 product-specific visuals are presented in a dedicated hardware section on `/products/antenna-rotator-control-systems` with a single restrained section note. Individual image captions are concise and product-focused.
-4. **DRC-4 Controller Face Branding Limitation:** The horizontal controller-face wordmark depicted on the DRC-4 front panel is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector or high-resolution brand artwork is supplied by USAP.
+2. **Family Hero Composition:** Breakpoint-sensitive right-anchored contained image (~65% desktop, ~75% tablet) blended with left-anchored navy gradient overlay. Renders 1536×576 desktop and 768×768 mobile crop via semantic `<picture>` with `(max-width: 47.999rem)` boundary. Zero cropping or white letterboxing across all viewports.
+3. **Dedicated Card Partials (16:10 Aspect Ratio):** `_HomeProductFamilyCard.cshtml` and `_ProductFamilyCard.cshtml` preserve approved 16:10 media presentation, single keyboard Tab stop, and `.stretched-link` activation.
+4. **Relocated Rotator Product Visuals (C2R):** The 3 product-specific visuals (DRC-3, DRC-4, and R3500/DRC-4 relationship) are integrated directly into their respective group disclosures via the non-destructive `AssociatedAsset` property on `ProductGroupRecord`, eliminating the standalone visual section.
+5. **Strict Terminology Compliance:**
+   - DRC-3: "Large industrial antenna-rotator control enclosure with display and control components." (Prohibits tabletop, wall-mounted, cabinet-mounted, mast-mounted, and defense claims).
+   - DRC-4: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls." (Prohibits rackmount, rack-mount, 19-inch, and unverified precision claims).
+   - R3500/DRC-4: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization." (No bundle or availability guarantee).
+6. **DRC-4 Controller Face Branding Limitation:** The horizontal controller-face wordmark depicted on the DRC-4 front panel is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector or high-resolution brand artwork is supplied by USAP.
+7. **Technical Document Publication Policy (C2R):** Publication is default-deny. Only 6 provisional/preferred provisional records are exposed: `doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`. All conflicting or candidate-only documents remain withheld. Current first-party PDF links remain a provisional dependency requiring migration prior to WordPress decommissioning.
+
+### Deferred Individual-Product Asset Matrix (16 Product Groups — C2R1)
+
+The individual-product asset strategy cleanly isolates deployed provisional assets from deferred future research and generation. Exactly three Rotator groups currently have associated visuals deployed; the remaining 13 product groups require a dedicated, separate asset-research and generation checkpoint.
+
+**Optional Imagery Architecture:** Disclosures containing an associated asset (`AssociatedAsset != null`) render the `<figure>` with responsive media; disclosures without an associated asset render a clean text-first layout with zero blank media containers, zero generic silhouettes, and zero placeholder frames. No backlog or governance terminology is exposed in public page markup.
+
+| Family | Group ID | Product Group Name | Associated Asset Currently Available | First-Party PDF / Public Source for Future Research | Asset Review & Generation Status |
+|---|---|---|---|---|---|
+| Log Periodic Antennas | `lp-high-power` | High Power Log Periodic Antennas | None | `LP-High-Power.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1017` | LP-1017 Series Log Periodic Antennas | None | `LP-1017.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1018ba` | LP-1018BA Directional Log Periodic Antenna | None | `LP-1018BA.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1019` | LP-1019 Series Log Periodic Antennas | None | `LP-1019.pdf` | Separate asset-research and generation checkpoint required |
+| Log Periodic Antennas | `lp-1112mr` | LP-1112MR Tactical Log Periodic Antenna | None | `LP-1112MR.pdf`, current public site visual | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `v-4213` | V-4213 Portable Discone Antenna System | None | `V-4213.pdf` | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `lp-1402-1403` | LP-1402 & LP-1403 Tactical Mast-Mounted Antennas | None | `LP-1402-1403.pdf` | Separate asset-research and generation checkpoint required |
+| Portable & Transportable | `1910` | 1910 Transportable Log Periodic Antenna System | None | `1910-OCT-2016.pdf`, `1910-OCT-2024.pdf` | Separate asset-research and generation checkpoint required |
+| Aperiodic Loop Antennas | `aperiodic` | Aperiodic Loop Antenna Systems | None | `Aperiodic-Loop.pdf` | Separate asset-research and generation checkpoint required |
+| NVIS Antennas | `1942` | 1942 Series NVIS Antenna System | None | `1942-NVIS.pdf` | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `r3500` | R3500 Heavy-Duty Antenna Rotator Series | `/images/products/usap-rotator-hardware-r3500-drc4-bench-source-guided-v1.png` | First-party rotator catalog & engineering datasheets | Available (source-guided technical visualization deployed) |
+| Rotator & Control Systems | `r3501` | R3501 Medium-Duty Antenna Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `r3503` | R3503 Elevation Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
+| Rotator & Control Systems | `drc-3` | DRC-3 Industrial Digital Rotator Controller | `/images/products/usap-rotator-controller-drc3-large-enclosure-candidate-a-v1.png` | First-party DRC-3 manual & enclosure photo | Available (source-guided technical visualization deployed) |
+| Rotator & Control Systems | `drc-4` | DRC-4 Tabletop Digital Rotator Controller | `/images/products/usap-rotator-controller-drc4-tabletop-front-detail-v1.png` | First-party DRC-4 datasheet & manual | Available (source-guided technical visualization deployed) |
+| Tower Systems & Accessories | `t-3002` | T-3002 Heavy Duty Tower Systems & Accessories | None | `T-3002-OCT2016.pdf` | Separate asset-research and generation checkpoint required |
 
 ### Current-Site Catalog Policy Alignment & Metadata Separation (QA2 / C2)
 

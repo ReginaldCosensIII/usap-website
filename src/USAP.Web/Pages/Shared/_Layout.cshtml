@@ -25,9 +25,9 @@
     @* Shared footer *@
     @await Html.PartialAsync("_Footer")
 
-    @* Navigation JS — deferred so it does not block rendering.
-       Implements the progressive-enhancement mobile disclosure pattern. *@
+    @* Navigation and Disclosure JS — deferred so they do not block rendering. *@
     <script src="~/js/site-navigation.js" asp-append-version="true" defer></script>
+    <script src="~/js/disclosure.js" asp-append-version="true" defer></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

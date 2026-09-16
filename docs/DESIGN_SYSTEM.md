@@ -99,12 +99,24 @@ No external font requests. No Google Fonts, Adobe Fonts, or CDN font loading.
 
 ### Borders and radii
 
+Primitive radius scale:
+
 | Token | Value |
 |---|---|
 | `--border-radius-sm` | 0.25rem |
 | `--border-radius` | 0.375rem |
 | `--border-radius-md` | 0.5rem |
 | `--border-radius-lg` | 0.75rem |
+| `--border-radius-full` | 9999px |
+
+Semantic radius scale (C2R Amendment 11):
+
+| Semantic Alias | Primitive Reference | Intended Surface Context |
+|---|---|---|
+| `--radius-control` | `var(--border-radius)` (0.375rem) | Buttons, form inputs, interactive controls |
+| `--radius-surface` | `var(--border-radius-lg)` (0.75rem) | Product family cards, FAQ panels, disclosure cards |
+| `--radius-media` | `var(--border-radius-md)` (0.5rem) | Card media frames, figures, embedded diagrams |
+| `--radius-pill` | `var(--border-radius-full)` (9999px) | Badges, tags, status pills |
 
 ### Shadows
 

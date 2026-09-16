@@ -33,4 +33,9 @@ public class FamilyModel : PageModel
         ProductGroups = _catalogService.GetProductGroupsByFamily(Family.Id);
         return Page();
     }
+
+    public IReadOnlyList<ProductResourceRecord> GetApprovedResources(string groupId)
+    {
+        return _catalogService.GetApprovedResourcesForGroup(groupId);
+    }
 }

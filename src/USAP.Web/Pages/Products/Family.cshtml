@@ -63,121 +63,143 @@
     </div>
 </nav>
 
-<!-- Section 2: Product Information & Product Group Listing -->
+<!-- Section 2: Product Group Listing -->
 <div class="container section family-content-section">
-    <div class="product-info-notice" role="region" aria-label="Product Information">
-        <div class="product-info-notice__badge">Product Information</div>
-        <div class="product-info-notice__content">
-            <p>Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application. For project planning or technical inquiries, <a href="/contact-us" class="product-info-notice__link">contact USAP engineering</a>.</p>
-        </div>
-    </div>
-
     <div class="family-groups-header">
         <span class="eyebrow">PRODUCT CATALOG</span>
         <h2 class="section-heading">Products and Models in This Family</h2>
         <p class="section-lead">The following product groups and configurations are cataloged for @familyName:</p>
     </div>
 
-    <div class="family-groups-grid">
+    <div class="family-groups-list">
         @foreach (var group in Model.ProductGroups)
         {
-            <div class="card card--ambient family-group-card" id="@group.SectionAnchor">
-                <div class="card-body">
-                    <h3 class="family-group-card__title">@group.Name</h3>
-                    <p class="family-group-card__description">@group.ShortDescription</p>
-                    <div class="family-group-card__models">
-                        <span class="family-group-card__models-label">Models and Configurations:</span>
-                        <ul class="family-group-card__models-list">
-                            @foreach (var productModel in group.Models)
-                            {
-                                if (!string.IsNullOrWhiteSpace(productModel.ModelCode))
+            var approvedDocs = Model.GetApprovedResources(group.Id);
+            <details class="product-group-disclosure" id="@group.SectionAnchor">
+                <summary class="product-group-summary">
+                    <div class="product-group-summary__header">
+                        <div class="product-group-summary__main">
+                            <h3 class="product-group-summary__heading">@group.Name</h3>
+                            <p class="product-group-summary__desc">@group.ShortDescription</p>
+                            <div class="product-group-summary__meta">
+                                <span class="product-group-badge product-group-badge--configs">
+                                    @(group.Models.Count == 1 ? "1 Configuration" : $"{group.Models.Count} Configurations")
+                                </span>
+                                @if (approvedDocs.Count > 0)
                                 {
-                                    <li><code>@productModel.ModelCode</code> <span class="family-group-card__config">(@productModel.Configuration)</span></li>
+                                    <span class="product-group-badge product-group-badge--docs">
+                                        @(approvedDocs.Count == 1 ? "Technical Document" : "Technical Documents")
+                                    </span>
                                 }
-                                else
+                            </div>
+                        </div>
+                        <div class="product-group-summary__action">
+                            <span class="product-group-summary__action-label product-group-summary__action-label--closed">View details</span>
+                            <span class="product-group-summary__action-label product-group-summary__action-label--open">Hide details</span>
+                            <span class="product-group-summary__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="disclosure-arrow">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                </summary>
+                <div class="product-group-disclosure__content">
+                    <div class="product-group-disclosure__inner">
+                        @if (group.AssociatedAsset != null)
+                        {
+                            <figure class="product-group-disclosure__figure">
+                                <div class="product-group-disclosure__media">
+                                    <img src="@group.AssociatedAsset.ImagePath"
+                                         alt="@group.AssociatedAsset.AltText"
+                                         width="1600"
+                                         height="1000"
+                                         loading="lazy"
+                                         decoding="async"
+                                         class="product-group-disclosure__img" />
+                                </div>
+                                <figcaption class="product-group-disclosure__caption">
+                                    @group.AssociatedAsset.AltText
+                                </figcaption>
+                            </figure>
+                        }
+
+                        <div class="product-group-disclosure__models">
+                            <h4 class="product-group-disclosure__subheading">Models &amp; Configurations</h4>
+                            <ul class="product-group-disclosure__models-list">
+                                @foreach (var productModel in group.Models)
                                 {
-                                    <li><span class="family-group-card__config">@productModel.Configuration <span class="text-muted">(No published model number)</span></span></li>
+                                    <li>
+                                        @if (!string.IsNullOrWhiteSpace(productModel.ModelCode))
+                                        {
+                                            <strong class="product-group-disclosure__model-code"><code>@productModel.ModelCode</code></strong>
+                                        }
+                                        <span class="product-group-disclosure__config">@productModel.Configuration</span>
+
+                                        @if (productModel.SpecificationStatus == "HoldDisputedSpecs" || group.SpecificationStatus == "HoldDisputedSpecs")
+                                        {
+                                            <span class="product-group-disclosure__spec-note text-muted">Specifications subject to engineering confirmation.</span>
+                                        }
+                                        else if (!string.IsNullOrWhiteSpace(productModel.SpecificationsSummary))
+                                        {
+                                            <span class="product-group-disclosure__spec">&mdash; @productModel.SpecificationsSummary</span>
+                                        }
+                                    </li>
                                 }
-                            }
-                        </ul>
+                            </ul>
+                        </div>
+
+                        @if (approvedDocs.Count > 0)
+                        {
+                            <div class="product-group-disclosure__resources">
+                                <h4 class="product-group-disclosure__subheading">Technical Documents</h4>
+                                <ul class="product-group-disclosure__resource-list">
+                                    @foreach (var doc in approvedDocs)
+                                    {
+                                        <li>
+                                            <a href="@doc.CurrentSourceUrl" target="_blank" rel="noopener noreferrer" class="product-group-disclosure__resource-link">
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resource-icon">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                                </svg>
+                                                <span>@doc.Title</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="product-group-disclosure__action">
+                            <a href="/contact-us" class="card-link product-group-disclosure__contact-link">
+                                <span class="card-link__text">Inquire about @group.Name with USAP Engineering</span>
+                                <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </details>
         }
     </div>
 
     <div class="family-back-nav">
         <a href="/products" class="btn btn-outline">&larr; Return to All Product Families</a>
     </div>
-</div>
 
-@if (Model.FamilySlug == "antenna-rotator-control-systems")
-{
-    <!-- Rotator Product Visuals Section -->
-    <section class="section family-visuals-section" aria-labelledby="rotator-visuals-heading">
-        <div class="container">
-            <div class="section-intro">
-                <span class="eyebrow">Product Visuals</span>
-                <h2 id="rotator-visuals-heading" class="section-heading">Rotator &amp; Controller Hardware</h2>
-                <p class="section-lead">Source-guided technical visualizations based on published USAP engineering materials.</p>
-            </div>
-
-            <div class="rotator-visuals-grid">
-                <figure class="card card--ambient rotator-visual-card">
-                    <div class="rotator-visual-card__media">
-                        <img src="/images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png"
-                             alt="R3500 heavy-duty rotator paired with a DRC-4 digital controller in an equipment bench configuration."
-                             width="1600"
-                             height="1000"
-                             loading="lazy"
-                             decoding="async"
-                             class="rotator-visual-card__img" />
-                    </div>
-                    <figcaption class="rotator-visual-card__caption">
-                        <h3 class="rotator-visual-card__title">R3500 / DRC-4 System Relationship</h3>
-                        <p class="rotator-visual-card__text">Heavy-duty mechanical rotator paired with the DRC-4 rackmount digital rotator controller.</p>
-                    </figcaption>
-                </figure>
-
-                <figure class="card card--ambient rotator-visual-card">
-                    <div class="rotator-visual-card__media">
-                        <img src="/images/products/usap-drc3-source-guided-product-visual-a3s-v1.png"
-                             alt="DRC-3 tabletop digital rotator controller with front-panel controls and display."
-                             width="1600"
-                             height="1000"
-                             loading="lazy"
-                             decoding="async"
-                             class="rotator-visual-card__img" />
-                    </div>
-                    <figcaption class="rotator-visual-card__caption">
-                        <h3 class="rotator-visual-card__title">DRC-3 Digital Rotator Controller</h3>
-                        <p class="rotator-visual-card__text">Tabletop digital controller unit with front-panel controls, digital readout, and interface connections.</p>
-                    </figcaption>
-                </figure>
-
-                <figure class="card card--ambient rotator-visual-card">
-                    <div class="rotator-visual-card__media">
-                        <img src="/images/products/usap-drc4-source-guided-product-visual-a3s-v1.png"
-                             alt="DRC-4 19-inch rackmount digital rotator controller with illuminated front panel."
-                             width="1600"
-                             height="1000"
-                             loading="lazy"
-                             decoding="async"
-                             class="rotator-visual-card__img" />
-                    </div>
-                    <figcaption class="rotator-visual-card__caption">
-                        <h3 class="rotator-visual-card__title">DRC-4 Digital Rotator Controller</h3>
-                        <p class="rotator-visual-card__text">Standard 19-inch rackmount digital rotator controller designed for base-station and central-control installations.</p>
-                    </figcaption>
-                </figure>
-            </div>
-
-            <p class="rotator-visuals-note">
-                <em>Note: Visualizations are source-guided models based on published USAP materials. Current enclosure designs, connectors, and mounting configurations must be confirmed with USAP engineering.</em>
-            </p>
+    <aside class="configuration-support-notice" role="region" aria-label="Configuration Support">
+        <div class="configuration-support-content">
+            <span class="configuration-support-eyebrow">CONFIGURATION SUPPORT</span>
+            <h2 class="configuration-support-heading">Technical Guidance &amp; Application Planning</h2>
+            <p>Product configurations, compatibility, documentation, and availability vary by application and project requirements. Contact USAP engineering for help identifying appropriate models, supporting hardware, and current technical information for your project.</p>
         </div>
-    </section>
-}
+        <div class="configuration-support-action">
+            <a href="/contact-us" class="btn btn-secondary">Contact Engineering</a>
+        </div>
+    </aside>
+</div>
 
 <!-- Section 3: Shared Closing CTA -->
 <section class="closing-cta closing-cta--default family-closing-cta" aria-labelledby="closing-cta-heading">
