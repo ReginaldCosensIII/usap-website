@@ -6,7 +6,7 @@
 |---|---|---|---|---|
 | `/` | `Pages/Index.cshtml` | Provisional | Section 5 integrates shared `_ProductFamilyCard.cshtml` featuring 4 canonical families via `IProductCatalogService`, linking to `/products/{slug}` with section-level `View All Products` linking to `/products`. | `HF, VHF & UHF Antenna Systems` (index, follow) |
 | `/products` | `Pages/Products/Index.cshtml` | Provisional (USAP-CATALOG-001-C2) | Structured 6-family catalog landing page with Direction C hero, unified shared card grid (3-column), Candidate B rotator card, 3 actionable guidance pathways with inline continuation, 6-question FAQ, and closing CTA. | `Antenna Products & Systems` (index, follow) |
-| `/products/{familySlug}` | `Pages/Products/Family.cshtml` | Provisional (USAP-CATALOG-001-C2) | Six canonical family routes with responsive `<picture>` hero (1536×576 desktop / 768×768 mobile) using `(max-width: 47.999rem)` boundary, copy-safe overlay, per-family focal positions, audited product groups, and dedicated Rotator hardware visuals section. Slug validation returns HTTP 404 for invalid slugs. | `[Family Name]` (noindex, follow) |
+| `/products/{familySlug}` | `Pages/Products/Family.cshtml` | Provisional (USAP-CATALOG-002-C1R6) | Six canonical family routes with responsive hero, breadcrumbs, structured product groups, Configuration Support, and standardized closing sequence. Unique titles/meta descriptions and family-specific headings. Validates slugs with HTTP 404 for invalid slugs. | `[Family Name] | United States Antenna Products` (index, follow — production intent) |
 | `/technical-resources` | `Pages/TechnicalResources.cshtml` | Stub | Pending approved documents and organization | `Technical Resources` (index, follow) |
 | `/about-us` | `Pages/AboutUs.cshtml` | Provisional | Reference-grounded imagery integrated; shared hero and closing CTA; client approval pending | `About Us` (index, follow) |
 | `/contact-us` | `Pages/ContactUs.cshtml` | Provisional | Shared internal hero and sidebar with verified contact details and Google Maps embed; form behavior preserved | `Contact Us` (index, follow) |
@@ -39,23 +39,48 @@
   * Third-party dependency: Google Maps embed relies on external network connectivity and Google privacy policies.
 * **Form Preservation:** PageModels, form bindings, validation attributes, antiforgery tokens, honeypot, reCAPTCHA, submit handlers, and rate limiting remain 100% untouched.
 
-## Product Catalog & Product Family Routes (Checkpoint USAP-CATALOG-001-C2R)
+## Product Catalog & Product Family Routes (Checkpoint USAP-CATALOG-002-C1)
 
-* **Landing Page (`/products`):** Full responsive landing page refined in Checkpoint `USAP-CATALOG-001-C2R`. Displays Direction C hero asset (`usap-products-landing-hero-direction-c-candidate-v1.png`), 3×2 responsive card grid (3-column desktop, 2-column tablet, 1-column mobile) powered by dedicated `_ProductFamilyCard.cshtml` with approved card display titles, 16:10 media aspect ratio, single Tab stop per card, actionable Engineering Guidance section with subtle dot-grid background and inline SVGs, 6-question Product Selection FAQ (`<details>`/`<summary>`), and closing CTA.
+* **Landing Page (`/products`):** Full responsive landing page displaying Direction C hero asset (`usap-products-landing-hero-direction-c-candidate-v1.png`), 3×2 responsive card grid (3-column desktop, 2-column tablet, 1-column mobile) powered by dedicated `_ProductFamilyCard.cshtml` with single semantic anchor per card, no nested interactive controls, approved card display titles, full-bleed 16:10 media aspect ratio without side gutters, single Tab stop per card, coordinated hover/focus zoom and arrow feedback, actionable Engineering Guidance section featuring 3 project-lead-selected coordinated card visuals (Deployment & Mobility, Coverage & Propagation, Positioning & Infrastructure; combined wide visual deferred), 6-question Product Selection FAQ (`<details>`/`<summary>`), and closing CTA.
 * **Homepage Section 5 Integration (`/`):** Section 5 utilizes dedicated `_HomeProductFamilyCard.cshtml` to feature the 4 authorized canonical families (1. Log Periodic Antennas, 2. Portable & Transportable, 3. Rotator & Control Systems, 4. Tower Systems & Accessories) in a balanced 2×2 desktop/tablet and 1×4 mobile layout. Each card retains 16:10 media presentation, single Tab stop, complete-card click activation (`stretched-link`), and direct family route destination. Section-level `View All Products` button links to `/products`.
 * **Six Reserved Canonical Family Routes (Canonical 5 / 3 / 1 / 1 / 5 / 1 distribution, 16 distinct groups):**
-  1. `/products/log-periodic-antennas` (5 groups: High-Power HF Log Periodics [LP-1005, LP-1001, LP-1002], LP-1017 Log Periodic, LP-1018BA Broadband Log Periodic, LP-1019 Series [LP-1019BA, LP-1019SS], LP-1112MR Transportable Log Periodic)
-  2. `/products/portable-transportable-antennas` (3 groups: V-4213 Portable Discone [V-4213AD, V-4213AC], LP-1402 / LP-1403 Transportable Log Periodics [LP-1402, LP-1403], 1910 Tactical Dipoles [1910AA, 1910BA])
-  3. `/products/aperiodic-loop-antennas` (1 group: USAP Aperiodic Loop Antenna [unnamed model line; fixed and transportable loop configurations])
-  4. `/products/nvis-antennas` (1 group: 1942 NVIS Series [1942-RT, 1942-TA, 1942-GM; low-power variants 1942-RT-LP, 1942-TA-LP, 1942-GM-LP on conflict hold])
-  5. `/products/antenna-rotator-control-systems` (5 groups: R3500 Heavy Duty Rotator with DRC-4 Rotator Control Unit, R3501 Universal Rotator System, R3503 Heavy Duty Rotating System, DRC-3 Digital Rotator Controller, DRC-4 Digital Rotator Controller)
-  6. `/products/tower-systems-accessories` (1 group: T-3002 RLPA Tower System [parent record with child configurations 3002FA, 3002FB, 3002SS, 3002SS-80])
-* **Breakpoint-Sensitive Family Hero:** Right-anchored contained image (~65% width on desktop, ~75% on tablet) seamlessly blended with a left-anchored navy gradient overlay. Zero cropping or letterboxing; readable copy and CTAs across 1920px, 1440px, 1024px, 768px, 767px, and 390px viewports.
-* **Product Group Disclosures:** Implemented as native semantic `<details class="product-group-disclosure">` with `<summary class="product-group-summary">` and inner `.product-group-content` wrapper. Enhanced with zero-dependency CSS/Web Animations API (`disclosure.js`) respecting `prefers-reduced-motion`.
-* **Associated Asset Integration:** Rotator product visual assets are rendered directly inside their respective disclosures (`r3500`, `drc-3`, `drc-4`) via the non-destructive `AssociatedAsset` property on `ProductGroupRecord`. The 13 non-rotator groups render no image frames.
-* **Neutral Configuration Support Notice:** Replaced previous warning banner with an authoritative, neutral `Configuration Support` panel directing inquiries to `/contact-us`.
-* **Disputed Specifications Policy:** Specifications on hold (`HoldDisputedSpecs`) are withheld and replaced with restrained engineering guidance. Internal governance metadata (`ConflictHolds`, `SourceNotes`) is never exposed publicly.
-* **Technical Document Allowlist:** Provisional publication restricted to explicit 6-item allowlist (`doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`).
+  1. `/products/log-periodic-antennas` (5 groups: High-Power HF Log Periodics [LP-1005, LP-1001, LP-1002], LP-1017 Log Periodic, LP-1018BA Broadband Log Periodic, LP-1019 Series [LP-1019BA, LP-1019SS], LP-1112MR Transportable Log Periodic) — 8 public named models.
+  2. `/products/portable-transportable-antennas` (3 groups: V-4213 Portable Discone [V-4213AD, V-4213AC], LP-1402 / LP-1403 Transportable Log Periodics [LP-1402, LP-1403], 1910 Tactical Dipoles [1910AA, 1910BA]) — 6 public named models.
+  3. `/products/aperiodic-loop-antennas` (1 group: USAP Aperiodic Loop Antenna [unnamed model line; fixed and transportable loop configurations; HasPublishedModelNumber = false; 0 named models]) — 1 group record.
+  4. `/products/nvis-antennas` (1 group: 1942 NVIS Series [1942-RT, 1942-TA, 1942-GM, 1942-RT-LP, 1942-TA-LP, 1942-GM-LP]) — 6 public named models. (All six configuration identifiers rendered; low-power variants published without unverified power, weight, or gain ratings).
+  5. `/products/antenna-rotator-control-systems` (5 groups: R3500 Heavy Duty Antenna Rotator [R3500], R3501 Universal Rotator System [R3501], R3503 Heavy Duty Rotating System [R3503], DRC-3 Digital Rotator Controller [DRC-3], DRC-4 Digital Rotator Controller [DRC-4]) — 5 public named models. (R3500 copy scoped strictly to verified mechanical rotator facts without unconfirmed DRC-4 bundling or pairing claims).
+  6. `/products/tower-systems-accessories` (1 group: T-3002 RLPA Tower System [parent record T-3002 with child configurations 3002FA, 3002FB, 3002SS, 3002SS-80]) — 5 public named models.
+  * **Public Catalog Inventory:** Exactly 30 published named models across 15 groups, plus 1 unnamed Aperiodic loop system record (`HasPublishedModelNumber = false`). Total: 31 public catalog records across 16 groups.
+* **Breakpoint-Sensitive Family Hero & Relocated Breadcrumbs:** Right-anchored contained image (~65% width on desktop, ~75% on tablet) seamlessly blended with a left-anchored navy gradient overlay. Zero cropping or letterboxing; readable copy and CTAs across 1920px, 1440px, 1024px, 768px, 767px, and 390px viewports. Semantic breadcrumb navigation (`<nav aria-label="Breadcrumb">`) is positioned in the main content container immediately below the hero, aligned to the top-left edge.
+* **Product Group Cards & Always-Visible Overview Presentation (C1R4 Refinement):**
+  - Outer semantic `<article class="product-group-card" id="@group.SectionAnchor">` combining an always-visible overview with a nested native `<details class="product-group-disclosure">`.
+  - Always-visible overview displays the associated product image (standard cover or contain-style for LP-1112MR, 1910, 1942), product-group name, short summary, expanded introduction (when providing distinct context), configuration/model count badges, technical resource badge, and up to three key group characteristics at all times.
+  - The product image and primary group identity remain visible whether the disclosure is collapsed or expanded.
+  - Nested native `<details class="product-group-disclosure">` provides progressive disclosure for deeper information:
+    - Summary control clearly labeled `View Models & Specifications` / `Hide Models & Specifications` (`View Configuration & Technical Details` / `Hide Configuration & Technical Details` for Aperiodic), accessible with assistive technology context (`for @group.Name`).
+    - Expanded content presents additional group characteristics (when total > 3), model cards grid (`.product-models-grid`), Aperiodic system configuration notes, approved interim technical resources with PDF badges, and Contact Engineering inquiry link (`/contact-us`).
+  - Model cards (`.product-model-card`) render model code (`<code>`), display name/configuration role, brief description, and model-level specifications (`<dl class="product-specs-list">`).
+  - Restrained neutral visual styling: routine red top borders and default navy left accents are removed from ordinary product cards and disclosures, reserved only for intentional emphasis components.
+* **Product Selection FAQ Full-Width Layout (C1R4 Refinement):**
+  - The `.faq-list` on `/products` spans the full standard `.container` width (`width: 100%`), eliminating awkward narrow-column spacing.
+  - Expanded answer copy is constrained internally (`max-width: 75ch`) on paragraph elements to preserve optimal readability line lengths.
+* **Canonical Catalog Inventory (30 + 1 Reconciliation):**
+  - Exactly 6 families, 16 product groups, 30 named models/configurations, 1 unnamed Aperiodic group record = 31 total catalog records.
+  - Erroneous temporary identifiers introduced in C1R3 markdown (`lp-1112`, `lp-3001`, `1925`, `1940`, `r3505`, `r3506`, `1942-1..6`, `R3501-1`, `R3503-1`, `T-3002-30..70`) are explicitly rejected and excluded from public content and documentation.
+* **Complete Product-Group Visual Coverage:** All 16 product groups feature intentional visuals: the 3 existing approved-for-provisional-use rotator visuals (`r3500`, `drc-3`, `drc-4`) plus the 13 project-lead-selected A1 source-guided candidates (`lp-high-power`, `lp-1017`, `lp-1018ba`, `lp-1019`, `lp-1112mr`, `v-4213`, `lp-1402-1403`, `1910`, `aperiodic`, `1942`, `r3501`, `r3503`, `t-3002`). Wide-span assets (`lp-1112mr`, `1910`, `1942`) utilize contain-style responsive presentation to prevent aggressive cropping.
+* **Family Closing Sequence & Configuration Support Action (C1R5 Refinement):**
+  - Sequence order on all family pages: (1) Product Groups -> (2) Configuration Support notice (`.configuration-support-notice`) -> (3) Return to All Product Families (`.family-back-nav`) -> (4) Closing CTA -> (5) Site Footer.
+  - Return to All Product Families navigation control is repositioned below Configuration Support and above the closing CTA, retaining secondary `.btn-outline` treatment.
+  - Action button inside Configuration Support upgraded to shared primary red button (`.btn-primary`), promoting direct conversion for technical application planning without duplicate button declarations.
+* **Header Product-Family Dropdown Navigation (C1R5 Refinement):**
+  - Desktop and mobile site headers (`_Header.cshtml`) implement an accessible `<details id="nav-products-dropdown">` / `<summary class="nav-dropdown-toggle">` disclosure menu.
+  - Submenu provides direct access to All Products (`/products`) plus the six canonical family routes (`/products/log-periodic-antennas`, `/products/portable-transportable-antennas`, `/products/aperiodic-loop-antennas`, `/products/nvis-antennas`, `/products/antenna-rotator-control-systems`, `/products/tower-systems-accessories`).
+  - Products navigation state is highlighted (`is-active`, `aria-current="page"`) across `/products` and all six family routes.
+  - Operable via mouse, touch, and keyboard (Enter/Space, Tab, Escape to dismiss and focus summary), with outside-click dismissal on desktop. Mobile drawer allows expanding/collapsing dropdown without unintended menu closure. Fully functional without JavaScript. Footer retains single top-level `/products` link without duplicate family links.
+* **Hero Resilience Architecture (C1R5 Refinement):**
+  - Internal-page heroes (`.internal-hero`, `.internal-hero--family`, `.internal-hero--products`) utilize content-driven height with fluid padding `clamp(var(--space-8), 4vw, var(--space-12))`, `box-sizing: border-box`, and balanced heading wrap to prevent text clipping across viewports (390px to 2560px) and zoom levels (80%, 100%, 125%). Breadcrumbs remain strictly below family heroes.
+* **Disputed Specifications Policy:** Specifications on hold are withheld and replaced with restrained engineering guidance. Internal governance metadata (`ConflictHolds`, `SourceNotes`, `ApprovalStatus`, etc.) is never exposed publicly.
+* **Interim Technical Documents:** Six current interim product-page resource links are wired and validated (`doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`). The data architecture remains extensible for R2's 17 canonical PDFs planned for future migration under `USAP-TECHDOC-001`, without treating six as a permanent ceiling or classifying remaining PDFs as rejected.
 * **Slug Validation & True 404:** Slugs are strictly validated against `IProductCatalogService.GetFamilyBySlug(familySlug)`. Unrecognized slugs return HTTP 404.
 * **Legacy Public Redirects (Deferred to C3):** Legacy WordPress category and product URLs from the current public site are mapped in the research workbook and will be implemented in Milestone C3.
 
@@ -86,15 +111,42 @@ See `docs/CONTENT_AND_ASSETS.md`.
 A static XML sitemap defines exactly six provisional routes (`/`, `/products`, `/technical-resources`, `/about-us`, `/contact-us`, `/request-a-quote`).
 
 **Excluded routes:**
-* `/products/{familySlug}` (currently `noindex, follow`).
 * `/thank-you` (`noindex, nofollow`).
 * `/not-found` (`noindex, nofollow`).
 * `/Error` (`noindex, nofollow`).
 * Arbitrary placeholder or invalid product-family routes and all PDF/attachment URLs.
 
+**Indexable Product Family Routes (C1R6):**
+The six canonical `/products/{familySlug}` routes omit page-level `Robots` metadata, allowing production search engines to index and follow them (`index, follow` default). Non-production environments (development and staging) are protected against indexing globally via the `X-Robots-Tag: noindex, nofollow` HTTP response header middleware in `Program.cs`.
+
 **Important:**
-* Invalid product-family slugs (e.g., `/products/this-is-not-real`) currently return HTTP 200 OK because `Family.cshtml.cs` blindly binds the route data. This is a known soft-404 defect that remains until the catalog implementation adds slug validation.
+* Invalid product-family slugs (e.g., `/products/this-is-not-real`) return HTTP 404 via `IProductCatalogService.GetFamilyBySlug` validation in `Family.cshtml.cs`.
 * The sitemap and structured-data values are provisional and **must be reviewed again before production launch**.
+
+## Product-Family SEO & Heading Register (C1R6)
+
+| Route | Rendered `<title>` | Meta Description | Section Eyebrow | Post-Hero H2 | Production Robots |
+|---|---|---|---|---|---|
+| `/products/log-periodic-antennas` | `Log Periodic Antennas — United States Antenna Products` | Broadband directional log periodic antenna models, configurations, published operating characteristics, and technical documentation from United States Antenna Products. | PRODUCT MODELS & CONFIGURATIONS | Log Periodic Antenna Models & Configurations | `index, follow` (default) |
+| `/products/portable-transportable-antennas` | `Portable & Transportable Antenna Systems — United States Antenna Products` | Documented portable and transportable antenna configurations including discone, log periodic, and tactical dipole models from United States Antenna Products. | PRODUCT MODELS & CONFIGURATIONS | Portable & Transportable Antenna Models | `index, follow` (default) |
+| `/products/aperiodic-loop-antennas` | `Aperiodic Loop Antennas — United States Antenna Products` | Broadband aperiodic loop receiving antenna system, published operating characteristics, configuration guidance, and technical documentation from United States Antenna Products. | SYSTEM CONFIGURATION & TECHNICAL DETAILS | Aperiodic Loop Antenna System & Configuration Details | `index, follow` (default) |
+| `/products/nvis-antennas` | `1942 NVIS Antennas — United States Antenna Products` | Published 1942 Near Vertical Incidence Skywave (NVIS) antenna identifiers covering rooftop, transportable, and ground-mount configurations from United States Antenna Products. | PRODUCT MODELS & CONFIGURATIONS | 1942 NVIS Antenna Models & Configurations | `index, follow` (default) |
+| `/products/antenna-rotator-control-systems` | `Antenna Rotator & Control Systems — United States Antenna Products` | Antenna rotator and controller models, published positioning and control information, and documented system relationships from United States Antenna Products. | POSITIONING & CONTROL EQUIPMENT | Antenna Rotator & Controller Models | `index, follow` (default) |
+| `/products/tower-systems-accessories` | `T-3002 Tower Systems & Accessories — United States Antenna Products` | T-3002 tower-system models, published structural configurations, rotation specifications, and accessory information from United States Antenna Products. | SYSTEM MODELS & ACCESSORIES | T-3002 Tower System Models & Accessories | `index, follow` (default) |
+
+## Shared Navigation & Products Hero Baseline Status (C1R8)
+
+- **Sitewide Always-Visible Sticky Header**: Deployed across all pages (`position: sticky; top: 0;`). Kept visible continuously across all scroll directions during normal operation; all scroll-direction hide/reveal logic and idle restoration timers removed per project-lead direction. While mobile navigation scroll lock is active (`.nav-open-lock`), temporarily viewport-pinned via `position: fixed; top: 0; left: 0; right: 0; width: 100%;` to maintain top-of-viewport anchoring while background scrolling is locked.
+- **Content-Height Mobile Navigation**: All six top-level controls centered within the mobile drawer; drawer terminates below Request a Quote button + padding; translucent backdrop dismisses navigation.
+- **Route Validation**: Verified HTTP 200 across all canonical routes (`/`, `/about-us`, `/technical-resources`, `/contact-us`, `/request-a-quote`, `/products`, and all six family routes), and verified true HTTP 404 for invalid family slugs (e.g., `/products/non-existent-family-xyz`).
+
+## Shared Internal-Hero Foundation & Full-Image Presentation Status (C1R9)
+
+- **Unified Desktop/Tablet Height Baseline**: Reconciled the shared internal hero foundation to establish a shared desktop/tablet minimum-height (`--internal-hero-min-height: 24.2875rem;` / ~388.6px), derived from the product-family hero baseline at 1440×900.
+- **Height Parity across Normal Content**: Normal image-backed internal heroes across all routes (`/products`, `/contact-us`, `/request-a-quote`, and all six family routes) resolve to exact height parity (388.6px, 0.0px variance at 1440×900 and 1920×1080).
+- **Full-Image Right-Side Media Containment**: Non-family heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`) transition from destructive full-width `object-fit: cover` to bounded right-side media containment (`width: 65%; max-width: 1100px; height: 100%; object-fit: contain; object-position: right center;` at desktop; `width: 75%` at tablet). Full 8:3 source compositions are visible with zero vertical cropping.
+- **Fluid Expansion for Longer Content**: Preserves `height: auto` without max-height constraints. Heroes with extensive copy (e.g. `/about-us` at 427.1px) expand naturally without clipping under browser zoom (125%, 200%) or accessibility text scaling.
+- **Atmospheric Mobile Fallback**: Compact mobile screens (< 48rem) retain fluid height and display media as an atmospheric background under a 90% navy contrast overlay (`rgba(13, 27, 46, 0.90)`). Zero horizontal overflow across all viewports.
 
 ## Redirect map
 

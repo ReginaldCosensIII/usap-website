@@ -1,11 +1,12 @@
 namespace USAP.Web.Models.Catalog;
 
+/// <summary>
+/// Represents a compact, public-display product or configuration model record.
+/// Contains only approved display data with zero internal governance or hold metadata.
+/// </summary>
 public record ProductModelRecord(
     string ModelCode,
-    string Configuration,
-    string SpecificationsSummary,
-    string ApprovalStatus,
-    string SourcePresence = "Listed on current USAP website",
-    string CommercialAvailability = "Not confirmed",
-    string SpecificationStatus = "Confirmed from current HTML"
+    string? DisplayName = null,
+    string? Description = null,
+    IReadOnlyList<ProductCharacteristic>? Characteristics = null
 );

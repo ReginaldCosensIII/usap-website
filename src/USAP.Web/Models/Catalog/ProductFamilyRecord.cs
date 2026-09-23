@@ -17,7 +17,12 @@ public record ProductFamilyRecord(
     string SourceNotes,
     IReadOnlyList<string> ConflictHolds,
     IReadOnlyList<string> ProductGroupIds,
-    ResponsiveHeroAsset? ResponsiveHero = null
+    ResponsiveHeroAsset? ResponsiveHero = null,
+    string? SectionEyebrow = null,
+    string? SectionHeading = null,
+    string? SectionIntro = null,
+    string? PageTitle = null,
+    string? MetaDescription = null
 )
 {
     public string DisplayTitle =>

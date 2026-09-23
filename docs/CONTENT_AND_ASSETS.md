@@ -43,7 +43,7 @@ Wireframes are structural and responsive references. The high-fidelity design co
 |---|---|---|
 | Home | `/` | 🟡 Provisional implementation. Final client copy, imagery, branding, and approval remain pending. |
 | Products listing | `/products` | ✅ Structured 6-family catalog landing page implemented with A2F provisional candidate assets (USAP-CATALOG-001). Detail pages deferred to C2. |
-| Product family detail | `/products/{familySlug}` | 🟡 Minimal route placeholders with shared hero, breadcrumbs, and audited group listing implemented (Milestone C1). True 404 for invalid slugs. Full specifications and datasheets deferred to C2. |
+| Product family detail | `/products/{familySlug}` | ✅ Evidence-safe product detail presentation implemented across all 6 family routes and 16 groups with always-visible overviews and nested native disclosures (USAP-CATALOG-002-C1/C1R4). All 16 product groups feature intentional visual coverage (3 existing rotator visuals + 13 project-lead-selected A1 assets). Full technical library deferred. |
 | Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
 | About Us | `/about-us` | 🟡 Provisionally complete with reference-grounded imagery integrated; uses shared hero and closing CTA. Final client approval, company history, and manufacturing details pending. |
 | Contact Us | `/contact-us` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
@@ -246,51 +246,57 @@ Every promoted file was copied without re-encoding, preserving exact byte counts
    - DRC-4: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls." (Prohibits rackmount, rack-mount, 19-inch, and unverified precision claims).
    - R3500/DRC-4: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization." (No bundle or availability guarantee).
 6. **DRC-4 Controller Face Branding Limitation:** The horizontal controller-face wordmark depicted on the DRC-4 front panel is source-derived and provisional. It is not an approved official alternate logo lockup and remains slated for replacement when official vector or high-resolution brand artwork is supplied by USAP.
-7. **Technical Document Publication Policy (C2R):** Publication is default-deny. Only 6 provisional/preferred provisional records are exposed: `doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`. All conflicting or candidate-only documents remain withheld. Current first-party PDF links remain a provisional dependency requiring migration prior to WordPress decommissioning.
+7. **Technical Document Publication Policy (Interim C1 Link Set vs. Migration):** The 6 technical documents linked on product pages (`doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`) constitute the current interim C1 product-page link set (`InterimResourceIds`); they do not represent a permanent authorization ceiling. Under the R2 technical documentation review, 17 canonical technical documents were selected for subsequent migration and local hosting prior to WordPress decommissioning. The remaining canonical documents outside C1 are not rejected merely because they are outside the interim C1 release.
 
-### Deferred Individual-Product Asset Matrix (16 Product Groups — C2R1)
+### Complete Product-Group Visual Coverage Matrix (16 Product Groups — C1 Finalized)
 
-The individual-product asset strategy cleanly isolates deployed provisional assets from deferred future research and generation. Exactly three Rotator groups currently have associated visuals deployed; the remaining 13 product groups require a dedicated, separate asset-research and generation checkpoint.
+All 16 product groups feature intentional visual coverage in C1. The project lead selected all 13 A1 product-group candidates and 3 coordinated Engineering Guidance card visuals for provisional implementation. Asset selection represents project-lead authorization for implementation and does not represent formal USAP approval.
 
-**Optional Imagery Architecture:** Disclosures containing an associated asset (`AssociatedAsset != null`) render the `<figure>` with responsive media; disclosures without an associated asset render a clean text-first layout with zero blank media containers, zero generic silhouettes, and zero placeholder frames. No backlog or governance terminology is exposed in public page markup.
+**Responsive Visual Treatments:**
+- **Standard cover layout:** Deployed across groups where subject remains accurately recognizable at full crop.
+- **Wide-span contain layout:** Deployed for `lp-1112mr`, `1910`, and `1942` (`.product-group-disclosure__figure--contain`, `.product-group-disclosure__img--contain`) to preserve the central antenna system identity and full footprint without aggressive cropping.
+- **Engineering Guidance visuals:** 3 coordinated card images deployed on `/products` (Deployment & Mobility, Coverage & Propagation, Positioning & Infrastructure). The combined wide guidance visual alternate remains deferred.
 
-| Family | Group ID | Product Group Name | Associated Asset Currently Available | First-Party PDF / Public Source for Future Research | Asset Review & Generation Status |
-|---|---|---|---|---|---|
-| Log Periodic Antennas | `lp-high-power` | High Power Log Periodic Antennas | None | `LP-High-Power.pdf` | Separate asset-research and generation checkpoint required |
-| Log Periodic Antennas | `lp-1017` | LP-1017 Series Log Periodic Antennas | None | `LP-1017.pdf` | Separate asset-research and generation checkpoint required |
-| Log Periodic Antennas | `lp-1018ba` | LP-1018BA Directional Log Periodic Antenna | None | `LP-1018BA.pdf` | Separate asset-research and generation checkpoint required |
-| Log Periodic Antennas | `lp-1019` | LP-1019 Series Log Periodic Antennas | None | `LP-1019.pdf` | Separate asset-research and generation checkpoint required |
-| Log Periodic Antennas | `lp-1112mr` | LP-1112MR Tactical Log Periodic Antenna | None | `LP-1112MR.pdf`, current public site visual | Separate asset-research and generation checkpoint required |
-| Portable & Transportable | `v-4213` | V-4213 Portable Discone Antenna System | None | `V-4213.pdf` | Separate asset-research and generation checkpoint required |
-| Portable & Transportable | `lp-1402-1403` | LP-1402 & LP-1403 Tactical Mast-Mounted Antennas | None | `LP-1402-1403.pdf` | Separate asset-research and generation checkpoint required |
-| Portable & Transportable | `1910` | 1910 Transportable Log Periodic Antenna System | None | `1910-OCT-2016.pdf`, `1910-OCT-2024.pdf` | Separate asset-research and generation checkpoint required |
-| Aperiodic Loop Antennas | `aperiodic` | Aperiodic Loop Antenna Systems | None | `Aperiodic-Loop.pdf` | Separate asset-research and generation checkpoint required |
-| NVIS Antennas | `1942` | 1942 Series NVIS Antenna System | None | `1942-NVIS.pdf` | Separate asset-research and generation checkpoint required |
-| Rotator & Control Systems | `r3500` | R3500 Heavy-Duty Antenna Rotator Series | `/images/products/usap-rotator-hardware-r3500-drc4-bench-source-guided-v1.png` | First-party rotator catalog & engineering datasheets | Available (source-guided technical visualization deployed) |
-| Rotator & Control Systems | `r3501` | R3501 Medium-Duty Antenna Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
-| Rotator & Control Systems | `r3503` | R3503 Elevation Rotator | None | First-party rotator catalog & engineering specs | Separate asset-research and generation checkpoint required |
-| Rotator & Control Systems | `drc-3` | DRC-3 Industrial Digital Rotator Controller | `/images/products/usap-rotator-controller-drc3-large-enclosure-candidate-a-v1.png` | First-party DRC-3 manual & enclosure photo | Available (source-guided technical visualization deployed) |
-| Rotator & Control Systems | `drc-4` | DRC-4 Tabletop Digital Rotator Controller | `/images/products/usap-rotator-controller-drc4-tabletop-front-detail-v1.png` | First-party DRC-4 datasheet & manual | Available (source-guided technical visualization deployed) |
-| Tower Systems & Accessories | `t-3002` | T-3002 Heavy Duty Tower Systems & Accessories | None | `T-3002-OCT2016.pdf` | Separate asset-research and generation checkpoint required |
+| Family | Group ID | Product Group Name | Associated Asset File | Dimensions & SHA-256 | Approved Safe Alt Text | Selection Status |
+|---|---|---|---|---|---|---|
+| Log Periodic | `lp-high-power` | High Power Log Periodic Antennas | `images/products/groups/usap-product-group-lp-high-power-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`699e6c992e498051929f4fe9fe7205f1b12f0a71e8a39af331216788f29be0ab` | Long-boom high-power log-periodic antenna array in an outdoor installation. | Project-lead selected; USAP approval pending |
+| Log Periodic | `lp-1017` | LP-1017 Series Log Periodic Antennas | `images/products/groups/usap-product-group-lp-1017-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`c3f542d458e4c3525b90263813e4700363f2a90009a90b003228bfc5c5aae26e` | Tower-mounted long-boom log-periodic antenna array. | Project-lead selected; USAP approval pending |
+| Log Periodic | `lp-1018ba` | LP-1018BA Directional Log Periodic Antenna | `images/products/groups/usap-product-group-lp-1018ba-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`997ffdf51065b6a8104385c50f0fb04a5b569e3a69b88867c6845c133f73b5e6` | Broadband log-periodic antenna array mounted on a mast. | Project-lead selected; USAP approval pending |
+| Log Periodic | `lp-1019` | LP-1019 Series Log Periodic Antennas | `images/products/groups/usap-product-group-lp-1019-source-guided-candidate-a1-v2.png` | 1600 × 1000 PNG<br>`c37b7c40e42e203f6cc01172816772d67db1ab3f3c44d5973a719cda118cb790` | Compact log-periodic antenna array mounted on a mast. | Project-lead selected corrected v2; USAP approval pending |
+| Log Periodic | `lp-1112mr` | LP-1112MR Tactical Log Periodic Antenna | `images/products/groups/usap-product-group-lp-1112mr-source-guided-candidate-a1-v2.png` | 1600 × 1000 PNG<br>`baf591379f8c48c36ae0b485534e4eb095d19e33d92c71a4866aa04bf76c30af` | Wide transportable log-periodic antenna system deployed on a central field mast. | Project-lead selected corrected v2 (contain mode); USAP approval pending |
+| Portable | `v-4213` | V-4213 Portable Discone Antenna System | `images/products/groups/usap-product-group-v-4213-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`68e5f91946ff0be0b375b76c7bce7c3b90bfa43cb0365b950786b5d6490ee6f1` | Portable discone antenna system deployed on a sectional field mast. | Project-lead selected; USAP approval pending |
+| Portable | `lp-1402-1403` | LP-1402 & LP-1403 Tactical Mast-Mounted Antennas | `images/products/groups/usap-product-group-lp-1402-1403-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`e8a19d6f2ed72b2e912ba3e44f872647ba33b481e21c041f9820f6fba05ea694` | Transportable mast-mounted log-periodic antenna system in a field setting. | Project-lead selected; USAP approval pending |
+| Portable | `1910` | 1910 Transportable Log Periodic Antenna System | `images/products/groups/usap-product-group-1910-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`001f8ed06a63c946f0ec8cc21ba58a948eca7a9187bc714b244c1c412ac565f1` | Field-deployed HF wire dipole system supported by a central mast. | Project-lead selected (contain mode); USAP approval pending |
+| Aperiodic | `aperiodic` | Aperiodic Loop Antenna Systems | `images/products/groups/usap-product-group-aperiodic-single-loop-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`aad1a11581fd6791cdac37701d9e5fb661d535afe3ca26d1a469a91466cd3334` | One aperiodic loop and preamplifier element on a transportable tripod. | Project-lead selected; USAP approval pending |
+| NVIS | `1942` | 1942 Series NVIS Antenna System | `images/products/groups/usap-product-group-1942-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`96a6769f7d6adaaf5486f1f15fa9c6e3bd9a3bc65bd973f674b02ded076cf908` | Field-deployed NVIS antenna system with a central mast and broad low wire footprint. | Project-lead selected (contain mode); USAP approval pending |
+| Rotator | `r3500` | R3500 Heavy-Duty Antenna Rotator Series | `images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png` | 1600 × 1000 PNG<br>`3ea85e13ed17635d9773eef34d8dcc828f4ecb61f131241b48b5e4a46585708a` | Heavy-duty antenna rotator and tabletop controller shown together in a technical studio scene. | Approved for provisional use |
+| Rotator | `r3501` | R3501 Universal Rotator System | `images/products/groups/usap-product-group-r3501-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`a8b160992914ed7baaa15c8e5b831db743d3eb579cfa1599d3cdc2049a614a04` | Source-guided visualization of an R3501 open-frame antenna rotator assembly. | Project-lead selected; USAP approval pending |
+| Rotator | `r3503` | R3503 Heavy Duty Rotating System | `images/products/groups/usap-product-group-r3503-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`8f7804c2c074ee001cf0e9482a4b6a28781ae1a0b4ce3a04fb9c2ed92ad16dbe` | Source-guided visualization of an R3503 heavy-duty open-frame antenna rotator assembly. | Project-lead selected; USAP approval pending |
+| Rotator | `drc-3` | DRC-3 Industrial Digital Rotator Controller | `images/products/usap-drc3-source-guided-product-visual-a3s-v1.png` | 1600 × 1000 PNG<br>`44047a064106567fe7bc02146e25785a9a8385077227d8cece4d989f6b9bcfa4` | Industrial antenna-rotator control enclosure with display and front-panel controls. | Approved for provisional use |
+| Rotator | `drc-4` | DRC-4 Tabletop Digital Rotator Controller | `images/products/usap-drc4-source-guided-product-visual-a3s-v1.png` | 1600 × 1000 PNG<br>`5b306b6b7da255a297746595ee5d92e59e2eb420313cf7f7ae8cae3ef816a7bb` | Horizontal tabletop antenna-rotator controller with digital display, rotary dial, and front controls. | Approved for provisional use |
+| Tower | `t-3002` | T-3002 RLPA Tower System | `images/products/groups/usap-product-group-t-3002-source-guided-candidate-a1-v1.png` | 1600 × 1000 PNG<br>`515ad9d510996b8301d9cdefc109f1bcd12048807fcf389eda0130cae74cbaa5` | Tower-system components including lattice supports, a rotating mast, and a directional antenna. | Project-lead selected; USAP approval pending |
 
-### Current-Site Catalog Policy Alignment & Metadata Separation (QA2 / C2)
+### Safe Public Scope & Content Reconciliation (USAP-CATALOG-002-C1 Finalized)
 
-- **Binding Authority:** Until USAP provides a controlled product list, the current public USAP website is the authority for which products belong in the catalog. Every product or configuration listed on the current site remains cataloged.
-- **Four-Dimensional Catalog Metadata:** The catalog architecture cleanly distinguishes:
-  1. *Source presence:* Listed on current USAP website (all 16 groups, 30 named models, 1 unnamed line).
-  2. *Commercial availability:* Not confirmed (no assumption of current manufacturing, stocking, or purchase availability).
-  3. *Client approval:* Pending (formal USAP client review required before production launch).
-  4. *Specification status:* Confirmed from current HTML / Provisional / HoldDisputedSpecs.
-- **Tone & Section Language:** All public product and group titles use natural names consistent with current first-party pages (the archival word `Reference` or `References` has been completely eliminated). Section eyebrow is `PRODUCT CATALOG`, heading is `Products and Models in This Family`, and model label is `Models and Configurations:`.
-- **Shared Availability Notice:**
-  > *"Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application."*
-- **Preservation of Technical Resources for Later Lifecycle Classification:**
-  All 19 discovered product datasheets and revisions remain cataloged and linked to their respective product groups. The catalog is architected to support future lifecycle reclassification (e.g., active vs legacy/support) without deleting product pages, specifications, downloads, revision history, or support documentation.
-- **Disputed Technical Values & Published Relationships:**
-  - R3500/DRC-4 and DRC-3 with R3501/R3503 are presented as current-site published relationships without guaranteeing current purchase availability.
-  - Conflicting specifications (LP-1001 impedance, LP-1017 angle, LP-1112MR power/gain, V-4213 wind rating, LP-1402/1403 power, 1910 datasheets, 1942 low-power variants) remain internally tracked in `ConflictHolds` and project documentation. Provisional display follows current HTML while omitting misleading disputed values.
-- **Architectural Isolation:** All asset paths, dimensions, alt text, and classifications are centralized in `ProductCatalogService.cs`. The Razor templates bind to `@Model.HeroAsset` and `@family.Asset`, ensuring assets can be swapped without touching page markup or layout styles.
-- **Native Placeholder Fallback:** The native CSS design placeholder markup (`.product-family-card__placeholder` with dot grid, antenna wireframe, and `PRODUCT IMAGERY IN DEVELOPMENT` badge) is preserved in `Index.cshtml` as an explicit fallback.
+- **Model & Identifier Reconciliation (30 + 1 Target Achieved):**
+  - Public catalog projection contains exactly 30 published named models across 15 groups, plus 1 unnamed Aperiodic loop system record (`HasPublishedModelNumber = false`). Total: 31 catalog records across 16 groups.
+  - All 6 current-site 1942 NVIS configurations are public: `1942-RT`, `1942-TA`, `1942-GM`, `1942-RT-LP`, `1942-TA-LP`, `1942-GM-LP`. The three low-power variants are identified conservatively by configuration role only, omitting unverified power, weight, gain, or coverage ratings.
+  - R3500 presentation strictly uses non-conflicting mechanical rotator characteristics, omitting unverified bundle, pairing, or commercial availability claims.
+- **Visual Asset Deployment Status:**
+  - Complete 16-group visual coverage deployed with verified SHA-256 hashes and dimensions.
+  - 3 coordinated Engineering Guidance card visuals deployed on `/products`. The combined wide visual alternate remains deferred.
+- **Interim Technical Documents vs. Future Technical Documentation Migration:**
+  - 6 interim technical resource links are currently wired into the product pages:
+    - `doc-lp-high-power`: `1001_1002_1005-data-sheet.pdf`
+    - `doc-lp-1018ba`: `LP_1018BA_data_sheet_revised.pdf`
+    - `doc-lp-1019`: `1019-and-1019-ss-data-sheet.pdf`
+    - `doc-1910-2024`: `1910AA_1910BA-revised-1.pdf`
+    - `doc-aperiodic`: `USAP-Aperiodic-Loop-Antenna-data-sheet.pdf`
+    - `doc-t-3002-oct2016`: `T3002_data_sheet.pdf`
+  - R2 identified 34 current PDF URL records representing 32 unique binaries and selected 17 canonical PDFs for eventual local migration under `USAP-TECHDOC-001`. The interim 6-link set does not represent an authorization ceiling or a rejection of the remaining 11 canonical documents. Public vs. lead-gated distribution status for all technical documents remains client-pending.
+- **Purged Governance and Unsupported Terms:**
+  - Prohibited governance tokens (`ApprovalStatus`, `PublicationRecommendation`, `SpecificationStatus`, `ConflictHolds`, `SourceNotes`, `SourcePresence`, `CommercialAvailability`, `ClientConfirmation`, `HoldDisputedSpecs`, `confidence score`, `provisional research record`) are excluded from public output.
+  - Prohibited unverified claims purged: "without skip zones in mountainous terrain", "gap-free", "no-skip-zone", "guaranteed coverage", "complete 30-foot mast field system", "rapid-deployment", "400 W PEP", "compatible with the DRC-3", "paired with the DRC-4", "rackmount", "19-inch", and unconfirmed torque/weight figures.
 
 ---
 

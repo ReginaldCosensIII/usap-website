@@ -400,7 +400,7 @@ A shared reusable card component implemented in `Pages/Shared/_ProductFamilyCard
 
 | Class | Role | Styling & Behavior |
 |---|---|---|
-| `.product-family-card` | Card shell | Extends `.card.card--interactive` with restrained neutral border (red top border removed), flex-column layout, relative positioning, and 100% height for equal row heights. Entire card surface is clickable via stretched link. Full-card 3px focus-visible outline (`--focus-ring`). |
+| `.product-family-card` | Card shell & primary anchor | Outer element is a single semantic anchor (`<a href="@Model.Route" class="card card--interactive product-family-card">`). Uses restrained neutral border (`var(--card-border)`; red top border and navy left accent removed), flex-column layout, relative positioning, and 100% height for equal row heights. Entire card surface is clickable as a native link without JavaScript. Full-card 3px focus-visible outline (`--focus-ring`). Hover and keyboard focus trigger coordinated image zoom (`scale(1.03)`) and editorial CTA arrow shift. |
 | `.product-family-card__media` | 16:10 media frame | Edge-to-edge 16:10 aspect ratio (`aspect-ratio: 16 / 10`), zero inset padding, running flush to top and side edges with `overflow: hidden`. |
 | `.product-family-card__img` | Product photography | Edge-to-edge frame coverage with `object-fit: cover; object-position: center; display: block; padding: 0;`. Intrinsic dimensions set to `width="1600" height="1000"` (16:10 native aspect ratio), with `loading="lazy"` and `decoding="async"`. Restrained scale zoom (`scale(1.03)`) on card hover and keyboard focus (suppressed under `prefers-reduced-motion: reduce`). |
 | `.product-family-card__placeholder` | Native design placeholder | Deliberate CSS fallback for families without candidate imagery or when imagery fails to load. 16:10 edge-to-edge geometry, dark navy gradient, technical blueprint dot grid (`.card-placeholder-pattern`), antenna SVG wireframe, `PRODUCT IMAGERY IN DEVELOPMENT` status badge, and `Design placeholder — replacement imagery pending USAP review.` caption. |
@@ -408,7 +408,7 @@ A shared reusable card component implemented in `Pages/Shared/_ProductFamilyCard
 | `.product-family-card__eyebrow` | Category tag | Uppercase 12px bold label in `--color-text-link` (#004a99). Height governed by `--family-card-eyebrow-min-height`. |
 | `.product-family-card__title` | Family name | Semantic `<h3>` heading in `--color-brand-navy` (#0d1b2e) with `--leading-snug`. Height governed by `--family-card-title-min-height`. |
 | `.product-family-card__summary` | Family description | Factual, conservative summary without disputed engineering claims. Height governed by `--family-card-summary-min-height`. Flex-grow pushes action link to card footer. |
-| `.card-link.stretched-link` | Interactive target & CTA | Exactly one real anchor per card with `.stretched-link::after` overlay covering the entire card surface. Restrained editorial text-link with visible `Explore Family →` text, animated arrow translation on hover, and accessible family-specific name (`aria-label="Explore @family.Name"`). Exactly one Tab stop per card. |
+| `.card-link.product-family-card__link` | Editorial CTA indicator | Semantic non-interactive `<span>` styled as a restrained editorial text-link with visible `Explore Family →` text. Zero nested interactive controls. Visibly responds to card hover and keyboard focus with color shift and directional arrow translation. Accessible family-specific target provided by card anchor (`aria-label="Explore @Model.Family.Name"`). Exactly one Tab stop per card. |
 
 #### Context-Sensitive Height Normalization Tokens
 
@@ -426,7 +426,7 @@ Family pages (`Pages/Products/Family.cshtml`) implement a responsive `<picture>`
 
 - **Non-Overlapping Breakpoint:** `<source media="(max-width: 47.999rem)" ...>` routes viewports below 768px to the 768×768 mobile crop, while viewports at 48rem/768px and above receive the 1536×576 desktop image, agreeing with desktop CSS `@media (min-width: 48rem)`.
 - **Loading Performance:** `fetchpriority="high"`, `decoding="async"`, and explicit intrinsic `width` and `height` attributes to eliminate cumulative layout shift.
-- **Copy-Safe Contrast Overlay (`.internal-hero-overlay--family`):** Dark gradient overlay (`linear-gradient(to right, rgba(13, 27, 46, 0.88) 0%, rgba(13, 27, 46, 0.72) 40%, rgba(13, 27, 46, 0.25) 75%, transparent 100%)`) ensures WCAG AA text contrast for headings and breadcrumbs against complex antenna imagery.
+- **Copy-Safe Contrast Overlay (`.internal-hero-overlay--family`):** Dark gradient overlay (`linear-gradient(to right, rgba(13, 27, 46, 0.88) 0%, rgba(13, 27, 46, 0.72) 40%, rgba(13, 27, 46, 0.25) 75%, transparent 100%)`) ensures WCAG AA text contrast for headings against complex antenna imagery.
 - **Per-Family Focal Positions:** Tailored focal alignments (e.g., `center 40%` for Log Periodic, `center 45%` for Portable, `center 42%` for Rotator & Control) to preserve structural antenna and controller geometry across breakpoints.
 
 ### Engineering Guidance Section (`.selection-help-section`)
@@ -434,7 +434,13 @@ Family pages (`Pages/Products/Family.cshtml`) implement a responsive `<picture>`
 - Background surface `.color-surface-subtle` with top and bottom dividers.
 - 3-column desktop grid, 1-column mobile layout.
 - Restrained ambient cards without heavy left accent borders (`.card.card--ambient`).
-- 3 actionable pathways: Deployment & Mobility, Coverage & Propagation, and Positioning & Infrastructure, providing cross-family selection links.
+- 3 actionable pathways with coordinated card visuals:
+  - **Deployment & Mobility:** `usap-guidance-card-deployment-mobility-a1-v1.png` (800 × 500 px).
+  - **Coverage & Propagation:** `usap-guidance-card-coverage-propagation-a1-v1.png` (800 × 500 px).
+  - **Positioning & Infrastructure:** `usap-guidance-card-positioning-infrastructure-a1-v1.png` (800 × 500 px).
+- Media frames: `.selection-help-card__media` (16:10 aspect ratio, full-bleed to top and sides, `overflow: hidden`, radius `var(--radius-media)`).
+- Images: `.selection-help-card__img` (`object-fit: cover`, `loading="lazy"`, `decoding="async"`).
+- Combined wide Engineering Guidance visual alternate is deliberately deferred.
 - **Single Conversion Destination:** Competing 2-button CTA removed; replaced with an inline continuation notice (`.guidance-continuation`) directing users to `#products-faq` and the existing `#closing-cta-heading` closing CTA.
 
 ### Product Selection FAQ Component (`.faq-list`)
@@ -444,34 +450,35 @@ Family pages (`Pages/Products/Family.cshtml`) implement a responsive `<picture>`
 - Accessible keyboard focus and toggle disclosure with smooth chevron rotation indicator (`transform: rotate(90deg)` on `details[open]`).
 - Animation suppressed under `prefers-reduced-motion: reduce`.
 
-### Dedicated Rotator Product Visuals Grid (`.rotator-visuals-grid`)
+### Product Group Disclosures & Presentation Components (USAP-CATALOG-002-C1 / C1R1)
 
-- Dedicated hardware figure section on `/products/antenna-rotator-control-systems`.
-- 3-column responsive grid of `<figure>` cards with 16:10 aspect ratio, subtle border, rounded corners, and `<figcaption>` product descriptions.
-- Single restrained section-level notice explaining images are source-guided visualizations based on published USAP materials.
+The family page renders 16 semantic `<details class="product-group-disclosure">` accordion items:
 
-### Product-Group Cards (`.family-group-card`)
+| Class | Role | Styling & Behavior |
+|---|---|---|
+| `.product-group-disclosure` | Disclosure container | Bordered surface (`var(--color-surface)`), rounded corners (`var(--radius-md)`), neutral border (`var(--card-border)`), with margin-bottom between groups. Ordinary groups do not use red top borders or navy left borders. |
+| `.product-group-summary` | Interactive header | Semantic `<summary>` element. Focus-visible outline, flex layout with header info, badges, and chevron indicator. Zero nested interactive elements. |
+| `.product-group-disclosure__badge` | Count indicator | Pill badge showing configuration count when `HasPublishedModelNumber` is true. Omitted when false (e.g. Aperiodic system configuration). |
+| `.product-group-disclosure__intro` | Expanded lead copy | Optional introductory paragraph providing high-level operational and architectural context for the group. |
+| `.product-group-disclosure__group-specs` | Group-level characteristics | Semantic `<dl>` list displaying top-level technical characteristics common to all models in the group (e.g., Frequency Range, Power Capacity, Polarization). |
+| `.product-models-grid` | Model cards grid | Auto-fit CSS grid (`grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))`) reflowing to 1 column on mobile (≤500px). |
+| `.product-model-card` | Model card | Compact card surface with subtle neutral border (no red top or navy left borders), padding (`var(--space-4)`), and flex column layout. Displays model code in `<h4>`, optional display name/role, concise description, and model-specific characteristics. |
+| `.product-specs-list` | Key-value spec list | Semantic `<dl class="product-specs-list">` using flex layout pairs (`.product-spec-item`) with uppercase term labels (`.product-spec-item__term`) and high-contrast definitions (`.product-spec-item__desc`). |
+| `.product-group-disclosure__note` | Model-less guidance note | Styled callout for groups without discrete model codes (e.g., Aperiodic Loop Antenna), providing procurement and configuration guidance. |
+| `.resource-badge` | Document format badge | Small uppercase tag (e.g., `PDF · 1.2 MB`) accompanying allowlisted technical resource links. |
+| `.product-group-media` | In-disclosure figure | Visual asset rendered within the disclosure. All 16 product groups feature intentional visual coverage (13 A1 candidates + 3 provisional rotator visuals). |
+| `.product-group-disclosure__img--contain` | Contain-style visual presentation | Applied to wide-span antenna systems (`lp-1112mr`, `1910`, `1942`) via `.product-group-disclosure__figure--contain` and `.product-group-disclosure__media--contain`. Renders with `object-fit: contain` on a subtle neutral background with generous padding, preventing misleading tight crops of the antenna footprint. |
 
-- Restrained neutral border (`var(--card-border)`), white surface, and ambient hover elevation.
-- Navy left accent border (`card--accent-left-navy`) removed per C1B accent restraint rule, reserving color accents for designated notice and guidance components.
+### Breadcrumb Navigation (`.breadcrumbs` / `.breadcrumb-trail`)
 
-### Breadcrumb Navigation (`.breadcrumbs`)
-
-- Semantic `<nav aria-label="Breadcrumb">` landmark positioned immediately below the hero banner as the first element in the page content area.
+- Semantic `<nav aria-label="Breadcrumb">` landmark positioned immediately below the hero banner as the first element in the page content area. Removed from inside the dark hero banner.
 - Aligned to the main content container (`.container`) at the upper-left edge.
 - Rendered on the light page background with high-contrast link styling (`--color-text-link`), neutral slash separators (`/`), and standard visible focus rings (`--focus-ring`).
 - Ordered list structure with linked `Home` and `Products` ancestors and current family item as non-linked text with `aria-current="page"`.
 
-### Product Information Notice (`.product-info-notice`)
+### Configuration Support Section (`.configuration-support`)
 
-- Warning-accented notice box (`border-left: 4px solid #f59e0b`, background `#fff8f0`) with `role="region"` and `aria-label="Product Information"`.
-- Clean public-facing current-site aligned disclaimer:
-  > *"Product information below is based on USAP’s current public website and linked technical documents. Contact USAP engineering to confirm availability, configuration, compatibility, and final specifications for your application."*
-- Followed by natural product catalog section headers:
-  - Eyebrow: `PRODUCT CATALOG`
-  - Heading: `Products and Models in This Family`
-  - Label: `Models and Configurations:`
-- Completely free of internal milestone or checkpoint terminology, and strictly excludes unconfirmed present-availability claims.
+- Authoritative, neutral notice box directing users to engineering contact for custom configurations, mast integration, and formal specifications. Positioned at the base of each family route.
 
 ---
 
@@ -585,3 +592,160 @@ No placeholder tagline. Company name is in the brand column and the sole copyrig
 6. **Replace the logo** by updating the `.site-brand-text` content in `_Header.cshtml` with an `<img>` — the surrounding structure is already production-ready.
 7. **Breakpoints are in CSS** — do not add media queries using custom properties.
 8. **Reduced-motion** is handled globally — individual components do not need to re-implement it.
+
+---
+
+## Product Group Card & Always-Visible Overview (C1R4)
+
+**Pattern:** Two-layer component combining an always-visible summary card with a nested progressive-enhancement disclosure.
+
+| Element | Class / Selector | Visual Treatment & Behavior |
+|---|---|---|
+| Outer card | `.product-group-card` | Neutral border (`1px solid var(--color-neutral-85)`), surface background, rounded corners (`var(--radius-surface)`), subtle shadow. |
+| Always-visible overview | `.product-group-overview` | Desktop (≥1024px / 64rem): 2-column grid (`40% 1fr`), 38–42% image width, remaining width for text. Mobile (<1024px): Stacked single column with image on top. |
+| Product image | `.product-group-overview__figure`, `.product-group-overview__media` | 16:10 aspect ratio, rounded corners, cover presentation. Contain-style modifier (`--contain`) applied for LP-1112MR, 1910, and 1942 to prevent cropping of wide footprints. |
+| Overview content | `.product-group-overview__content` | Heading (`.product-group-overview__heading`), short summary (`.product-group-overview__summary`), metadata badges (`.product-group-badge`), and up to three key characteristics (`.product-specs-list--overview`). |
+| Nested disclosure | `.product-group-disclosure` | Native `<details>` element with neutral top border (`1px solid var(--color-neutral-85)`). Zero margin/padding on outer wrapper. |
+| Disclosure summary bar | `.product-group-summary` | Full-width button surface (`var(--color-surface-subtle)`), text labels for closed/open states (`View Models & Specifications` / `Hide Models & Specifications`; `View Configuration & Technical Details` / `Hide Configuration & Technical Details` for Aperiodic), accessible name via `aria-label`, rotating chevron icon. |
+| Expanded detail content | `.product-group-disclosure__content`, `.product-group-disclosure__inner` | Background surface, padding (`var(--space-6)`), contains additional group characteristics (when > 3), model cards grid (`.product-models-grid`), interim technical resources (`.product-group-disclosure__resources`), and contact action. |
+
+---
+
+## Product Selection FAQ Component (C1R4)
+
+**Pattern:** Full-width native accordion disclosure list.
+
+| Element | Class / Selector | Visual Treatment & Behavior |
+|---|---|---|
+| Section container | `.faq-section` | Standard `.container` width, neutral section surface. |
+| FAQ list | `.faq-list` | Full width (`width: 100%`), vertical stack with `var(--space-3)` gap. Eliminates prior narrow-column constraints. |
+| FAQ item | `.faq-item` | Native `<details>` with neutral border (`1px solid var(--color-neutral-90)`), rounded corners (`var(--radius-surface)`). |
+| FAQ summary | `.faq-summary` | Interactive trigger with bold title, hover color transition, and plus/minus icon toggle via CSS pseudo-elements. |
+| FAQ answer | `.faq-content p` | Constrained internally to `max-width: 75ch` for optimal reading line lengths, while disclosure card spans full container width. |
+
+---
+
+## Product Family Dropdown Navigation (C1R5)
+
+**Pattern:** Semantic progressive-enhancement dropdown in site header partial (`Pages/Shared/_Header.cshtml`).
+
+| Element | Class / Selector | Visual Treatment & Behavior |
+|---|---|---|
+| Dropdown wrapper | `.nav-item-dropdown` | List item container (`<li>`), relative positioning on desktop, full width on mobile. |
+| Native disclosure | `.nav-dropdown` | Native `<details id="nav-products-dropdown">` element, keyboard-operable without JavaScript. |
+| Dropdown trigger | `.nav-dropdown-toggle` | Semantic `<summary>` element with text and rotating chevron SVG. Styled identically to primary nav links. Never treated as an anchor (`<a>`), preventing unintended mobile menu dismissal when expanded. |
+| Dropdown menu | `.nav-dropdown-menu` | Unordered list (`<ul role="list">`) containing All Products (`/products`) plus the six family routes. |
+| Desktop presentation | `@media (min-width: 64rem)` | Absolute dropdown positioned below header (`top: 100%; left: 0;`), min-width 18.5rem, max-width `calc(100vw - 2rem)`, white surface, subtle border and elevation shadow (`box-shadow: 0 10px 25px -5px rgba(0,0,0,0.12)`). Escape key and click-outside dismissal managed by `site-navigation.js`. |
+| Mobile presentation | `@media (max-width: 63.9375rem)` | In-flow vertical accordion expansion within mobile navigation drawer. Indented child links (`padding-left: var(--space-10)`), semi-transparent contrast background (`rgba(0,0,0,0.18)`), and borders matching dark navy drawer aesthetic. |
+| Dropdown links | `.nav-dropdown-link` | Block anchor elements with left red accent border on hover/focus/active. Full keyboard focus outline (`--focus-ring` on desktop, `--focus-ring-dark` on mobile). |
+
+---
+
+## Family-Page Closing Sequence & Configuration Support (C1R5)
+
+**Sequence Order:**
+1. Product Groups List (`.product-groups-list`)
+2. Configuration Support Notice (`.configuration-support-notice`)
+3. Return to All Product Families Navigation (`.family-back-nav`)
+4. Closing CTA (`.family-closing-cta`)
+5. Site Footer (`_Footer.cshtml` in layout)
+
+| Element | Class / Selector | Visual Treatment & Behavior |
+|---|---|---|
+| Support notice card | `.configuration-support-notice` | Subtle surface (`var(--color-surface-subtle)`), thin border (`var(--color-border-subtle)`), rounded corners, flex layout (row on desktop ≥48rem, column on mobile). Margin top `var(--space-8)`, margin bottom `var(--space-6)`. |
+| Support notice CTA | `.configuration-support-action .btn-primary` | Standardized to USAP red brand button (`.btn-primary`), establishing a prominent conversion action for tailored application guidance. Reuses core design token without duplicate CSS declarations. |
+| Return navigation | `.family-back-nav .btn-outline` | Positioned immediately below Configuration Support and above the closing CTA. Retains secondary back-navigation styling (`.btn-outline`) without competing with primary conversion actions. |
+
+---
+
+## Hero Resilience Architecture (C1R5)
+
+**Pattern:** Content-driven responsive hero container eliminating fixed heights and text clipping across all standard viewports and browser zoom levels (80%, 100%, 125%).
+
+| Element | Rule / Property | Resilience Implementation |
+|---|---|---|
+| Container height | `min-height: 22rem; height: auto; max-height: none;` | Height is strictly driven by content and vertical padding; no rigid constraints that can cause overflow or text truncation. |
+| Responsive padding | `padding-block: clamp(var(--space-8), 4vw, var(--space-12));` | Fluid vertical breathing room adapting smoothly to narrow mobile screens and magnified zoom levels. |
+| Typography scaling | `font-size: clamp(1.875rem, 3.25vw + 0.5rem, 2.75rem);` | Balanced heading scale with `overflow-wrap: break-word` and `text-wrap: balance` to prevent line blowout at 125% zoom. |
+| Box model sizing | `box-sizing: border-box;` | Uniform box sizing across hero and content wrapper prevents boundary miscalculations. |
+| Breadcrumbs position | `.family-breadcrumbs` | Remains positioned strictly in Section 2 below the hero banner. |
+
+---
+
+## Mobile Navigation Overlay & Interaction Contract (C1R6)
+
+**Pattern:** Viewport-overlay mobile navigation drawer anchored beneath the header bar without page reflow.
+
+| Element | Class / Selector | Visual Treatment & Behavior |
+|---|---|---|
+| Header container | `.site-header-inner` | In mobile (<64rem), `margin-bottom: 0` on brand link and toggle button prevents vertical expansion or layout shift. |
+| Fixed overlay drawer | `.js-nav-ready .primary-nav-list` | `position: fixed; top: var(--mobile-header-bottom, 4.25rem); left: 0; right: 0; width: 100%; height: calc(100dvh - var(--mobile-header-bottom, 4.25rem)); overflow-y: auto; overscroll-behavior: contain; z-index: var(--z-index-dropdown, 100);`. Decouples menu from document flow, eliminating downward push of page hero. |
+| Viewport scroll lock | `html.nav-open-lock, body.nav-open-lock` | `overflow: hidden !important; overscroll-behavior: none;`. Prevents background body scrolling. JS records `window.scrollY` on open and restores exact scroll position on close. |
+| Focus containment | `#main-content, .site-footer, .skip-link` | Receives standard `inert` attribute while menu is open. Navigation controller tracks modified elements to remove only attributes it applied. |
+| Centered mobile products control | `.nav-dropdown-toggle--mobile` | `display: flex; align-items: center; justify-content: center; gap: var(--space-2); list-style: none;`. Products label and rotating chevron SVG are centered together as a single visual group. Child dropdown links remain left-aligned (`padding-left: var(--space-10)`). |
+| Native disclosure state | `.nav-dropdown-toggle` | Relies on native `<details>/<summary>` state. Static `aria-haspopup` and `aria-expanded` attributes omitted. |
+
+---
+
+## Family-Page Heading Hierarchy & Subordination (C1R6)
+
+**Pattern:** Strict, accessible heading hierarchy ensuring the hero H1 remains the unambiguous primary page title while post-hero sections are clearly subordinate.
+
+| Level | Role / Element | Selector | Visual Treatment & Scale |
+|---|---|---|---|
+| **H1** | Primary Visible Page Title | `.internal-hero--family .internal-hero-title` | `font-size: clamp(1.875rem, 3.25vw + 0.5rem, 2.75rem); font-weight: 700; color: var(--color-text-inverse);`. Clear, dominant page identifier. |
+| **H2** | Family Models & Configurations Section | `.family-groups-header .section-heading` | `font-size: clamp(1.5rem, 2.5vw, 1.875rem); font-weight: 700; color: var(--color-brand-navy);`. Visibly subordinate to the hero H1. Paired with family-specific `.section-eyebrow` (`--color-brand-red`). |
+| **H3** | Product Group Title | `.product-group-overview__heading` | `font-size: var(--text-xl); font-weight: 700; color: var(--color-brand-navy);`. |
+| **H4** | Model Cards & Subsections | `.product-model-card__title` / Subsection headings | `font-size: var(--text-md); font-weight: 600;`. |
+| **H5** | Nested Configurations | When applicable beneath H4 subsections | `font-size: var(--text-base); font-weight: 600;`. |
+
+---
+
+## Shared Always-Visible Sticky Header & Refined Mobile Navigation (C1R8)
+
+**Pattern:** Persistent, always-visible sticky header and content-height mobile navigation overlay with centered top-level controls.
+
+### 1. Always-Visible Sticky Header Component
+
+| Property / Rule | Value | Purpose |
+|---|---|---|
+| Positioning | `position: sticky; top: 0;` | Keeps header anchored to viewport top and visible at all times during normal page operation. While mobile nav scroll lock is active (`.nav-open-lock`), temporarily viewport-pinned via `position: fixed; top: 0; left: 0; right: 0; width: 100%;` to maintain top-of-viewport anchoring while `html`/`body` overflow is locked. |
+| Stacking order | `z-index: var(--z-sticky)` (200); elevated to `var(--z-overlay)` (300) when mobile menu is open | Ensures header and mobile menu remain above standard content and the translucent click-away backdrop. |
+| Hide-on-scroll state machine | None (Removed in C1R8) | The scroll-direction auto-hide state machine, transform transitions, and idle timer were completely removed per project-lead direction. |
+| Responsive positioning | `--mobile-header-bottom: <header.offsetHeight>px` | Stable offsetHeight measurement used to place mobile overlay directly below the sticky header. |
+
+### 3. Content-Height Mobile Navigation Panel & Backdrop
+
+| Element | Selector | Implementation & Behavior |
+|---|---|---|
+| Menu panel | `.js-nav-ready .primary-nav-list` | `position: fixed; top: var(--mobile-header-bottom, 4.25rem); left: 0; right: 0; width: 100vw; height: auto; max-height: calc(100dvh - var(--mobile-header-bottom, 4.25rem)); overflow-y: auto; overscroll-behavior: contain;`. Content-driven height ending immediately after Request a Quote button + padding. |
+| Click-away backdrop | `.js-nav-ready .nav-backdrop` | `position: fixed; inset: 0; top: var(--mobile-header-bottom); background-color: rgba(0, 0, 0, 0.40); backdrop-filter: blur(2px); z-index: calc(var(--z-overlay) - 1);`. Translucent shade distinguishing unused screen space, dismissing navigation on outside click. |
+| Centered top-level controls | `.primary-nav-link`, `.nav-dropdown > summary`, `.nav-cta` | `display: flex; justify-content: center; align-items: center; width: 100%; text-align: center;`. Horizontally centers Home, Products, Technical Resources, About Us, Contact Us, and Request a Quote. |
+| Unified Products group | `.nav-dropdown-summary-group` | `display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);`. Centers Products label and rotating chevron together as a single visual unit. |
+| Submenu child links | `.nav-dropdown-link` | Left-aligned and indented (`padding-left: var(--space-10)`) for scanability. |
+| Non-displacing active accent | `.primary-nav-link::before`, `.nav-dropdown > summary::before` | Absolutely positioned 3px left bar (`position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background-color: var(--color-accent-dark-surface);`). Zero horizontal displacement of centered text. |
+
+---
+
+## Shared Internal-Hero Foundation & Full-Image Presentation (C1R9)
+
+**Pattern:** Unified desktop/tablet banner baseline height with non-cropping right-side media containment and atmospheric mobile fallback.
+
+### 1. Hero Baseline Geometry Tokens & Rules
+
+| Token / Property | Selector | Value | Visual Purpose |
+|---|---|---|---|
+| Baseline Desktop Min-Height | `:root` | `--internal-hero-min-height: 24.2875rem;` | Unified baseline height (~388.6px) measured from product-family hero geometry at 1440×900. |
+| Fluid Height Contract | `.internal-hero` | `height: auto; min-height: 22rem;` | Content-resilient container sizing allowing natural expansion under longer copy or zoom without clipping. |
+| Desktop/Tablet Min-Height | `.internal-hero` (>= 48rem) | `min-height: var(--internal-hero-min-height, 24.2875rem);` | Enforces exact height parity (388.6px ±0.0px) across all standard internal pages where copy fits. |
+| Vertical Padding | `.internal-hero` | `padding-block: clamp(var(--space-8), 4vw, var(--space-12));` | Fluid vertical rhythm scaling smoothly across viewports. |
+
+### 2. Media Containment & Overlay System
+
+| Element | Viewport Scope | Implementation | Presentation Behavior |
+|---|---|---|---|
+| Media Region (`.internal-hero-picture`, `.internal-hero-image`) | Desktop (>= 64rem / 1024px) | `position: absolute; left: auto; right: 0; width: 65%; max-width: 1100px; height: 100%;` | Bounded right-side media slot aligned to right edge, leaving left side unobstructed for copy. |
+| Media Region (`.internal-hero-picture`, `.internal-hero-image`) | Tablet (48rem–63.999rem / 768px–1023px) | `position: absolute; left: auto; right: 0; width: 75%; height: 100%;` | Proportional tablet media region providing generous visual area without copy collision. |
+| Media Sizing (`.internal-hero-img`, `.internal-hero-image`) | Desktop & Tablet (>= 48rem) | `object-fit: contain; object-position: right center;` | Displays full 8:3 source composition (2048×768 or 1536×576) with zero top/bottom cropping. |
+| Contrast Overlay (`.internal-hero-overlay`, `.internal-hero-overlay--family`) | Desktop & Tablet (>= 48rem) | `linear-gradient(to right, var(--color-brand-navy) 0%, var(--color-brand-navy) 35%, rgba(13, 27, 46, 0.85) 55%, rgba(13, 27, 46, 0.40) 80%, transparent 100%)` | Solid navy protection under left-side copy, fading smoothly to reveal 100% of right-side imagery. |
+| Mobile Media & Overlay | Mobile (< 48rem / 768px) | `object-fit: cover; object-position: center; overlay: rgba(13, 27, 46, 0.90);` | Atmospheric background presentation providing safe contrast for white typography on compact screens. |

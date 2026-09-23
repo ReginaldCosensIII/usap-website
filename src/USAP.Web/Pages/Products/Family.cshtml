@@ -7,10 +7,9 @@
 
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
-        Title = familyName,
-        Description = familySummary,
+        Title = Model.Family?.PageTitle ?? familyName,
+        Description = Model.Family?.MetaDescription ?? familySummary,
         CanonicalPath = $"/products/{Model.FamilySlug}",
-        Robots = "noindex, follow",
         OpenGraphType = "website"
     };
 }
@@ -66,127 +65,198 @@
 <!-- Section 2: Product Group Listing -->
 <div class="container section family-content-section">
     <div class="family-groups-header">
-        <span class="eyebrow">PRODUCT CATALOG</span>
-        <h2 class="section-heading">Products and Models in This Family</h2>
-        <p class="section-lead">The following product groups and configurations are cataloged for @familyName:</p>
+        <span class="eyebrow">@(Model.Family?.SectionEyebrow ?? "PRODUCT MODELS & CONFIGURATIONS")</span>
+        <h2 class="section-heading">@(Model.Family?.SectionHeading ?? "Product Models & Configurations")</h2>
+        <p class="section-lead">@(Model.Family?.SectionIntro ?? $"Review cataloged product groups and configurations for {familyName}:")</p>
     </div>
 
     <div class="family-groups-list">
         @foreach (var group in Model.ProductGroups)
         {
             var approvedDocs = Model.GetApprovedResources(group.Id);
-            <details class="product-group-disclosure" id="@group.SectionAnchor">
-                <summary class="product-group-summary">
-                    <div class="product-group-summary__header">
-                        <div class="product-group-summary__main">
-                            <h3 class="product-group-summary__heading">@group.Name</h3>
-                            <p class="product-group-summary__desc">@group.ShortDescription</p>
-                            <div class="product-group-summary__meta">
+            var isContainGroup = group.Id is "lp-1112mr" or "1910" or "1942";
+            var isAperiodic = !group.HasPublishedModelNumber;
+            var openLabel = isAperiodic ? "View Configuration & Technical Details" : "View Models & Specifications";
+            var closeLabel = isAperiodic ? "Hide Configuration & Technical Details" : "Hide Models & Specifications";
+            var accessibleName = isAperiodic ? $"View configuration and technical details for {group.Name}" : $"View models and specifications for {group.Name}";
+
+            <article class="product-group-card" id="@group.SectionAnchor">
+                <div class="product-group-overview">
+                    @if (group.AssociatedAsset != null)
+                    {
+                        <figure class="product-group-overview__figure @(isContainGroup ? "product-group-overview__figure--contain" : "")">
+                            <div class="product-group-overview__media @(isContainGroup ? "product-group-overview__media--contain" : "")">
+                                <img src="@group.AssociatedAsset.ImagePath"
+                                     alt="@group.AssociatedAsset.AltText"
+                                     width="1600"
+                                     height="1000"
+                                     loading="lazy"
+                                     decoding="async"
+                                     class="product-group-overview__img @(isContainGroup ? "product-group-overview__img--contain" : "")" />
+                            </div>
+                        </figure>
+                    }
+
+                    <div class="product-group-overview__content">
+                        <div class="product-group-overview__meta">
+                            @if (group.HasPublishedModelNumber && group.Models.Count > 0)
+                            {
                                 <span class="product-group-badge product-group-badge--configs">
-                                    @(group.Models.Count == 1 ? "1 Configuration" : $"{group.Models.Count} Configurations")
+                                    @(group.Models.Count == 1 ? "1 Model / Configuration" : $"{group.Models.Count} Models / Configurations")
                                 </span>
-                                @if (approvedDocs.Count > 0)
-                                {
-                                    <span class="product-group-badge product-group-badge--docs">
-                                        @(approvedDocs.Count == 1 ? "Technical Document" : "Technical Documents")
-                                    </span>
-                                }
-                            </div>
+                            }
+                            @if (approvedDocs.Count > 0)
+                            {
+                                <span class="product-group-badge product-group-badge--docs">
+                                    @(approvedDocs.Count == 1 ? "Technical Document Available" : "Technical Documents Available")
+                                </span>
+                            }
                         </div>
-                        <div class="product-group-summary__action">
-                            <span class="product-group-summary__action-label product-group-summary__action-label--closed">View details</span>
-                            <span class="product-group-summary__action-label product-group-summary__action-label--open">Hide details</span>
-                            <span class="product-group-summary__icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="disclosure-arrow">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                </summary>
-                <div class="product-group-disclosure__content">
-                    <div class="product-group-disclosure__inner">
-                        @if (group.AssociatedAsset != null)
+
+                        <h3 class="product-group-overview__heading">@group.Name</h3>
+                        <p class="product-group-overview__summary">@group.ShortDescription</p>
+
+                        @if (!string.IsNullOrWhiteSpace(group.ExpandedIntroduction) && !string.Equals(group.ExpandedIntroduction.Trim(), group.ShortDescription.Trim(), StringComparison.OrdinalIgnoreCase))
                         {
-                            <figure class="product-group-disclosure__figure">
-                                <div class="product-group-disclosure__media">
-                                    <img src="@group.AssociatedAsset.ImagePath"
-                                         alt="@group.AssociatedAsset.AltText"
-                                         width="1600"
-                                         height="1000"
-                                         loading="lazy"
-                                         decoding="async"
-                                         class="product-group-disclosure__img" />
-                                </div>
-                                <figcaption class="product-group-disclosure__caption">
-                                    @group.AssociatedAsset.AltText
-                                </figcaption>
-                            </figure>
+                            <p class="product-group-overview__intro">@group.ExpandedIntroduction</p>
                         }
 
-                        <div class="product-group-disclosure__models">
-                            <h4 class="product-group-disclosure__subheading">Models &amp; Configurations</h4>
-                            <ul class="product-group-disclosure__models-list">
-                                @foreach (var productModel in group.Models)
-                                {
-                                    <li>
-                                        @if (!string.IsNullOrWhiteSpace(productModel.ModelCode))
-                                        {
-                                            <strong class="product-group-disclosure__model-code"><code>@productModel.ModelCode</code></strong>
-                                        }
-                                        <span class="product-group-disclosure__config">@productModel.Configuration</span>
-
-                                        @if (productModel.SpecificationStatus == "HoldDisputedSpecs" || group.SpecificationStatus == "HoldDisputedSpecs")
-                                        {
-                                            <span class="product-group-disclosure__spec-note text-muted">Specifications subject to engineering confirmation.</span>
-                                        }
-                                        else if (!string.IsNullOrWhiteSpace(productModel.SpecificationsSummary))
-                                        {
-                                            <span class="product-group-disclosure__spec">&mdash; @productModel.SpecificationsSummary</span>
-                                        }
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-
-                        @if (approvedDocs.Count > 0)
+                        @if (group.OverviewCharacteristics != null && group.OverviewCharacteristics.Count > 0)
                         {
-                            <div class="product-group-disclosure__resources">
-                                <h4 class="product-group-disclosure__subheading">Technical Documents</h4>
-                                <ul class="product-group-disclosure__resource-list">
-                                    @foreach (var doc in approvedDocs)
+                            <div class="product-group-overview__specs">
+                                <h4 class="product-group-overview__specs-heading">Key Characteristics</h4>
+                                <dl class="product-specs-list product-specs-list--overview">
+                                    @foreach (var spec in group.OverviewCharacteristics)
                                     {
-                                        <li>
-                                            <a href="@doc.CurrentSourceUrl" target="_blank" rel="noopener noreferrer" class="product-group-disclosure__resource-link">
-                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resource-icon">
-                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                                                    <polyline points="10 9 9 9 8 9"></polyline>
-                                                </svg>
-                                                <span>@doc.Title</span>
-                                            </a>
-                                        </li>
+                                        <div class="product-spec-item">
+                                            <dt class="product-spec-item__label">@spec.Label</dt>
+                                            <dd class="product-spec-item__value">@spec.DisplayValue</dd>
+                                        </div>
                                     }
-                                </ul>
+                                </dl>
                             </div>
                         }
-
-                        <div class="product-group-disclosure__action">
-                            <a href="/contact-us" class="card-link product-group-disclosure__contact-link">
-                                <span class="card-link__text">Inquire about @group.Name with USAP Engineering</span>
-                                <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
-                            </a>
-                        </div>
                     </div>
                 </div>
-            </details>
-        }
-    </div>
 
-    <div class="family-back-nav">
-        <a href="/products" class="btn btn-outline">&larr; Return to All Product Families</a>
+                <details class="product-group-disclosure">
+                    <summary class="product-group-summary" aria-label="@accessibleName">
+                        <span class="product-group-summary__action-label product-group-summary__action-label--closed">@openLabel</span>
+                        <span class="product-group-summary__action-label product-group-summary__action-label--open">@closeLabel</span>
+                        <span class="sr-only">for @group.Name</span>
+                        <span class="product-group-summary__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="disclosure-arrow">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div class="product-group-disclosure__content">
+                        <div class="product-group-disclosure__inner">
+                            @if (group.DetailedCharacteristics != null && group.DetailedCharacteristics.Count > 0)
+                            {
+                                <div class="product-group-disclosure__group-specs">
+                                    <h4 class="product-group-disclosure__subheading">Additional Group Characteristics</h4>
+                                    <dl class="product-specs-list product-specs-list--group">
+                                        @foreach (var spec in group.DetailedCharacteristics)
+                                        {
+                                            <div class="product-spec-item">
+                                                <dt class="product-spec-item__label">@spec.Label</dt>
+                                                <dd class="product-spec-item__value">@spec.DisplayValue</dd>
+                                            </div>
+                                        }
+                                    </dl>
+                                </div>
+                            }
+
+                            @if (group.HasPublishedModelNumber && group.Models.Count > 0)
+                            {
+                                <div class="product-group-disclosure__models">
+                                    <h4 class="product-group-disclosure__subheading">Models &amp; Configurations</h4>
+                                    <ul class="product-models-grid" role="list">
+                                        @foreach (var productModel in group.Models)
+                                        {
+                                            <li class="product-model-card">
+                                                <div class="product-model-card__header">
+                                                    <h5 class="product-model-card__title">
+                                                        <code>@productModel.ModelCode</code>
+                                                    </h5>
+                                                    @if (!string.IsNullOrWhiteSpace(productModel.DisplayName))
+                                                    {
+                                                        <span class="product-model-card__display-name">@productModel.DisplayName</span>
+                                                    }
+                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(productModel.Description))
+                                                {
+                                                    <p class="product-model-card__desc">@productModel.Description</p>
+                                                }
+                                                @if (productModel.Characteristics != null && productModel.Characteristics.Count > 0)
+                                                {
+                                                    <dl class="product-specs-list product-specs-list--model">
+                                                        @foreach (var spec in productModel.Characteristics)
+                                                        {
+                                                            <div class="product-spec-item">
+                                                                <dt class="product-spec-item__label">@spec.Label</dt>
+                                                                <dd class="product-spec-item__value">@spec.DisplayValue</dd>
+                                                            </div>
+                                                        }
+                                                    </dl>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            else if (!group.HasPublishedModelNumber)
+                            {
+                                <div class="product-group-disclosure__models product-group-disclosure__models--unnamed">
+                                    <h4 class="product-group-disclosure__subheading">System Configuration</h4>
+                                    @if (!string.IsNullOrWhiteSpace(group.ModelNote))
+                                    {
+                                        <p class="product-group-disclosure__note">@group.ModelNote</p>
+                                    }
+                                </div>
+                            }
+
+                            @if (approvedDocs.Count > 0)
+                            {
+                                <div class="product-group-disclosure__resources">
+                                    <h4 class="product-group-disclosure__subheading">Technical Resources</h4>
+                                    <ul class="product-group-disclosure__resource-list">
+                                        @foreach (var doc in approvedDocs)
+                                        {
+                                            <li>
+                                                <a href="@doc.CurrentSourceUrl"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   class="product-group-disclosure__resource-link"
+                                                   aria-label="View @doc.Title for @group.Name (PDF, opens in new tab)">
+                                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="resource-icon">
+                                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                                    </svg>
+                                                    <span>@doc.Title</span>
+                                                    <span class="resource-badge">PDF</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            <div class="product-group-disclosure__action">
+                                <a href="/contact-us" class="card-link product-group-disclosure__contact-link">
+                                    <span class="card-link__text">Inquire about @group.Name with USAP Engineering</span>
+                                    <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </article>
+        }
     </div>
 
     <aside class="configuration-support-notice" role="region" aria-label="Configuration Support">
@@ -196,9 +266,13 @@
             <p>Product configurations, compatibility, documentation, and availability vary by application and project requirements. Contact USAP engineering for help identifying appropriate models, supporting hardware, and current technical information for your project.</p>
         </div>
         <div class="configuration-support-action">
-            <a href="/contact-us" class="btn btn-secondary">Contact Engineering</a>
+            <a href="/contact-us" class="btn btn-primary">Contact Engineering</a>
         </div>
     </aside>
+
+    <div class="family-back-nav">
+        <a href="/products" class="btn btn-outline">&larr; Return to All Product Families</a>
+    </div>
 </div>
 
 <!-- Section 3: Shared Closing CTA -->

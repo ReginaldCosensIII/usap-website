@@ -730,3 +730,343 @@ To prevent recurrence:
   * `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (Exit code 0).
   * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Exit code 1 (attributed strictly to baseline `IDE0011` brace warnings in `Program.cs` lines 16-35; zero formatting issues in modified files).
   * `git diff --check`: Clean (0 whitespace errors).
+
+---
+
+## QA-014 — Checkpoint USAP-CATALOG-002-C1 / C1R1 Verification: Evidence-Safe Product Detail Presentation, 30+1 Reconciliation, and Full Visual Coverage
+
+* **Date:** 2026-09-17 (Recovered & Completed 2026-09-18)
+* **Milestone / Task:** USAP-CATALOG-002-C1 / C1R1 (Interrupted Corrective Implementation Recovery and Completion)
+* **Authority & Preflight Hashes:**
+  * Controlling implementation prompt: `project-inputs/USAP-CATALOG-002-C1-EVIDENCE-SAFE-PRODUCT-DETAIL-PRESENTATION-IMPLEMENTATION-PROMPT.md`
+    - Line count: 885 lines (Verified).
+    - SHA-256: `710767E03947CDA5323F52A6FCB6AFE126009E6504B8CE21FF8B70D1BD96EC2B` (Verified).
+  * `USAP-CATALOG-002-R2-research-package.zip`: `3E6A4C00B5B9D5A51165869582A767380C79E1363C7A9C5B7ECA2B0B55AD296F` (Verified).
+  * `USAP-CATALOG-002-R2-canonical-document-source-package.zip`: `28D66FDD365DF4289C1390F6332C9B8256FB7A25D5C1C70248C43AEA3ED0A529` (Verified).
+  * `USAP-CATALOG-002-A1-Final-Review-Package-2026-09-17.zip`: `D8C11C85BD42AD220C79C48C657B33D47A4E88B39F618DF72D98840EC5E94BCD` (Verified).
+* **Build and Formatting Verification:**
+  * `dotnet restore USAP.Web.sln`: 0 Warnings, 0 Errors (Exit code 0).
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Warnings, 0 Errors (Exit code 0).
+  * `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Modified files completely clean (Exit code 1 attributable only to pre-existing baseline `IDE0011` brace warnings in `Program.cs` lines 16-35).
+  * `git diff --check`: Clean (0 whitespace or character encoding errors).
+* **Deterministic Catalog Invariant Verification:**
+  * `ProductCatalogService.ValidateCatalog()` verified at startup:
+    1. Exact 6 canonical families in order (`log-periodic-antennas`, `portable-transportable-antennas`, `aperiodic-loop-antennas`, `nvis-antennas`, `antenna-rotator-control-systems`, `tower-systems-accessories`).
+    2. Exact 16 product groups matching 5/3/1/1/5/1 distribution.
+    3. Exactly 30 published named models across 15 groups.
+    4. Exactly 1 unnamed Aperiodic group record (`HasPublishedModelNumber = false`, empty `Models` list, procurement note rendered). Total catalog records = 31.
+    5. All 6 1942 NVIS configurations published (`1942-RT`, `1942-TA`, `1942-GM`, `1942-RT-LP`, `1942-TA-LP`, `1942-GM-LP`), with low-power variants retaining conservative configuration-level role identification only without disputed power, weight, or coverage ratings.
+    6. Non-empty group characteristics on all 16 groups.
+    7. Valid non-empty model codes with valid characteristic pairs on all 30 models.
+    8. Exactly 16 product-group visual assets wired with matching files on disk and conservative alt text.
+    9. Exactly 3 Engineering Guidance card visuals wired on `/products` (combined wide visual absent).
+    10. Exactly 6 interim technical documents allowlisted.
+    11. Zero prohibited governance tokens found in metadata (`HoldDisputedSpecs`, `ConflictHolds`, `SourceNotes`, `ApprovalStatus`, `PublicationRecommendation`, `SpecificationStatus`, `CommercialAvailability`, `ClientConfirmation`, confidence scores).
+* **Route Verification (Isolated Release Server, Port 5299):**
+  * `/`: HTTP 200 OK
+  * `/products`: HTTP 200 OK
+  * `/products/log-periodic-antennas`: HTTP 200 OK
+  * `/products/portable-transportable-antennas`: HTTP 200 OK
+  * `/products/aperiodic-loop-antennas`: HTTP 200 OK
+  * `/products/nvis-antennas`: HTTP 200 OK
+  * `/products/antenna-rotator-control-systems`: HTTP 200 OK
+  * `/products/tower-systems-accessories`: HTTP 200 OK
+  * `/about-us`: HTTP 200 OK
+  * `/technical-resources`: HTTP 200 OK
+  * `/contact-us`: HTTP 200 OK
+  * `/request-a-quote`: HTTP 200 OK
+  * `/products/non-existent-family`: HTTP 404 Not Found (executed via custom `/not-found` page)
+* **DOM Content & Presentation Audit:**
+  * Product family cards: Exactly 6 family cards, each constructed with an outer `<a>` anchor and inner `<span class="card-link">` (zero nested buttons or links).
+  * Product group disclosures: Exactly 16 across 6 families.
+  * Model cards (`.product-model-card`): Exactly 30 named model cards rendered across 15 groups.
+  * Aperiodic loop group renders 0 model cards and displays the dedicated procurement / system configuration note.
+  * 1942 NVIS group displays all 6 configuration codes (`1942-RT`, `1942-TA`, `1942-GM`, `1942-RT-LP`, `1942-TA-LP`, `1942-GM-LP`).
+  * Contain-style visual presentation verified active for `lp-1112mr`, `1910`, and `1942`.
+  * Technical document links: Exactly 6 interim links rendered across catalog pages.
+  * Breadcrumbs: Verified on all 6 family pages positioned in `<nav aria-label="Breadcrumb">` at the top-left of the main content container below the hero.
+  * Engineering Guidance visuals: Exactly 3 card images rendered on `/products`; combined wide visual absent.
+  * Prohibited phrases and tokens: Exactly 0 occurrences in rendered HTML.
+* **Responsive & Accessibility Verification:**
+  * Tested viewports: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * Zero horizontal overflow on any route across all viewports (`scrollWidth <= innerWidth`).
+  * Native `<details>`/`<summary>` disclosures expand and collapse cleanly without JavaScript.
+  * Focus-visible outlines (3px solid `#0057b8`) visible on keyboard Tab navigation across family cards, disclosure headers, and technical links.
+  * All animations suppressed under `prefers-reduced-motion: reduce`.
+
+---
+
+## QA-015 — Checkpoint USAP-CATALOG-002-C1R2 Verification: Final Compliance Repair, Exact A1 Derivatives, and Evidence Correction
+
+* **Date:** 2026-09-18
+* **Milestone / Task:** USAP-CATALOG-002-C1R2 (Final Compliance Repair and Evidence Correction)
+* **Authority & Preflight Hashes:**
+  * Controlling implementation prompt: `project-inputs/USAP-CATALOG-002-C1-EVIDENCE-SAFE-PRODUCT-DETAIL-PRESENTATION-IMPLEMENTATION-PROMPT.md`
+    - Line count: 885 lines (Verified).
+    - SHA-256: `710767E03947CDA5323F52A6FCB6AFE126009E6504B8CE21FF8B70D1BD96EC2B` (Verified).
+* **Deficiencies Addressed & Compliance Repairs:**
+  1. **Layout Viewport Rectification (CDP Device Metrics Override):**
+     - Formally acknowledged and documented that the C1R1 390px test had an actual layout width of 980px due to Chrome headless fallback under `mobile: True`.
+     - Rectified using Chrome DevTools Protocol `Emulation.setDeviceMetricsOverride` with `--hide-scrollbars` and `mobile: False`.
+     - Verified exact layout width equality: `window.innerWidth === requestedWidth` and `document.documentElement.clientWidth === requestedWidth` across all 6 viewports (390, 768, 1024, 1025, 1440, 1920 px).
+     - Live measured results across 8 routes (48/48 test runs passed): 390px measured layout width = exactly 390px, scrollWidth = 390px (0px horizontal overflow).
+  2. **Restoration of Prohibited Family-Card and Family-Hero Changes:**
+     - Restored pre-C1 verified asset paths and accurate alt text:
+       - Aperiodic family card: `/images/products/usap-family-card-aperiodic-loop-element-v1.png`
+       - Aperiodic desktop hero: `/images/products/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-desktop-preview.png`
+       - Aperiodic mobile hero: `/images/products/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-mobile-crop.png`
+       - NVIS family card: `/images/products/usap-family-card-nvis-1942-family-visual-v1.png`
+       - NVIS desktop hero: `/images/products/usap-family-nvis-antennas-hero-candidate-a-v2-desktop-preview.png`
+       - NVIS mobile hero: `/images/products/usap-family-nvis-antennas-hero-candidate-a-v2-mobile-crop.png`
+       - Rotator/Controller family card: `/images/products/usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png`
+     - Automated live image audit across `/products` and all 6 family routes verified `img.complete && img.naturalWidth > 0 && img.naturalHeight > 0` for every rendered image (39/39 passed; 0 broken images).
+  3. **A1 Master Asset Register & Derivative Verification:**
+     - Verified all 16 Section 9.7 assets (13 product groups and 3 Engineering Guidance cards) on disk are byte-for-byte identical to the verified A1 master package:
+       - Preserved original filenames and destinations.
+       - Exact 1600 × 1000 px dimensions preserved.
+       - 100% SHA-256 hash match against Section 9.7 specifications.
+       - Preserved the 3 existing rotator assets (`r3500`, `drc-3`, `drc-4`).
+       - Asset hash register generated matching Section 9.7 requirements.
+  4. **Public-Copy Violations Purged:**
+     - DRC-4: Purged "continuous-rotation capability on compatible rotators" and compatibility claims. Rotation characteristic set to "360-degree continuous-rotation control".
+     - DRC-3: Purged "documented for selected rotator systems".
+     - T-3002: Removed "50 ohms pressurized" feedline, "1-5/8 in EIA coaxial flange", and introductory feedline claims.
+     - V-4213: Replaced "Complete field-system package record" with "Portable discone equipment-package configuration" on `V-4213AD`.
+     - Full automated scan of catalog data and views confirms 0 occurrences of prohibited terms.
+  5. **Documentation Parity & Terminology Consistency:**
+     - `docs/DECISION_LOG.md`: Corrected DEC-032 product inventory to exact public projection: Log Periodic: 8, Portable: 6, Aperiodic: 0 (+1 unnamed record), NVIS: 6, Rotator: 5, Tower: 5 (Total: 30 named identifiers + 1 unnamed record = 31 records).
+     - `docs/CONTENT_AND_ASSETS.md`: Removed obsolete default-deny/withheld paragraph; established consistent policy distinguishing the 6 interim C1 product-page links from the planned 17 canonical document migration under `USAP-TECHDOC-001`.
+     - Terminology renamed: `ApprovedResourceIds` -> `InterimResourceIds`. `ProductResourceRecord` documented as an extensible public-facing record in the current interim product-document set.
+* **Build and Formatting Verification:**
+  * `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 Errors, 0 Warnings (Exit code 0).
+  * `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (Exit code 0).
+  * `dotnet format USAP.Web.sln --verify-no-changes --no-restore`: Clean on all modified files (Exit code 1 attributable only to baseline `IDE0011` warnings in `Program.cs`).
+  * `git diff --check`: Clean (0 whitespace/encoding errors).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R2-final-compliance-review-package.zip` generated in artifact directory.
+  * Contains exact viewport evidence JSON, image integrity audit, Section 9.7 asset hash register CSV, build outputs, source diff, and complete review screenshots demonstrating all required states and components.
+
+---
+
+## QA-016 — Checkpoint USAP-CATALOG-002-C1R4 Verification: Product Overview Disclosure, Full-Width FAQ Layout, and Inventory Reconciliation
+
+* **Date:** 2026-09-18
+* **Milestone / Task:** USAP-CATALOG-002-C1R4 (Product Overview Disclosure and FAQ Layout Refinement)
+* **Authority & Guiding Inputs:**
+  * Controlling implementation prompt: `project-inputs/USAP-CATALOG-002-C1-EVIDENCE-SAFE-PRODUCT-DETAIL-PRESENTATION-IMPLEMENTATION-PROMPT.md` (885 lines, SHA-256: `710767E03947CDA5323F52A6FCB6AFE126009E6504B8CE21FF8B70D1BD96EC2B`).
+  * Binding C1R4 clarifications approved by project lead:
+    1. Aperiodic badges and disclosure wording: omit model-count badge; preserve Technical Document badge; disclosure labeled `View Configuration & Technical Details` / `Hide Configuration & Technical Details`.
+    2. Meaningful always-visible overview copy: short summary + distinct expanded introduction (non-duplicative); expanded area focuses on models/specs/resources/engineering guidance.
+    3. Key-characteristic selection: up to 3 safe group-level characteristics in intended order; no model-specific, disputed, or filler values.
+    4. Unique accessible disclosure names: assistive technology receives full group context (`View Models & Specifications for [Group Title]`) while preserving native state announcement.
+    5. Progressive enhancement: native `<details>/<summary>` baseline; `.product-group-disclosure` retained for `disclosure.js`; respects `prefers-reduced-motion`.
+    6. FAQ layout: full standard container width (`width: 100%`); internal answer copy constrained to `max-width: 75ch`; shared alignment with section content.
+    7. Mechanically verified inventory: 30+1 canonical inventory (6 families, 16 groups, 30 named models/configurations, 1 unnamed Aperiodic group = 31 records); exact set equality; zero invalid C1R3 dummy identifiers.
+    8. Image metrics separation: separate reporting of total rendered `<img>` occurrences, unique image URLs, loaded occurrences, and broken occurrences.
+    9. Server & final-build order: record agent server PID, shut down cleanly before final Release build, exit code 0 required.
+    10. Complete evidence package: collapsed & expanded desktop and 390px comparisons; complete FAQ width in container context.
+* **Layout & Style Refinements Verified:**
+  * `/products` FAQ Section:
+    - `.faq-list` occupies full container width (`width: 100%`).
+    - `.faq-content p` constrained to `max-width: 75ch` for reading comfort.
+    - Border, focus outline, and padding aligned consistently at 1440px desktop, 768px tablet, and 390px mobile.
+  * Family Pages Product Group Card (`Pages/Products/Family.cshtml` & `site.css`):
+    - Outer `<article class="product-group-card" id="@group.SectionAnchor">`.
+    - Always-visible `.product-group-overview`: 2-column desktop grid (image ~40% width, min 280px / max 420px; text flex-1), stacked mobile column.
+    - Product group image remains visible at all times, including when disclosure is collapsed.
+    - Overview displays badges, heading, safe short summary, distinct introduction copy, and up to 3 safe group-level key characteristics in `.product-group-overview__specs`.
+    - Nested `<details class="product-group-disclosure">`: contains model cards, remaining specs, technical resources, and Contact Engineering guidance.
+    - Accessible name on summary: `aria-label="View Models &amp; Specifications for @group.Title"`.
+    - Aperiodic group customized: no model-count badge; disclosure labeled `View Configuration & Technical Details`.
+* **Inventory Reconciliation:**
+  * Canonical 30+1 verified across catalog data and live DOM:
+    - Log Periodic: 8 models across 5 groups.
+    - Portable: 6 models across 3 groups.
+    - Aperiodic: 0 named models (+1 unnamed record) across 1 group.
+    - NVIS: 6 models across 1 group.
+    - Rotator: 5 models across 4 groups.
+    - Tower: 5 models across 2 groups.
+    - Total: 30 named model configurations + 1 unnamed record = 31 records.
+  * Zero invalid C1R3 identifiers present.
+* **Responsive & Horizontal Overflow Verification:**
+  * Tested across 6 standard viewports: 390×844, 768×1024, 1024×768, 1025×768, 1440×900, 1920×1080.
+  * Chrome DevTools Protocol verified exact layout width: `document.documentElement.clientWidth === requestedWidth`.
+  * Zero horizontal overflow on `/products` and all 6 family routes.
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R4-product-overview-and-faq-review-package.zip`.
+
+---
+
+## QA-017 — Checkpoint USAP-CATALOG-002-C1R5 Verification: Product Navigation, Configuration Support, Hero Resilience, and Asset Reliability Refinement
+
+* **Date:** 2026-09-18
+* **Milestone / Task:** USAP-CATALOG-002-C1R5 (Product Navigation, Configuration Support, Hero Resilience, and Asset Reliability Refinement)
+* **Scope & Implementation Summary:**
+  * **Family-Page Closing Sequence:**
+    - Established strict sequence across all 6 family routes: (1) product groups -> (2) Configuration Support card -> (3) Return to All Product Families -> (4) closing CTA -> (5) footer.
+    - Moved `Return to All Product Families` below Configuration Support and above closing CTA. Retained `.btn-outline` treatment.
+    - Updated Configuration Support CTA to shared `.btn-primary` using USAP red brand color with zero duplicate CSS button rules.
+  * **Product Navigation (Desktop & Mobile):**
+    - Semantic `<details id="nav-products-dropdown">` and `<summary class="nav-dropdown-toggle">` implemented in `_Header.cshtml`.
+    - Menu contains All Products (`/products`) plus all 6 family routes (`log-periodic-antennas`, `portable-transportable-antennas`, `aperiodic-loop-antennas`, `nvis-antennas`, `antenna-rotator-control-systems`, `tower-systems-accessories`).
+    - Active route highlighting: Products highlighted on `/products` and all 6 family routes.
+    - Not hover-only; accessible via keyboard (Enter/Space to toggle, Escape to dismiss and return focus to summary, Tab navigation), click outside dismissal on desktop.
+    - Mobile menu: toggling Products dropdown does not close the mobile drawer. Clicking any anchor closes the drawer.
+    - Usable without JavaScript as native HTML disclosure.
+  * **Hero Resilience & Scaling Correction:**
+    - Content-driven height architecture verified across viewports (390×844, 768×1024, 1024×768, 1440×900, 1920×1080, 2560×1440) and zoom levels (80%, 100%, 125%).
+    - Fluid padding `clamp(var(--space-8), 4vw, var(--space-12))`, `overflow-wrap: break-word`, `box-sizing: border-box`.
+    - Mechanical bounding box assertions verified: `contentRect.bottom <= heroRect.bottom + 1` across all viewports and zoom levels with 0 clipping.
+    - Breadcrumbs remain positioned below family heroes in Section 2.
+  * **Broken Product-Family Image Investigation & Verification:**
+    - Investigated Aperiodic family card: asset file `usap-family-card-aperiodic-loop-element-v1.png` exists on disk (2,098,672 bytes) and returns HTTP 200 with Content-Type `image/png`.
+    - Discovered root cause of prior reported broken screenshot: legacy pre-C1R2 screenshot artifact (`06_products_landing_1920x1080.png`) showing old alt text `"mounted on a field tripod"` was present in review staging, exacerbated by lazy loading in headless browser captures.
+    - Dual verification enforced: HTTP 200 response + content-type AND browser DOM completion (`naturalWidth > 0 && naturalHeight > 0`).
+  * **Review Package:**
+    - `USAP-CATALOG-002-C1R5-navigation-hero-and-support-review-package.zip`.
+
+---
+
+## QA-018 — Checkpoint USAP-CATALOG-002-C1R6 Verification: Mobile Navigation Overlay, Family SEO Content, Accessibility, and Final Refinement
+
+* **Date:** 2026-09-18
+* **Milestone / Task:** USAP-CATALOG-002-C1R6 (Mobile Navigation Overlay, Family SEO Content, Accessibility, and Final Refinement)
+* **Scope & Implementation Summary:**
+  * **Mobile Navigation Fixed Overlay:**
+    - Refactored opened mobile navigation to fixed viewport overlay (`position: fixed`, `top: var(--mobile-header-bottom, 4.25rem)`, `height: calc(100dvh - var(--mobile-header-bottom, 4.25rem))`, `overscroll-behavior: contain`).
+    - Bounding-box assertions verify zero vertical displacement or reflow of `.site-header` or `.internal-hero` when mobile menu opens or closes.
+    - Viewport background scroll-lock verified: `nav-open-lock` applies to `html` and `body`; `window.scrollY` saved on open and restored identically across 3 repeated open/close cycles without layout drift.
+    - Focus containment verified: HTML5 `inert` applied to `#main-content`, `.site-footer`, and `.skip-link` when open, and cleanly restored on close.
+    - Short viewport (375×500) internal overlay scrolling verified.
+  * **Mobile Navigation Products Control Centering & Native Semantics:**
+    - Centered mobile Products disclosure control (`.nav-dropdown-toggle--mobile`) with `justify-content: center` and `gap: var(--space-2)`. Label and rotating chevron SVG are visually centered as a unit while child links remain left-aligned.
+    - Native `<details>/<summary>` semantics: Redundant `aria-haspopup` and `aria-expanded` removed from `<summary>`; native keyboard operation (<kbd>Enter</kbd>/<kbd>Space</kbd>) and screen reader announcements preserved.
+  * **Product-Family SEO, Eyebrows, Headings, and Introductions:**
+    - Replaced generic post-hero intro with family-specific eyebrows, H2s, and conservative R2-backed introductory paragraphs across all 6 family routes.
+    - Hero H1 verified as primary, dominant page title (`clamp(1.875rem, 3.25vw + 0.5rem, 2.75rem)`); post-hero H2 is visibly subordinate (`clamp(1.5rem, 2.5vw, 1.875rem)` in `.family-groups-header`).
+    - Unique `<title>` and `<meta name="description">` assigned per family. No page-level `noindex` applied; indexable production intent confirmed (`index, follow` default; global non-production protection via `X-Robots-Tag: noindex, nofollow`).
+  * **Explicit Overview-Characteristic Curation:**
+    - Replaced runtime `Take(3)` and `Skip(3)` slicing with canonical `OverviewCharacteristics` (0 to 3 items) and `DetailedCharacteristics` on `ProductGroupRecord`.
+    - Deterministic startup validation in `ProductCatalogService` validates count <= 3, non-empty labels/values, label uniqueness within group, zero overlap between overview and detailed collections, and scans family SEO strings for prohibited tokens.
+  * **Technical Document Status Confirmation:**
+    - Exactly 17 canonical PDFs identified in R2; 6 provisionally linked in C1; canonical migration deferred to `USAP-TECHDOC-001`; public vs lead-gated status is client-pending.
+  * **Scratch Handling Confirmation:**
+    - `scratch/audit_and_package_c1r5.py` left untouched in repository root per instructions; new C1R6 automation executed exclusively in external brain scratch storage.
+  * **Review Package:**
+  * `USAP-CATALOG-002-C1R6-mobile-navigation-and-family-seo-review-package.zip`.
+
+---
+
+## QA-019 — Checkpoint USAP-CATALOG-002-C1R7 Verification: Header Interaction, Mobile Navigation, Products Hero Investigation, and C1R6 Recovery Verification
+
+* **Date:** 2026-09-18
+* **Milestone / Task:** USAP-CATALOG-002-C1R7 (Header Interaction, Mobile Navigation, Products Hero Investigation, and C1R6 Recovery Verification)
+* **Scope & Implementation Summary:**
+  * **Characteristic Audit Contradiction Resolution:**
+    - Diagnosed the reported C1R6 audit finding (0 overview / 0 detailed characteristics across 16 groups).
+    - Verified `ProductGroupRecord.cs`, `ProductCatalogService.cs`, and `Family.cshtml`: all 16 groups have intact, approved, curated characteristics (`lp-high-power`, `lp-1019`, `v-4213`, `lp-1402-1403`, `1910`, `aperiodic`, `1942`, `t-3002`).
+    - Identified root cause as an audit script extraction defect (checking obsolete card selectors or pre-expansion DOM state). The underlying catalog implementation and data model were 100% correct; zero source data modifications required.
+  * **Mobile Header Alignment & Centering:**
+    - Logo remains left-aligned; mobile menu toggle positioned at far right of container (`margin-left: auto`).
+    - Top-level mobile navigation links (Home, Products + chevron disclosure summary, Technical Resources, About Us, Contact Us, Request a Quote) verified horizontally centered using rendered DOM geometry (control center matches text center within 0.01px).
+    - Non-displacing active state implemented via absolute `::before` accent bar, ensuring active route does not shift text centering.
+    - Product family sub-links within expanded Products dropdown remain left-aligned and indented for readability.
+  * **Content-Height Mobile Navigation Overlay & Translucent Backdrop:**
+    - Mobile drawer refactored to content-driven height: `height: auto; max-height: calc(100dvh - var(--mobile-header-bottom, 4.25rem));`.
+    - Terminated immediately after Request a Quote button plus padding (368.58px height on 390×844 viewport, leaving page visible beneath).
+    - Subtly translucent click-away backdrop (`#nav-backdrop`, `rgba(0, 0, 0, 0.40)`) covers remainder of screen and dismisses menu on click without visual confusion.
+    - On short viewports (375×500) and expanded Products submenu, max-height engages and internal scrolling operates smoothly (`overscroll-behavior: contain`).
+    - Background page scroll-lock and HTML5 `inert` focus containment verified; 0px scroll drift across 3 consecutive open/close cycles.
+  * **Premium Auto-Hiding Sticky Header:**
+    - Implemented `position: sticky; top: 0;` auto-hiding header with hardware-accelerated `translate3d(0, -100%, 0)` transition (220ms ease).
+    - Downward scroll beyond threshold hides header; upward scroll immediately restores it; ~200ms scroll idle restores it when scrolling stops.
+    - Auto-hide is automatically suspended when mobile menu is open, desktop Products dropdown is open, or keyboard focus is inside `.site-header`.
+    - Opening mobile menu while header is scrolled off-screen restores header smoothly before opening drawer.
+    - `prefers-reduced-motion: reduce` completely removes transform animation (`transition: none`) while preserving visibility and functionality.
+  * **Main Products Hero Investigation (Mandatory Investigation Only):**
+    - Executed exhaustive markup, CSS cascade, breakpoint matrix, and computed style analysis across viewports (1366×768, 1440×900, 1536×864, 1920×1080, 2560×1440).
+    - Proved 100% invariance in CSS rules, selectors, computed min-height, height (369.8px), padding, background-size, and background-position.
+    - Mathematical crop analysis proved visual differences across desktop displays are the natural geometric consequence of `object-fit: cover` scaling an 8:3 source image against wider container aspect ratios (5.2:1 at 1920px crops 175px from top; 6.9:1 at 2560px crops 295px from top).
+    - Strictly adhered to binding no-change boundary: 0 markup, style, or asset modifications to `/products` hero or family heroes.
+  * **Post-Header Verification of Products Hero:**
+    - Verified hero bounding box after header implementation: `width: 1440px`, `height: 369.797px`, `padding: 48px`, matching baseline measurements exactly.
+  * **Build, Formatting, & Route Verification:**
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+    - `git diff --check` (exit code 0).
+    - All canonical routes verified HTTP 200; `/products/non-existent-family-xyz` verified true HTTP 404.
+    - Zero horizontal overflow across all 11 viewports (320px to 2560px).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R7-header-navigation-and-products-hero-investigation-review-package.zip`.
+
+---
+
+## QA-020 — Checkpoint USAP-CATALOG-002-C1R8 Verification: Always-Visible Sticky Header Reconciliation and Focused Navigation QA
+
+* **Date:** 2026-09-22
+* **Milestone / Task:** USAP-CATALOG-002-C1R8 (Always-Visible Sticky Header Reconciliation and Focused Navigation QA)
+* **Scope & Implementation Summary:**
+  * **Always-Visible Sticky Header Architecture:**
+    - Reconciled `.site-header` to `position: sticky; top: 0;` persistent behavior per latest project-lead direction.
+    - Completely removed all auto-hide JavaScript machinery from `site-navigation.js`: directional scroll constants (`DELTA_DOWN`, `DELTA_UP`, `TOP_THRESHOLD`), idle restoration timer (`IDLE_DELAY`), scroll history (`lastScrollY`), rAF frame handler (`handleScrollFrame`), scroll event listener (`onScroll`), suspension check (`isSuspended`), and reveal helpers (`showHeader`, `hideHeader`).
+    - Completely removed auto-hide CSS from `site.css`: `.site-header.is-hidden`, negative translate transform, `will-change: transform`, and transform transition. Removed obsolete inline style overrides from `openNav()` and transform/transition overrides from `.nav-open-lock .site-header`.
+    - Maintained stacking context: `.site-header` uses `z-index: var(--z-sticky)` (200), elevated to `var(--z-overlay)` (300) when mobile menu is open.
+  * **Preserved C1R7/C1R7R1 Mobile Navigation Architecture:**
+    - Mobile header alignment: Logo left-aligned; toggle far right (`margin-inline-start: auto`); full container width utilized.
+    - Centered top-level controls: Home, Products (label + rotating chevron centered as one unit via `.nav-dropdown-summary-group`), Technical Resources, About Us, Contact Us, Request a Quote.
+    - Left-aligned indented submenu links (`padding-left: var(--space-10)`).
+    - Non-displacing active-route indicator via absolute left accent bar (`::before`).
+    - Content-height drawer: `height: auto; max-height: calc(100dvh - var(--mobile-header-bottom)); overflow-y: auto; overscroll-behavior: contain`.
+    - Stable header offset measurement: `--mobile-header-bottom` computed directly from stable `header.offsetHeight`.
+    - Translucent click-away backdrop (`#nav-backdrop`, `rgba(0, 0, 0, 0.40)`) with outside tap dismissal.
+    - Background page scroll lock (`html.nav-open-lock, body.nav-open-lock`) and HTML5 `inert` background focus containment with zero scroll drift across repeated open/close cycles.
+    - Initial enhanced-menu collapse does not perform scroll restoration, preserving fragment URLs and browser-restored scroll states.
+    - Desktop breakpoint transition (>=1024px) cleanly tears down open mobile state, backdrop, scroll-lock, and inert attributes.
+  * **Desktop Products Disclosure:**
+    - Native `<details>/<summary>` disclosure preserved with outside click and Escape dismissal, returning focus to `<summary>`.
+  * **Products Hero & Catalog Invariance:**
+    - Zero modifications to `/products` landing hero, family heroes, catalog data, characteristics, product assets, or routing.
+  * **Build, Formatting, & Route Verification:**
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+    - `git diff --check` (exit code 0).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R8-always-visible-sticky-header-reconciliation-review-package.zip`.
+
+---
+
+## QA-021 — Checkpoint USAP-CATALOG-002-C1R9 Verification: Shared Internal-Hero Geometry and Full-Image Presentation Reconciliation
+
+* **Date:** 2026-09-22
+* **Milestone / Task:** USAP-CATALOG-002-C1R9 (Shared Internal-Hero Geometry and Full-Image Presentation Reconciliation)
+* **Scope & Implementation Summary:**
+  * **Shared Baseline Height & Height Parity:**
+    - Established `--internal-hero-min-height: 24.2875rem;` (~388.6px) derived directly from product-family hero geometry at 1440×900.
+    - Verified exact height parity (388.6px ±0.0px) across all 9 normal internal pages (`/products`, `/contact-us`, `/request-a-quote`, and all six `/products/{familySlug}` routes) at 1440×900 and 1920×1080.
+    - Confirmed fluid content resilience (`height: auto; min-height: ...;` without max-height constraints). `/about-us` expands naturally to 427.1px to accommodate its longer copy without clipping.
+  * **Full-Image Right-Side Media Containment:**
+    - Superseded destructive full-container `object-fit: cover` on non-family heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`).
+    - Unified `.internal-hero-image` with `.internal-hero-picture` family treatment: bounded right-side media region (`width: 65%; max-width: 1100px; height: 100%; right: 0; left: auto; object-fit: contain; object-position: right center;` at >= 64rem; `width: 75%;` at tablet).
+    - Verified zero vertical cropping: 100% of 8:3 source compositions (2048×768 non-family, 1536×576 family) are visible without stretching or distortion.
+    - Standardized gradient overlay (`linear-gradient(to right, var(--color-brand-navy) 0%, var(--color-brand-navy) 35%, rgba(13, 27, 46, 0.85) 55%, rgba(13, 27, 46, 0.40) 80%, transparent 100%)`) providing solid navy protection for left copy and smooth fade into right-side imagery.
+  * **Content Resilience & Zoom Testing:**
+    - Tested representative heroes under 100%, 125%, and 200% zoom.
+    - Confirmed all titles, leads, and action buttons remain visible and fully interactive with zero text clipping or container overflow.
+  * **Responsive & Mobile Verification:**
+    - Tested across 9 viewports: `1440×900`, `1920×1080`, `1366×768`, `2560×1440`, `1024×768`, `768×1024`, `390×844`, `375×667`, `375×500`.
+    - Confirmed zero horizontal overflow (`scrollWidth <= innerWidth`) on every route and viewport.
+    - On mobile (< 48rem), heroes retain fluid height with atmospheric background media under 90% navy overlay (`rgba(13, 27, 46, 0.90)`).
+  * **Header Architecture Precision & Static Boundaries:**
+    - Verified header remains sticky at `top: 0` during normal operation, and viewport-pinned with `position: fixed` while mobile navigation scroll lock is active.
+    - Confirmed zero changes to homepage hero/video, header sizing, logo assets, product-family source assets, catalog data/models, technical documents, or backend logic.
+  * **Build, Formatting, & Route Verification:**
+    - `git diff --check` (exit code 0).
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+    - `dotnet format USAP.Web.sln --verify-no-changes --no-restore` (reported known pre-existing baseline IDE0011 brace warnings in `Program.cs` lines 16–35, zero in C1R9 changes).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R9-shared-internal-hero-reconciliation-review-package.zip`.

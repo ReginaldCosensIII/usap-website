@@ -1,6 +1,6 @@
 @model USAP.Web.Models.Catalog.ProductFamilyRecord
 
-<article class="card card--interactive product-family-card" id="family-@Model.Slug">
+<a href="@Model.Route" class="card card--interactive product-family-card" id="family-@Model.Slug" aria-label="Explore @Model.Name">
     <div class="product-family-card__media">
         @if (!Model.CardAsset.IsPlaceholder)
         {
@@ -14,7 +14,7 @@
         }
         else
         {
-            <div class="card-img-placeholder product-family-card__placeholder" role="img" aria-label="@Model.Name — Design placeholder, imagery in development">
+            <div class="card-img-placeholder product-family-card__placeholder" role="img" aria-label="@Model.Name &mdash; Design placeholder, imagery in development">
                 <div class="card-placeholder-pattern" aria-hidden="true"></div>
                 <div class="card-placeholder-content">
                     <svg class="card-placeholder-icon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -32,10 +32,10 @@
         <h3 class="product-family-card__title">@Model.DisplayTitle</h3>
         <p class="product-family-card__summary">@Model.CardSummary</p>
         <div class="product-family-card__action-wrapper">
-            <a href="@Model.Route" class="card-link product-family-card__link stretched-link" aria-label="Explore @Model.Name">
+            <span class="card-link product-family-card__link">
                 <span class="card-link__text">Explore Family</span>
                 <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
-            </a>
+            </span>
         </div>
     </div>
-</article>
+</a>
