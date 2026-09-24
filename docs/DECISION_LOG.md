@@ -786,11 +786,12 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
      - `.internal-hero-picture .internal-hero-img, .internal-hero-image`: `object-fit: contain; object-position: right center;`.
    - The contained 8:3 image terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
    - Moderate height growth (~422px at 1920px, capped at 448px at 2560px) allows the full 8:3 image to scale up and extend significantly farther left into the viewport (~796px at 1920px, ~1368px at 2560px; +90.1px and +158.4px farther left than Candidate A), bridging the empty center chasm while maintaining an elegant, non-dominant hero height.
-3. **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay:**
+3. **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay (C1R11 / C1R12 Refinement):**
    - Replaced the rejected right-edge gutter dissolve with the canvas-anchored relaxed horizontal gradient:
-     `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem), rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem), rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem))`
+     `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem), rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem), rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem), rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem))`
+   - Under C1R12, finalized the transition to Candidate H1: solid navy extends 6rem farther right (to `gutter + 30rem`), maintaining 88% opacity at `+40rem` (where image enters at x=796px at 1920px), completely eliminating the perceptible vertical tonal seam under headings on wide monitors while ensuring antenna subjects past `+72rem` remain clear and unshaded.
    - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
-   - Guarantees 100% solid contrast behind typography (max-width 44rem) while allowing graphic details to emerge earlier and remain clear toward the right edge. Zero right-to-left gutter fade.
+   - Guarantees 100% solid contrast behind typography (max-width 44rem) while allowing graphic details to emerge smoothly without tonal seams or artificial dark bands. Zero right-to-left gutter fade.
 4. **Uniform Cross-Route Architecture & Invariance:**
    - Applied uniformly across all 10 image-backed internal heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes).
    - Preserves complete 8:3 source imagery containment with zero cropping, distortion, or source asset modification.

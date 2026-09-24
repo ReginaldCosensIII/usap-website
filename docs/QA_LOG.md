@@ -1128,11 +1128,12 @@ To prevent recurrence:
       - `.internal-hero-picture .internal-hero-img, .internal-hero-image`: `object-fit: contain; object-position: right center;`.
     - Contained imagery terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
     - Responsive height growth allows the full 8:3 image to scale up and reach significantly farther left into the viewport (~796px at 1920px, ~1368px at 2560px; +90.1px and +158.4px farther left than Candidate A), eliminating the empty center chasm.
-  * **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay:**
+  * **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay (C1R11 / C1R12 Refinement):**
     - Replaced the right-edge gutter dissolve with the canvas-anchored relaxed horizontal gradient:
-      `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem), rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem), rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem))`
+      `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem), rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem), rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem), rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem))`
+    - Under C1R12, finalized horizontal transition to Candidate H1: extends solid navy to `gutter + 30rem` (covering copy start to 640px at 1920px), retains 88% opacity at `+40rem` (where image enters at x=796px at 1920px) to completely eliminate the visible tonal seam beside and beneath headings, gently dissolves through `+50rem` (58%) and `+62rem` (24%), and reaches full transparency by `+72rem` (1312px) before main antenna hardware subjects.
     - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
-    - Guarantees 100% solid navy contrast behind typography while allowing graphic details to emerge earlier and remain clear toward the right edge. Zero right-to-left gutter gradient.
+    - Guarantees 100% solid navy contrast behind typography while allowing graphic details to emerge smoothly without dark bands or tonal seams. Zero right-to-left gutter gradient.
   * **Wide-Screen Desktop QA Across Viewports:**
     - 1600×900: Hero height 388.6px, media width 1040.0px, visible image 566.4px–1600.0px, right gutter 0.0px (`right: 0`).
     - 1920×1080: Hero height 422.4px, media width 1132.8px, media left/right 787.2px / 1920.0px, visible image 796.3px–1920.0px, right gutter 0.0px (`right: 0`).

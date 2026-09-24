@@ -269,11 +269,12 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
     - `.internal-hero-picture, .internal-hero-image`: `right: 0; width: clamp(65rem, 59vw, 75rem); max-width: none;` (scales from 1040px at 1600px to 1132.8px at 1920px, capped at 1200px at 2560px).
   - Visible imagery terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
   - Responsive hero growth allows the full 8:3 source composition to scale proportionately, extending visible imagery significantly farther left (+90.1px at 1920px, +158.4px at 2560px compared to fixed-height Candidate A) to eliminate the empty center chasm while maintaining an elegant, non-dominant hero height.
-- **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay**:
+- **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay (C1R11 / C1R12 Refinement)**:
   - Anchors gradient color stops to the centered 100rem design canvas via `--ultra-wide-gutter: max(0px, (100vw - 100rem) / 2)`:
-    `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem), rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem), rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem))`
+    `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem), rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem), rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem), rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem))`
+  - Under C1R12, the horizontal transition was softened to Candidate H1: solid navy extends to `gutter + 30rem` (covering copy start to 640px at 1920px), maintains high opacity (88% at `+40rem` / 800px where image enters) to eliminate visible tonal seam lines under the heading, dissolves through `+50rem` (58%) and `+62rem` (24%), and reaches full transparency by `+72rem` (1312px) before main antenna hardware subjects.
   - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
-  - Completely eliminates the rejected right-to-left navy gutter fade. Ensures 100% solid navy contrast behind typography while allowing graphic details to emerge earlier and remain clear toward the right edge.
+  - Completely eliminates the rejected right-to-left navy gutter fade. Ensures 100% solid navy contrast behind typography while allowing graphic details to emerge smoothly without dark bands or seams.
 - **Uniform Shared System & Scope Boundaries**:
   - Applied uniformly across all 10 image-backed internal heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes).
   - Preserves full `object-fit: contain; object-position: right center;` with zero cropping, distortion, or source asset changes.

@@ -1103,10 +1103,11 @@ a:hover {
       linear-gradient(
         to right,
         var(--color-brand-navy) 0,
-        var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem),
-        rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem),
-        rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem),
-        transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem)
+        var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem),
+        rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem),
+        rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem),
+        rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem),
+        transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem)
       );
   }
 }
