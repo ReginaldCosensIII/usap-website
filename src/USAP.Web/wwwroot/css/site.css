@@ -1110,6 +1110,24 @@ a:hover {
         transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem)
       );
   }
+
+  /* Route-specific entry mask for rotator & control systems hero asset */
+  .internal-hero--family-antenna-rotator-control-systems .internal-hero-picture {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgba(0, 0, 0, 0.55) 4rem,
+      rgba(0, 0, 0, 0.85) 8rem,
+      #000 12rem
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgba(0, 0, 0, 0.55) 4rem,
+      rgba(0, 0, 0, 0.85) 8rem,
+      #000 12rem
+    );
+  }
 }
 
 

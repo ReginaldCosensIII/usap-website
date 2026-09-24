@@ -797,3 +797,26 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
    - Preserves complete 8:3 source imagery containment with zero cropping, distortion, or source asset modification.
    - Homepage hero remains separate and unmodified. Technical Resources hero will inherit this shared architecture upon eventual implementation.
 **Reason:** Production implementation of project-lead-selected Candidate B right-anchored ultra-wide hero composition under USAP-CATALOG-002-C1R11/R2.
+
+---
+
+## DEC-041 — USAP-CATALOG-002-C1R13-R1: Rotator & Control Systems Hero Route-Specific Asset-Entry Mask
+
+**Date:** 2026-09-24
+**Decision:**
+1. **Asset-Driven Route-Specific Exception (Candidate R2 Selection):**
+   - Implemented a route-specific CSS image mask on `.internal-hero--family-antenna-rotator-control-systems .internal-hero-picture` under `@media (min-width: 100rem)`:
+     `-webkit-mask-image` / `mask-image`: `linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.55) 4rem, rgba(0, 0, 0, 0.85) 8rem, #000 12rem)`.
+   - Fades the source image's alpha channel from 0% to 100% over the left 12rem (192px) of the media region, dissolving the sharp rectangular left entrance of the technical blueprint asset into the underlying `#0d1b2e` hero canvas without any contrast step.
+2. **Preservation of Shared Architecture & Invariance:**
+   - Global shared hero architecture remains 100% unchanged across the other nine internal heroes.
+   - Candidate D vertical top/bottom fade remains controlling.
+   - Candidate H1 horizontal copy-protection blend remains controlling.
+   - Ultra-wide geometry (height clamp, width clamp, right pinning, zero right gutter, `object-fit: contain`) remains 100% unchanged.
+   - No behavior changes below 100rem (verified at 1440×900 and 1366×768 where image enters under solid navy).
+   - Mobile and tablet responsive cover behavior remains 100% untouched.
+3. **No Razor Markup Modifications:**
+   - Isolated cleanly using the pre-existing semantic family class rendered by `Family.cshtml` (`.internal-hero--family-antenna-rotator-control-systems`).
+4. **Deferred Ultra-Wide Copy Layout Enhancement:**
+   - Retained project-lead observation that internal hero copy on larger/wider monitors should later receive additional horizontal space; deferred to the future visual-enhancement workstream.
+**Reason:** Production implementation of project-lead/Architect-selected Candidate R2 mask following the USAP-CATALOG-002-C1R13 prototype study to eliminate the Rotator hero asset's hard entrance seam.

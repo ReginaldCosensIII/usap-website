@@ -275,6 +275,13 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
   - Under C1R12, the horizontal transition was softened to Candidate H1: solid navy extends to `gutter + 30rem` (covering copy start to 640px at 1920px), maintains high opacity (88% at `+40rem` / 800px where image enters) to eliminate visible tonal seam lines under the heading, dissolves through `+50rem` (58%) and `+62rem` (24%), and reaches full transparency by `+72rem` (1312px) before main antenna hardware subjects.
   - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
   - Completely eliminates the rejected right-to-left navy gutter fade. Ensures 100% solid navy contrast behind typography while allowing graphic details to emerge smoothly without dark bands or seams.
+- **Rotator & Control Systems Route-Specific Image-Entry Mask (USAP-CATALOG-002-C1R13-R1)**:
+  - While the shared Candidate H1 overlay cleanly blends photographic hero imagery (which features natural outdoor vignetting), the Rotator & Control Systems asset (`usap-family-rotator-control-hero-a3s-desktop-1536x576.png`) features a high-contrast mechanical schematic grid drawn over a uniform dark-blue studio field that starts abruptly with a sharp vertical boundary at $x=0$.
+  - At ultra-wide displays ($\ge 100\text{rem}$ / $1600\text{px}+$ viewports), this hard rectangular edge produced a perceptible contrast step against the solid navy canvas.
+  - Implemented Candidate R2: a route-specific horizontal alpha mask applied directly to `.internal-hero--family-antenna-rotator-control-systems .internal-hero-picture` over its left $12\text{rem}$ ($192\text{px}$):
+    `-webkit-mask-image` / `mask-image`: `linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.55) 4rem, rgba(0, 0, 0, 0.85) 8rem, #000 12rem)`.
+  - Dissolves the actual image pixels to zero opacity at the asset boundary, allowing the blueprint schematic to emerge organically from the `#0d1b2e` hero canvas without any contrast step, without dimming rotator or controller hardware, and without secondary veil lines.
+  - Scoped strictly to `@media (min-width: 100rem)`. Sub-100rem viewports (where image enters under 100% solid navy) and all other nine hero routes remain $100\%$ untouched. Targeted via the existing semantic `.internal-hero--family-antenna-rotator-control-systems` class without any Razor markup modifications.
 - **Uniform Shared System & Scope Boundaries**:
   - Applied uniformly across all 10 image-backed internal heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes).
   - Preserves full `object-fit: contain; object-position: right center;` with zero cropping, distortion, or source asset changes.
@@ -289,6 +296,7 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
 | Analytics (GA4) | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized |
 | Legacy URL redirect map | The initial redirect map now exists. Redirect implementation remains deferred until the catalog/resource mapping and IIS review are complete. |
+| Internal hero text width and placement on ultra-wide displays | Visual Enhancements (On larger/wider desktop monitors, internal hero copy remains relatively constrained toward the left despite increased space; layout expansion deferred to later visual-enhancement workstream) |
 
 ## Forms and Validation
 

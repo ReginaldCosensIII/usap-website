@@ -1151,3 +1151,26 @@ To prevent recurrence:
     - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
 * **Review Package:**
   * `USAP-CATALOG-002-C1R11-R2-final-right-anchored-ultrawide-review-package.zip`.
+
+---
+
+## 2026-09-24 — USAP-CATALOG-002-C1R13-R1: Rotator & Control Systems Route-Specific Mask Implementation QA
+
+* **Scope & Implementation Summary:**
+  * **Approved Candidate R2 Mask Integration:**
+    - Implemented route-specific CSS image mask on `.internal-hero--family-antenna-rotator-control-systems .internal-hero-picture` under `@media (min-width: 100rem)` in `site.css`:
+      `-webkit-mask-image` / `mask-image`: `linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.55) 4rem, rgba(0, 0, 0, 0.85) 8rem, #000 12rem)`.
+    - Eliminates the perceptible vertical seam caused by the hard rectangular left boundary of the rotator technical schematic asset without affecting hardware clarity.
+  * **Preservation of Shared Architecture & Breakpoints:**
+    - Preserved Candidate D top/bottom fade, Candidate H1 horizontal copy-protection blend, right-anchored media track, and zero right gutter.
+    - Zero style leakage to other nine hero routes; standard desktop (1366, 1440) and tablet/mobile viewports remain 100% unaffected.
+  * **Target Framework Verification:**
+    - Confirmed `src/USAP.Web/USAP.Web.csproj` specifies `<TargetFramework>net10.0</TargetFramework>`.
+    - Validated build outputs target `net10.0`.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check` (exit code 0).
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R13-R1-rotator-mask-production-review-package.zip`.
