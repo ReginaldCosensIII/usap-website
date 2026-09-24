@@ -742,3 +742,57 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 5. **Strict Scope & Invariance:**
    - Zero changes to homepage hero, homepage video, header sizing, logo assets, product-family source assets, catalog service/records, product facts, technical documents, routes, or backend logic.
 **Reason:** Binding requirements of USAP-CATALOG-002-C1R9 to standardize internal hero height and eliminate destructive image cropping.
+
+---
+
+## DEC-039 — USAP-CATALOG-002-C1R10: Final Internal-Hero Height Normalization and Top-Biased Edge-Fade Reconciliation
+
+**Date:** 2026-09-23
+**Decision:**
+1. **About Us Height Normalization to Shared Baseline:**
+   - Normalized `.internal-hero--about` at desktop/tablet widths (`@media (min-width: 48rem)`) to `padding-block: 1.75rem;` (28px top and bottom).
+   - Resolves `/about-us` to exactly 388.59px (~388.6px) at normal desktop presentation (1440×900, 1366×768, 1920×1080, 2560×1440), achieving 100% height parity with all other internal image-backed heroes where copy fits.
+   - Retained fluid content resilience (`height: auto; min-height: var(--internal-hero-min-height, 24.2875rem);`). Preserved full content width (704px), lead max-width (608px), typography, line heights, button dimensions, and copy without forced overflow clipping.
+   - Vertically centered content layout provides symmetrical, comfortable breathing room (~28.8px top space above eyebrow and ~29.8px bottom space below CTA).
+2. **Top-Biased Image-Edge Vertical Fade (Candidate D Selection):**
+   - Implemented the project-lead/Architect-selected Candidate D visual treatment across all image-backed internal heroes (`.internal-hero-overlay, .internal-hero-overlay--family`) at desktop (`>= 64rem`) and tablet (`48rem - 63.999rem`).
+   - Combined multi-background gradient layers a vertical top-biased dissolve over the existing horizontal text-protection gradient:
+     `linear-gradient(to bottom, var(--color-brand-navy) 0%, rgba(13, 27, 46, 0.75) 5%, transparent 18%, transparent 88%, rgba(13, 27, 46, 0.45) 96%, var(--color-brand-navy) 100%)`.
+   - Refined 5% top navy band dissolving by 18% eliminates the abrupt color cutoff between bright sky and surrounding navy without unnecessarily darkening upper sky or antenna mast structures.
+   - Lighter bottom dissolve (transparent until 88%, 45% navy at 96%) preserves lower equipment and terrain detail while softening the lower pixel cutoff.
+   - Retains 100% untouched source color and contrast across the central 70% vertical image region (from 18% to 88%).
+3. **Preservation of Contained Right-Side Media Architecture:**
+   - Retained C1R9 non-cropping architecture: `object-fit: contain; object-position: right center;` on right-side bounded media (`width: 65%; max-width: 1100px;` desktop, `width: 75%;` tablet).
+   - Zero image cropping, stretching, distortion, or alteration of source media files.
+4. **Mobile & Asset Scope Boundary:**
+   - Mobile (< 48rem) retains content-driven fluid height, atmospheric cover imagery, and 90% navy overlay with zero horizontal overflow. Dedicated 1:1 mobile derivative generation for non-family pages remains explicitly deferred to future asset work.
+   - Technical Resources hero implementation remains deferred.
+**Reason:** Production implementation of project-lead/Architect-selected internal-hero height normalization and refined Candidate D top-fade treatment under USAP-CATALOG-002-C1R10/R2.
+
+---
+
+## DEC-040 — USAP-CATALOG-002-C1R11: Right-Anchored Ultra-Wide Hero Composition Reconciliation
+
+**Date:** 2026-09-23
+**Decision:**
+1. **Ultra-Wide Breakpoint Selection (`@media (min-width: 100rem)`):**
+   - Established 100rem (~1600px) as the controlling ultra-wide internal-hero breakpoint, mathematically justified by the crossover threshold where contained 8:3 source imagery reaches maximum width in a 65vw track ($1033.58 / 0.65 \approx 1590.13\text{px}$).
+   - Below 100rem, the accepted C1R10-R2 desktop, tablet, and mobile hero geometry remains 100% unchanged.
+2. **Right-Pinned Media with Moderate Responsive Hero Growth (Candidate B Selection):**
+   - Following physical desktop monitor review by the project lead, the initial centered 100rem canvas and right navy gutter were rejected as unsuited for production.
+   - Selected Candidate B: right-pinned media (`right: 0`) paired with moderate, capped responsive growth:
+     - `.internal-hero`: `min-height: clamp(24.2875rem, 22vw, 28rem);`.
+     - `.internal-hero-picture, .internal-hero-image`: `right: 0; width: clamp(65rem, 59vw, 75rem); max-width: none;`.
+     - `.internal-hero-picture .internal-hero-img, .internal-hero-image`: `object-fit: contain; object-position: right center;`.
+   - The contained 8:3 image terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
+   - Moderate height growth (~422px at 1920px, capped at 448px at 2560px) allows the full 8:3 image to scale up and extend significantly farther left into the viewport (~796px at 1920px, ~1368px at 2560px; +90.1px and +158.4px farther left than Candidate A), bridging the empty center chasm while maintaining an elegant, non-dominant hero height.
+3. **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay:**
+   - Replaced the rejected right-edge gutter dissolve with the canvas-anchored relaxed horizontal gradient:
+     `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem), rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem), rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem))`
+   - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
+   - Guarantees 100% solid contrast behind typography (max-width 44rem) while allowing graphic details to emerge earlier and remain clear toward the right edge. Zero right-to-left gutter fade.
+4. **Uniform Cross-Route Architecture & Invariance:**
+   - Applied uniformly across all 10 image-backed internal heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes).
+   - Preserves complete 8:3 source imagery containment with zero cropping, distortion, or source asset modification.
+   - Homepage hero remains separate and unmodified. Technical Resources hero will inherit this shared architecture upon eventual implementation.
+**Reason:** Production implementation of project-lead-selected Candidate B right-anchored ultra-wide hero composition under USAP-CATALOG-002-C1R11/R2.

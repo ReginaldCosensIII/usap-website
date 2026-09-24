@@ -920,6 +920,10 @@ a:hover {
   .internal-hero {
     min-height: var(--internal-hero-min-height, 24.2875rem);
   }
+
+  .internal-hero--about {
+    padding-block: 1.75rem;
+  }
 }
 
 /* Background gradient base */
@@ -986,14 +990,24 @@ a:hover {
 
   .internal-hero-overlay,
   .internal-hero-overlay--family {
-    background: linear-gradient(
-      to right,
-      var(--color-brand-navy) 0%,
-      var(--color-brand-navy) 35%,
-      rgba(13, 27, 46, 0.85) 55%,
-      rgba(13, 27, 46, 0.40) 80%,
-      transparent 100%
-    );
+    background:
+      linear-gradient(
+        to bottom,
+        var(--color-brand-navy) 0%,
+        rgba(13, 27, 46, 0.75) 5%,
+        transparent 18%,
+        transparent 88%,
+        rgba(13, 27, 46, 0.45) 96%,
+        var(--color-brand-navy) 100%
+      ),
+      linear-gradient(
+        to right,
+        var(--color-brand-navy) 0%,
+        var(--color-brand-navy) 35%,
+        rgba(13, 27, 46, 0.85) 55%,
+        rgba(13, 27, 46, 0.40) 80%,
+        transparent 100%
+      );
   }
 }
 
@@ -1020,14 +1034,24 @@ a:hover {
 
   .internal-hero-overlay,
   .internal-hero-overlay--family {
-    background: linear-gradient(
-      to right,
-      var(--color-brand-navy) 0%,
-      var(--color-brand-navy) 40%,
-      rgba(13, 27, 46, 0.88) 65%,
-      rgba(13, 27, 46, 0.50) 90%,
-      transparent 100%
-    );
+    background:
+      linear-gradient(
+        to bottom,
+        var(--color-brand-navy) 0%,
+        rgba(13, 27, 46, 0.75) 5%,
+        transparent 18%,
+        transparent 88%,
+        rgba(13, 27, 46, 0.45) 96%,
+        var(--color-brand-navy) 100%
+      ),
+      linear-gradient(
+        to right,
+        var(--color-brand-navy) 0%,
+        var(--color-brand-navy) 40%,
+        rgba(13, 27, 46, 0.88) 65%,
+        rgba(13, 27, 46, 0.50) 90%,
+        transparent 100%
+      );
   }
 }
 
@@ -1042,6 +1066,48 @@ a:hover {
   .internal-hero-overlay,
   .internal-hero-overlay--family {
     background: rgba(13, 27, 46, 0.90);
+  }
+}
+
+/* Ultra-wide right-anchored hero composition with moderate responsive growth (>= 100rem / 1600px) */
+@media (min-width: 100rem) {
+  .internal-hero {
+    min-height: clamp(24.2875rem, 22vw, 28rem);
+  }
+
+  .internal-hero-picture,
+  .internal-hero-image {
+    right: 0;
+    width: clamp(65rem, 59vw, 75rem);
+    max-width: none;
+  }
+
+  .internal-hero-picture .internal-hero-img,
+  .internal-hero-image {
+    object-fit: contain;
+    object-position: right center;
+  }
+
+  .internal-hero-overlay,
+  .internal-hero-overlay--family {
+    background:
+      linear-gradient(
+        to bottom,
+        var(--color-brand-navy) 0%,
+        rgba(13, 27, 46, 0.75) 5%,
+        transparent 18%,
+        transparent 88%,
+        rgba(13, 27, 46, 0.45) 96%,
+        var(--color-brand-navy) 100%
+      ),
+      linear-gradient(
+        to right,
+        var(--color-brand-navy) 0,
+        var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem),
+        rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem),
+        rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem),
+        transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem)
+      );
   }
 }
 

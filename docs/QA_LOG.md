@@ -1070,3 +1070,83 @@ To prevent recurrence:
     - `dotnet format USAP.Web.sln --verify-no-changes --no-restore` (reported known pre-existing baseline IDE0011 brace warnings in `Program.cs` lines 16–35, zero in C1R9 changes).
 * **Review Package:**
   * `USAP-CATALOG-002-C1R9-shared-internal-hero-reconciliation-review-package.zip`.
+
+---
+
+## QA-022 — Checkpoint USAP-CATALOG-002-C1R10 Verification: Final Internal-Hero Height and Edge-Fade Reconciliation
+
+* **Date:** 2026-09-23
+* **Milestone / Task:** USAP-CATALOG-002-C1R10 (Final Internal-Hero Height and Edge-Fade Reconciliation)
+* **Scope & Implementation Summary:**
+  * **About Us Height Normalization:**
+    - Normalized `.internal-hero--about` to `padding-block: 1.75rem;` (28px top/bottom) under `@media (min-width: 48rem)`.
+    - Confirmed `/about-us` resolves to exactly 388.59px (~388.6px) at 1440×900, 1366×768, 1920×1080, and 2560×1440, matching the shared `--internal-hero-min-height` baseline.
+    - Verified content breathing room: 28.75px top space above eyebrow and 29.75px bottom space below CTA button.
+    - Verified zero modifications to About text block width (704px), lead max-width (608px), typography, line heights, CTA dimensions, or copy.
+  * **Top-Biased Edge Fade (Selected Candidate D):**
+    - Implemented multi-background gradient on `.internal-hero-overlay, .internal-hero-overlay--family` at desktop (`>= 64rem`) and tablet (`48rem - 63.999rem`).
+    - Top dissolve (5% navy band at 75%, clear by 18%) eliminates hard sky edge while preserving natural upper sky and antenna structures; bottom dissolve (88% to 96% light fade, navy at 100%) preserves terrain and hardware bases.
+    - Central 70% of image height (18% to 88%) remains completely unshaded and crisp.
+    - Horizontal text-protection gradient remains 100% effective for left copy contrast.
+  * **Cross-Page Desktop QA (10 Routes @ 1440×900):**
+    - Tested all 10 image-backed routes: `/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 family routes (`/products/log-periodic-antennas`, `/products/portable-transportable-antennas`, `/products/aperiodic-loop-antennas`, `/products/nvis-antennas`, `/products/antenna-rotator-control-systems`, `/products/tower-systems-accessories`).
+    - All 10 routes resolved to exact baseline: 388.59px height, zero horizontal overflow (`scrollWidth <= innerWidth`).
+  * **Tablet & Responsive QA:**
+    - Verified 1024×768: All routes resolve to 388.59px. About content height is 321.28px with 33.16px top / 34.16px bottom space.
+    - Verified 768×1024: All routes resolve to 388.59px. About content height is 255.86px with 65.86px top / 66.88px bottom space.
+    - Zero horizontal overflow across all viewports.
+  * **Mobile Regression QA (< 48rem):**
+    - Verified 390×844 and 375×667 across representative routes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, `/products/log-periodic-antennas`).
+    - Verified `object-fit: cover` and atmospheric overlay preserved exactly as established in C1R9 with zero regression and zero horizontal overflow.
+  * **Browser Zoom Verification:**
+    - Tested `/about-us` under 100%, 125%, 150%, and 200% zoom.
+    - 100% & 125%: Resolves to 388.59px without clipping.
+    - 150% & 200%: Hero container scales and expands naturally without text clipping, hidden CTA, or forced fixed-height overflow.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check` (exit code 0).
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+    - Static boundaries verified: zero changes to homepage hero/video, header behavior/logo, catalog data, product facts, or backend logic.
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R10-final-internal-hero-reconciliation-review-package.zip`.
+
+---
+
+## QA-023 — Checkpoint USAP-CATALOG-002-C1R11 Verification: Final Right-Anchored Ultra-Wide Hero Composition Reconciliation
+
+* **Date:** 2026-09-23
+* **Milestone / Task:** USAP-CATALOG-002-C1R11 (Right-Anchored Ultra-Wide Hero Composition Reconciliation)
+* **Scope & Implementation Summary:**
+  * **Ultra-Wide Breakpoint Architecture (`@media (min-width: 100rem)`):**
+    - Established 100rem (~1600px) as the controlling ultra-wide breakpoint, derived from the mathematical crossover threshold where contained 8:3 source imagery reaches maximum width in a 65vw track ($1033.58 / 0.65 \approx 1590.13\text{px}$).
+    - Below 100rem (verified at 1440×900 and 1366×768), all hero metrics, padding, media dimensions, and visual presentations remain 100% byte-for-byte or pixel-equivalent to the accepted C1R10-R2 baseline.
+  * **Right-Pinned Media with Moderate Responsive Growth (Candidate B):**
+    - Replaced the initially prototyped centered canvas and right navy gutter with Candidate B:
+      - `.internal-hero`: `min-height: clamp(24.2875rem, 22vw, 28rem);`.
+      - `.internal-hero-picture, .internal-hero-image`: `right: 0; width: clamp(65rem, 59vw, 75rem); max-width: none;`.
+      - `.internal-hero-picture .internal-hero-img, .internal-hero-image`: `object-fit: contain; object-position: right center;`.
+    - Contained imagery terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
+    - Responsive height growth allows the full 8:3 image to scale up and reach significantly farther left into the viewport (~796px at 1920px, ~1368px at 2560px; +90.1px and +158.4px farther left than Candidate A), eliminating the empty center chasm.
+  * **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay:**
+    - Replaced the right-edge gutter dissolve with the canvas-anchored relaxed horizontal gradient:
+      `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 24rem), rgba(13, 27, 46, 0.72) calc(max(0px, (100vw - 100rem) / 2) + 38rem), rgba(13, 27, 46, 0.25) calc(max(0px, (100vw - 100rem) / 2) + 54rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 68rem))`
+    - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
+    - Guarantees 100% solid navy contrast behind typography while allowing graphic details to emerge earlier and remain clear toward the right edge. Zero right-to-left gutter gradient.
+  * **Wide-Screen Desktop QA Across Viewports:**
+    - 1600×900: Hero height 388.6px, media width 1040.0px, visible image 566.4px–1600.0px, right gutter 0.0px (`right: 0`).
+    - 1920×1080: Hero height 422.4px, media width 1132.8px, media left/right 787.2px / 1920.0px, visible image 796.3px–1920.0px, right gutter 0.0px (`right: 0`).
+    - 2560×1440: Hero height 448.0px, media width 1200.0px, media left/right 1360.0px / 2560.0px, visible image 1368.0px–2560.0px, right gutter 0.0px (`right: 0`).
+    - Zero horizontal overflow (`scrollWidth <= innerWidth`) on all viewports.
+  * **All-Ten-Route Ultra-Wide QA (1920×1080 & 2560×1440):**
+    - Tested all 10 image-backed routes: `/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes.
+    - Confirmed zero horizontal overflow, zero right navy gutter, full 8:3 source image containment (no cropping, no stretching), zero text/image collision, and identical shared behavior across all 10 routes.
+  * **Real Local-Browser Serving Verification:**
+    - Verified that the running ASP.NET Core application on `localhost` directly serves the updated production CSS from `site.css` with `min-height: clamp(...)` and `right: 0;` without any runtime injection required.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check` (exit code 0).
+    - `dotnet restore USAP.Web.sln` (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore` (exit code 0, 0 warnings, 0 errors).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
+* **Review Package:**
+  * `USAP-CATALOG-002-C1R11-R2-final-right-anchored-ultrawide-review-package.zip`.
