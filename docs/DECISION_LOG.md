@@ -535,3 +535,288 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 14. **Conservative Public Copy for 1942 NVIS Series (C2R2):**
     - Removed unsupported "gap-free" claim from NVIS collapsed short description in `ProductCatalogService.cs`. Applied restrained public wording: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz for short-to-medium-range communications in roof-top, transportable, and ground-mount configurations." Zero operational performance guarantees or unverified claims introduced.
 **Reason:** Binding implementation amendments of USAP-CATALOG-001-C2R, USAP-CATALOG-001-C2R1, and USAP-CATALOG-001-C2R2 approved execution plan.
+
+---
+
+## DEC-032 — USAP-CATALOG-002-C1 / C1R1: Corrective Evidence-Safe Product Detail Presentation & Provisional Asset Integration
+
+**Date:** 2026-09-17 (Corrected 2026-09-18)
+**Decision:**
+1. **Public Presentation Projection Architecture & Clean Governance Separation:**
+   - Introduced `ProductCharacteristic` key-value model `(Label, DisplayValue)` to cleanly project technical attributes without leaking raw governance tags.
+   - Preserved pure public view models for `ProductModelRecord` and `ProductGroupRecord`. Purged all internal research/governance tokens (`HoldDisputedSpecs`, `ConflictHolds`, `SourceNotes`, `ApprovalStatus`, `PublicationRecommendation`, `SpecificationStatus`, `CommercialAvailability`, `ClientConfirmation`, confidence scores) from the public API and Razor templates.
+2. **Product Inventory & Reconciliation (30 Named Identifiers + 1 Unnamed Record = 31 Records):**
+   - The public catalog reconciles to 6 families, 16 groups, 30 named models/configurations, and 1 unnamed Aperiodic group record, totaling 31 records:
+     - Log Periodic: 8 (`LP-1005`, `LP-1001`, `LP-1002`, `LP-1017`, `LP-1018BA`, `LP-1019BA`, `LP-1019SS`, `LP-1112MR`)
+     - Portable & Transportable: 6 (`V-4213AD`, `V-4213AC`, `LP-1402`, `LP-1403`, `1910AA`, `1910BA`)
+     - Aperiodic: 0 named models plus 1 unnamed group record
+     - NVIS: 6 (`1942-RT`, `1942-TA`, `1942-GM`, `1942-RT-LP`, `1942-TA-LP`, `1942-GM-LP`). All 6 published; the 3 low-power variants are presented with conservative configuration-level role identification only, strictly omitting disputed power, weight, gain, or coverage claims.
+     - Rotator & Controller: 5 (`R3500`, `R3501`, `R3503`, `DRC-3`, `DRC-4`)
+     - Tower: 5 (`T-3002`, `3002FA`, `3002FB`, `3002SS`, `3002SS-80`)
+   - Total: 30 named identifiers + 1 unnamed Aperiodic record.
+3. **Intentional Product-Group Visual Coverage Across All 16 Groups:**
+   - Deployed intentional visual coverage to all 16 product groups using the 3 provisional rotator visuals plus 13 project-lead-selected A1 candidates from `project-inputs/USAP-CATALOG-002-A1-Final-Review-Package-2026-09-17.zip`.
+   - Asset selection is provisional project-lead authorization for implementation, pending formal USAP client approval.
+   - Implemented contain-style responsive presentation (`.product-group-disclosure__img--contain`) for wide-footprint groups (`lp-1112mr`, `1910`, `1942`) to prevent misleading tight cropping.
+4. **Engineering Guidance Visual Integration:**
+   - Implemented 3 coordinated card visuals for the Engineering Guidance pathways on `/products`: Deployment & Mobility (`usap-guidance-card-deployment-mobility-a1-v1.png`), Coverage & Propagation (`usap-guidance-card-coverage-propagation-a1-v1.png`), and Positioning & Infrastructure (`usap-guidance-card-positioning-infrastructure-a1-v1.png`).
+   - The combined wide Guidance visual alternate was deliberately deferred.
+5. **Products Landing-Page Card Semantic & Visual Refinement:**
+   - Converted the product family card outer element to a single semantic anchor (`<a>`).
+   - Zero nested interactive controls (`<span class="card-link">` replaces inner link).
+   - Removed routine red top borders and navy left borders from ordinary catalog cards.
+   - Coordinated hover/focus zoom (`scale(1.03)`) and inline editorial CTA reaction (`Explore Family →`).
+6. **Breadcrumb Placement:**
+   - Breadcrumbs removed from family-page heroes.
+   - Semantic breadcrumbs placed at the top-left of the main content container immediately below the hero.
+7. **R3500 and DRC-4 Conservative Relationship Wording:**
+   - Conservative wording applied: R3500 and DRC-4 are described based on published references without claiming mandatory pairing, bundled supply, confirmed compatibility, or current commercial availability.
+8. **Technical Document Policy (Interim 6 Links vs Planned 17 Migration):**
+   - Retained 6 interim product-page resource links (`doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`) without treating 6 as a permanent ceiling or classifying R2's 17 canonical PDFs as rejected.
+9. **Deterministic Catalog Startup Validation:**
+   - Service constructor strictly validates 6 families, 16 groups (5/3/1/1/5/1), 30 named models, 1 unnamed Aperiodic line, all 6 1942 identifiers, 16 group visuals, 6 interim docs, and scans for prohibited governance terms.
+**Reason:** Binding execution of finalized 885-line USAP-CATALOG-002-C1 implementation prompt and C1R1 recovery instructions.
+
+---
+
+## DEC-033 — USAP-CATALOG-002-C1R4: Product Overview Disclosure & FAQ Layout Refinement
+
+**Date:** 2026-09-18
+**Decision:**
+1. **Always-Visible Product-Group Overview Structure:**
+   - Re-architected all 16 product-group presentations into an outer `<article class="product-group-card" id="@group.SectionAnchor">` containing an always-visible overview (`.product-group-overview`) and a nested native `<details class="product-group-disclosure">`.
+   - Product imagery remains visible at all times, resolving the issue where closing disclosures hid product visuals.
+   - Overview displays product image (cover or contain-style for LP-1112MR, 1910, 1942), group heading, short summary, expanded introduction (when providing distinct context), configuration count badge (omitted for Aperiodic), technical document indicator, and up to three key group characteristics.
+2. **Accessible Nested Details Disclosure Control:**
+   - Disclosure summary bar spans the full width at the base of the overview.
+   - Text labels explicitly communicate state: `View Models & Specifications` / `Hide Models & Specifications` (`View Configuration & Technical Details` / `Hide Configuration & Technical Details` for Aperiodic).
+   - Augmented with accessible name context (`for @group.Name`) for assistive technology.
+   - Nested disclosure content contains additional group characteristics (when > 3), model cards grid, Aperiodic configuration note, approved interim technical documents, and Contact Engineering link.
+   - Native progressive enhancement via `disclosure.js` preserved with zero JavaScript dependency.
+3. **Product Selection FAQ Layout Alignment:**
+   - Expanded `.faq-list` to occupy the full standard `.container` width (`width: 100%`), eliminating awkward narrow-column spacing.
+   - Constrained answer copy internally to `max-width: 75ch` on paragraph elements to preserve optimal readability line lengths while disclosure cards span full container width.
+4. **Canonical Catalog Inventory Reconciliation:**
+   - Mechanically reconciled the exact 30+1 inventory (6 families, 16 groups, 30 named models/configurations, 1 unnamed Aperiodic record = 31 total records).
+   - Erroneous temporary identifiers introduced in C1R3 markdown (`lp-1112`, `lp-3001`, `1925`, `1940`, `r3505`, `r3506`, `1942-1..6`, `R3501-1`, `R3503-1`, `T-3002-30..70`) are explicitly rejected and excluded from public content and documentation.
+**Reason:** Binding implementation of project lead's product-page presentation refinements in USAP-CATALOG-002-C1R4.
+
+---
+
+## DEC-034 — USAP-CATALOG-002-C1R5: Product Navigation, Configuration Support, Hero Resilience, and Asset Reliability Refinement
+
+**Date:** 2026-09-18
+**Decision:**
+1. **Family-Page Closing Sequence & Primary Action:**
+   - Established strict sequence across all product-family pages: (1) product-group content -> (2) Configuration Support card -> (3) Return to All Product Families navigation -> (4) closing CTA -> (5) footer.
+   - Moved `Return to All Product Families` (`.family-back-nav`) below `<aside class="configuration-support-notice">` and above the closing CTA, preserving its secondary outline treatment (`.btn-outline`).
+   - Standardized the CTA in Configuration Support to use USAP's primary red brand button (`.btn-primary`) rather than secondary styling, reusing the existing design-system class with zero duplicate button declarations.
+2. **Accessible Product-Family Navigation (Desktop & Mobile):**
+   - Implemented semantic disclosure dropdown for Products in site header partial (`_Header.cshtml`) using native `<details class="nav-dropdown" id="nav-products-dropdown">` and `<summary class="primary-nav-link nav-dropdown-toggle">`.
+   - Menu includes All Products (`/products`) plus all six family routes (`log-periodic-antennas`, `portable-transportable-antennas`, `aperiodic-loop-antennas`, `nvis-antennas`, `antenna-rotator-control-systems`, `tower-systems-accessories`).
+   - Fully accessible across mouse, touch, keyboard, and screen readers without hover dependence. Usable without JavaScript.
+   - Enhanced via `site-navigation.js` for desktop click-outside dismissal, Escape-key dismissal with focus return to summary, link-click closure, and `aria-expanded` state synchronization.
+   - Mobile navigation drawer preserves independent dropdown expansion/collapse without closing the mobile navigation drawer unexpectedly.
+   - Direct access to `/products` preserved via first submenu item. Top-level Products footer link retained without duplicate family links.
+3. **Hero Resilience and Multi-Scale Responsive Scaling:**
+   - Unified hero architecture across `.internal-hero` and family hero variants to ensure height is driven purely by content and vertical padding.
+   - Added `box-sizing: border-box`, responsive vertical padding `clamp(var(--space-8), 4vw, var(--space-12))`, `overflow-wrap: break-word`, and fluid title sizing `clamp(1.875rem, 3.25vw + 0.5rem, 2.75rem)` to eliminate text clipping across 80%, 100%, and 125% zoom levels and viewports from 390px to 2560px.
+   - Ensured breadcrumbs remain strictly below family-page heroes.
+4. **Asset Reliability and Image Verification Architecture:**
+   - Confirmed Aperiodic family card image file `usap-family-card-aperiodic-loop-element-v1.png` is committed, intact on disk (2,098,672 bytes), and returns HTTP 200 with MIME type `image/png`.
+   - Discovered root cause of prior screenshot defect: legacy screenshot artifact from pre-C1R2 with obsolete alt text `"mounted on a field tripod"` was lingering in review staging, exacerbated by browser lazy loading during headless captures.
+   - Established dual-verification requirement in automated audit: every image verified via both HTTP response/content-type and browser DOM completion (`naturalWidth > 0 && naturalHeight > 0`).
+**Reason:** Binding requirements of USAP-CATALOG-002-C1R5.
+
+---
+
+## DEC-035 — USAP-CATALOG-002-C1R6: Mobile Navigation Overlay, Family SEO Content, Centered Disclosure, and Characteristic Curation
+
+**Date:** 2026-09-18
+**Decision:**
+1. **Mobile Navigation Overlay Architecture:**
+   - Refactored opened mobile navigation to operate as an overlay (`position: fixed`, `top: var(--mobile-header-bottom, 4.25rem)`, `width: 100vw`, `height: calc(100dvh - var(--mobile-header-bottom, 4.25rem))`, `overscroll-behavior: contain`) positioned immediately below the header.
+   - Opening or closing the navigation causes zero document reflow: the visible mobile header, hero, and main content remain at their exact scroll and visual positions without shifting.
+   - Background scrolling is locked via `html.nav-open-lock, body.nav-open-lock { overflow: hidden !important; overscroll-behavior: none; }`. The page scroll position is recorded at open and restored at close with zero scroll drift across repeated cycles.
+   - Focus is safely contained without dialog role mutation by applying standards-based `inert` to `#main-content`, `.site-footer`, and `.skip-link` while the overlay is open, and clearing only those applied attributes on close or breakpoint resize.
+2. **Centered Mobile Products Disclosure Control:**
+   - Updated mobile `<summary class="nav-dropdown-toggle">` from `justify-content: space-between` to `justify-content: center; gap: var(--space-2)`.
+   - The "Products" label and chevron form a single, unified visual group centered within the control, preserving chevron rotation on open. Submenu links retain indented, left-aligned layout for readability.
+3. **Native Disclosure Accessibility Cleanup:**
+   - Removed static `aria-haspopup="true"` and `aria-expanded="false"` from the native `<summary>`, and eliminated redundant JavaScript listeners that manually synchronized `aria-expanded`.
+   - The native HTML5 `<details>/<summary>` element handles disclosure state and accessibility semantics naturally without JavaScript, eliminating out-of-sync ARIA states.
+4. **Product-Family Heading Hierarchy and Evidence-Safe SEO Content:**
+   - Replaced generic post-hero copy on all six family pages with family-specific eyebrows, H2 section headings, and factual supporting paragraphs derived strictly from R2 research.
+   - Heading hierarchy strictly enforced: page-level `<h1>` (hero family name) -> subordinate `<h2>` (family models/configurations section) -> `<h3>` (product groups) -> `<h4>`/`<h5>` (model/configuration details).
+   - Audited and assigned unique page titles, meta descriptions, and canonical terms across all six family routes.
+   - Omitted page-level `noindex` so production-intent metadata allows indexing and following by default.
+5. **Explicit Overview-Characteristic Curation:**
+   - Replaced generic Razor `Take(3)` and `Skip(3)` slicing with explicit curated properties: `OverviewCharacteristics` (0 to 3 group-level facts) and `DetailedCharacteristics` (remaining safe group-level facts) on `ProductGroupRecord`.
+   - Each technical fact has exactly one canonical stored definition, eliminating duplicate copies or competing sources. Startup validation mechanically enforces non-overlap, label uniqueness, and the 3-value limit.
+6. **Technical Document Status Policy:**
+   - Maintained accurate factual status: 17 canonical PDFs identified in R2 for planned local migration, 6 provisionally linked, canonical migration deferred to `USAP-TECHDOC-001`, public vs lead-gated decision client-pending.
+**Reason:** Binding requirements of USAP-CATALOG-002-C1R6.
+
+---
+
+## DEC-036 — USAP-CATALOG-002-C1R7: Header Interaction, Mobile Navigation Refinement, Characteristic Audit Resolution, and Products Hero Baseline Investigation
+
+**Date:** 2026-09-18
+**Decision:**
+1. **Auto-Hiding Sticky Header State Machine:**
+   - Standardized the shared site header (`.site-header`) on `position: sticky; top: 0;` with smooth, compositor-only transform-based hide/show transitions (`transform: translate3d(0, -100%, 0)`).
+   - Driven by a single unified scroll listener with `requestAnimationFrame` throttling, a directional downward delta threshold (6px), upward restoration delta threshold (4px), and a top-of-page immunity threshold (50px).
+   - Implemented an idle restoration timer (~200ms) that smoothly restores the header to view whenever scrolling ceases.
+   - Auto-hiding is suspended whenever: (1) the mobile menu is open, (2) the desktop Products dropdown is open, (3) the header or any child element has keyboard/focus within, or (4) skip-link navigation is triggered.
+   - Opening the mobile menu while the header is hidden immediately restores the header before opening the overlay.
+   - Under `prefers-reduced-motion: reduce`, sliding transitions are completely suppressed (`transition: none !important`), ensuring instantaneous state changes.
+2. **Content-Height Mobile Navigation Panel & Translucent Backdrop:**
+   - Redesigned the mobile navigation drawer (`#primary-nav-list`) from a forced full-viewport height (`height: calc(100dvh - ...)`) to a content-driven overlay (`height: auto; max-height: calc(100dvh - var(--mobile-header-bottom))`).
+   - In collapsed state, the navy panel ends cleanly below the Request a Quote button with intentional bottom padding, eliminating unnecessary navy empty space and showing the page surface beneath.
+   - When the Products submenu is expanded or on short-height viewports (e.g. 375×500), the panel expands up to its maximum available height and activates internal momentum scrolling (`overflow-y: auto; overscroll-behavior: contain`).
+   - Added a separate, subtle click-away backdrop (`#nav-backdrop`, `background-color: rgba(0, 0, 0, 0.40)`) that covers the remaining viewport beneath the header, visually distinct from the navy panel, dismissing the menu on outside tap.
+   - Background scroll lock (`html.nav-open-lock, body.nav-open-lock`) and focus containment via `inert` are strictly preserved with zero scroll-position drift across repeated cycles.
+3. **Centered Top-Level Mobile Navigation & Alignment Geometry:**
+   - Corrected mobile header layout: the logo is anchored to the left container edge, the hamburger toggle is anchored to the far right container edge (`margin-inline-start: auto`), and `.primary-nav` uses `display: contents` under `js-nav-ready`, utilizing the full available container width.
+   - Horizontally centered every top-level navigation item: Home, Products (label + chevron centered as a single unit via `.nav-dropdown-summary-group`), Technical Resources, About Us, Contact Us, and Request a Quote.
+   - Submenu child links remain left-aligned and indented (`padding-left: var(--space-10)`) for scanability.
+   - Redesigned the active-route indicator as an absolutely positioned left accent bar (`::before { position: absolute; left: 0; width: 3px; }`), completely eliminating asymmetric horizontal borders or padding and ensuring zero horizontal displacement of centered labels (measured difference <= 0.01px).
+4. **C1R6 Characteristic Audit Contradiction Resolution:**
+   - Investigated the C1R6 audit report contradiction (which reported 0 overview and 0 detailed characteristics despite code claims).
+   - Confirmed this was strictly an audit-script selector/extraction defect in C1R6 tooling.
+   - Domain models, Razor rendering templates (`Family.cshtml`), and live catalog data (`ProductCatalogService.cs`) are 100% intact and actively serving the approved mapping (3 overview for lp-high-power, lp-1019, v-4213, lp-1402-1403, 1910, aperiodic, 1942; 2 for t-3002; detailed specs inside disclosures; empty groups intentionally empty; zero Razor Take/Skip slicing; zero disputed claims).
+5. **Main Products Hero Baseline Investigation & Binding No-Change Compliance:**
+   - Completed a comprehensive cascade, breakpoint, and viewport audit of `.internal-hero--products` across 1366×768, 1440×900, 1536×864, 1920×1080, and 2560×1440 viewports.
+   - Established that markup, CSS rules, typography, vertical padding (48px), and computed hero height (369.8px) are 100% identical across all desktop viewports. No desktop breakpoint difference exists.
+   - Established that the perceived differences between laptop displays and desktop monitors are caused by: (1) mathematical `object-fit: cover` scaling of an 8:3 image inside an increasingly wide container (container aspect ratio grows from 3.69:1 at 1366px to 5.19:1 at 1920px and 6.92:1 at 2560px, forcing top crop to increase from 71px to 175px and 295px); and (2) relative proportion of viewport height (370px occupies 48% of a 768p screen vs 34% of a 1080p screen).
+   - Complied with the binding no-change boundary: zero edits made to `/products` hero markup, CSS, image, overlay, padding, or sizing.
+**Reason:** Binding requirements of USAP-CATALOG-002-C1R7.
+
+---
+
+## DEC-037 — USAP-CATALOG-002-C1R8: Always-Visible Sticky Header Reconciliation and Focused Navigation QA
+
+**Date:** 2026-09-22
+**Decision:**
+1. **Always-Visible Sticky Header Pivot:**
+   - In accordance with latest explicit project-lead direction, reconciled `.site-header` to remain `position: sticky; top: 0;` and visible at all times.
+   - Completely removed the superseded C1R7 scroll-direction auto-hide state machine from `site-navigation.js` and `site.css`:
+     - Removed `DELTA_DOWN`, `DELTA_UP`, `TOP_THRESHOLD`, `IDLE_DELAY`, and `lastScrollY`.
+     - Removed rAF scroll handler (`handleScrollFrame`), scroll event listener (`onScroll`), idle restoration timer, and `isSuspended()`.
+     - Removed `.site-header.is-hidden` CSS rule, `translate3d(0, -100%, 0)` transform, `will-change: transform`, and header transform transition.
+     - Removed header `focusin`, skip-link click, and Products-dropdown `toggle` reveal logic whose sole purpose was restoring hidden headers.
+     - Removed forced transform/transition overrides from `openNav()` (`header.style.transition = 'none'`, `header.style.transform = 'none'`, reflow trigger) and obsolete overrides from `.nav-open-lock .site-header`.
+2. **Preservation of Valid Navigation & Layout Architecture:**
+   - Retained stable `offsetHeight` measurement on `.site-header` for computing `--mobile-header-bottom`.
+   - Retained content-height mobile navigation drawer (`height: auto; max-height: calc(100dvh - var(--mobile-header-bottom)); overflow-y: auto`).
+   - Retained translucent click-away backdrop (`#nav-backdrop`) with outside tap dismissal.
+   - Retained background scroll locking (`html.nav-open-lock, body.nav-open-lock`) and HTML5 `inert` background focus containment with zero scroll drift.
+   - Retained initial enhanced-menu collapse without scroll restoration, ensuring fragment navigation and browser-restored scroll states are never overwritten.
+   - Retained centered top-level mobile navigation links, centered Products label+chevron unit, and left-aligned indented submenu links.
+   - Retained native HTML5 `<details>/<summary>` desktop Products disclosure with outside click and Escape dismissal.
+3. **Strict Scope and Hero Invariance:**
+   - Zero modifications to `/products` landing hero, family heroes, catalog data, characteristics, product assets, or routing.
+**Reason:** Latest binding project-lead direction superseding the prior auto-hide header behavior under USAP-CATALOG-002-C1R8.
+
+---
+
+## DEC-038 — USAP-CATALOG-002-C1R9: Shared Internal-Hero Geometry and Full-Image Presentation Reconciliation
+
+**Date:** 2026-09-22
+**Decision:**
+1. **Shared Desktop/Tablet Banner Baseline Height:**
+   - Standardized the internal-page hero foundation (`.internal-hero`) on a shared desktop/tablet minimum-height token: `--internal-hero-min-height: 24.2875rem;` (~388.6px), measured directly from the product-family hero baseline at 1440×900.
+   - Enforced exact height parity (388.6px, 0.0px variance at 1440×900 and 1920×1080) across all standard image-backed internal heroes where content fits (`/products`, `/contact-us`, `/request-a-quote`, and all six `/products/{familySlug}` routes).
+   - Retained fluid content resilience (`height: auto; min-height: ...;` without max-height constraints). Heroes with longer content (e.g. `/about-us` at 427.1px) expand naturally without clipping under normal viewports, browser zoom (125%, 200%), or accessibility text scaling.
+2. **Full-Image Right-Side Media Containment:**
+   - Superseded the prior destructive full-width `object-fit: cover` presentation on non-family heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`).
+   - Unified `.internal-hero-image` with the established `.internal-hero-picture` family treatment: bounded right-side media region at desktop (`width: 65%; max-width: 1100px; height: 100%; right: 0; left: auto; object-fit: contain; object-position: right center;`) and tablet (`width: 75%;`).
+   - Completely eliminates vertical cover cropping, ensuring the full 8:3 source composition is visible without stretching or distortion.
+   - Standardized the shared gradient overlay (`linear-gradient(to right, var(--color-brand-navy) 0%, var(--color-brand-navy) 35%, rgba(13, 27, 46, 0.85) 55%, rgba(13, 27, 46, 0.40) 80%, transparent 100%)`), guaranteeing high-contrast solid navy protection under copy while smoothly blending into the contained right-side media.
+3. **Responsive Mobile Behavior (< 48rem / 768px):**
+   - Maintained content-driven fluid height (`min-height: 22rem; height: auto`) without rigid vertical constraints.
+   - Configured non-family media layers as an atmospheric background (`object-fit: cover; object-position: center;`) under a 90% navy overlay (`rgba(13, 27, 46, 0.90)`), guaranteeing white typography readability without horizontal overflow.
+   - Documented dedicated 1:1 mobile derivative creation for non-family assets as a future enhancement candidate.
+4. **Header Architecture Precision Documentation:**
+   - Clarified that the shared header is `position: sticky; top: 0;` during normal page operation, and is temporarily viewport-pinned with `position: fixed; top: 0; left: 0; right: 0; width: 100%;` while `.nav-open-lock` is active to maintain top-of-viewport anchoring while background scrolling is locked.
+5. **Strict Scope & Invariance:**
+   - Zero changes to homepage hero, homepage video, header sizing, logo assets, product-family source assets, catalog service/records, product facts, technical documents, routes, or backend logic.
+**Reason:** Binding requirements of USAP-CATALOG-002-C1R9 to standardize internal hero height and eliminate destructive image cropping.
+
+---
+
+## DEC-039 — USAP-CATALOG-002-C1R10: Final Internal-Hero Height Normalization and Top-Biased Edge-Fade Reconciliation
+
+**Date:** 2026-09-23
+**Decision:**
+1. **About Us Height Normalization to Shared Baseline:**
+   - Normalized `.internal-hero--about` at desktop/tablet widths (`@media (min-width: 48rem)`) to `padding-block: 1.75rem;` (28px top and bottom).
+   - Resolves `/about-us` to exactly 388.59px (~388.6px) at normal desktop presentation (1440×900, 1366×768, 1920×1080, 2560×1440), achieving 100% height parity with all other internal image-backed heroes where copy fits.
+   - Retained fluid content resilience (`height: auto; min-height: var(--internal-hero-min-height, 24.2875rem);`). Preserved full content width (704px), lead max-width (608px), typography, line heights, button dimensions, and copy without forced overflow clipping.
+   - Vertically centered content layout provides symmetrical, comfortable breathing room (~28.8px top space above eyebrow and ~29.8px bottom space below CTA).
+2. **Top-Biased Image-Edge Vertical Fade (Candidate D Selection):**
+   - Implemented the project-lead/Architect-selected Candidate D visual treatment across all image-backed internal heroes (`.internal-hero-overlay, .internal-hero-overlay--family`) at desktop (`>= 64rem`) and tablet (`48rem - 63.999rem`).
+   - Combined multi-background gradient layers a vertical top-biased dissolve over the existing horizontal text-protection gradient:
+     `linear-gradient(to bottom, var(--color-brand-navy) 0%, rgba(13, 27, 46, 0.75) 5%, transparent 18%, transparent 88%, rgba(13, 27, 46, 0.45) 96%, var(--color-brand-navy) 100%)`.
+   - Refined 5% top navy band dissolving by 18% eliminates the abrupt color cutoff between bright sky and surrounding navy without unnecessarily darkening upper sky or antenna mast structures.
+   - Lighter bottom dissolve (transparent until 88%, 45% navy at 96%) preserves lower equipment and terrain detail while softening the lower pixel cutoff.
+   - Retains 100% untouched source color and contrast across the central 70% vertical image region (from 18% to 88%).
+3. **Preservation of Contained Right-Side Media Architecture:**
+   - Retained C1R9 non-cropping architecture: `object-fit: contain; object-position: right center;` on right-side bounded media (`width: 65%; max-width: 1100px;` desktop, `width: 75%;` tablet).
+   - Zero image cropping, stretching, distortion, or alteration of source media files.
+4. **Mobile & Asset Scope Boundary:**
+   - Mobile (< 48rem) retains content-driven fluid height, atmospheric cover imagery, and 90% navy overlay with zero horizontal overflow. Dedicated 1:1 mobile derivative generation for non-family pages remains explicitly deferred to future asset work.
+   - Technical Resources hero implementation remains deferred.
+**Reason:** Production implementation of project-lead/Architect-selected internal-hero height normalization and refined Candidate D top-fade treatment under USAP-CATALOG-002-C1R10/R2.
+
+---
+
+## DEC-040 — USAP-CATALOG-002-C1R11: Right-Anchored Ultra-Wide Hero Composition Reconciliation
+
+**Date:** 2026-09-23
+**Decision:**
+1. **Ultra-Wide Breakpoint Selection (`@media (min-width: 100rem)`):**
+   - Established 100rem (~1600px) as the controlling ultra-wide internal-hero breakpoint, mathematically justified by the crossover threshold where contained 8:3 source imagery reaches maximum width in a 65vw track ($1033.58 / 0.65 \approx 1590.13\text{px}$).
+   - Below 100rem, the accepted C1R10-R2 desktop, tablet, and mobile hero geometry remains 100% unchanged.
+2. **Right-Pinned Media with Moderate Responsive Hero Growth (Candidate B Selection):**
+   - Following physical desktop monitor review by the project lead, the initial centered 100rem canvas and right navy gutter were rejected as unsuited for production.
+   - Selected Candidate B: right-pinned media (`right: 0`) paired with moderate, capped responsive growth:
+     - `.internal-hero`: `min-height: clamp(24.2875rem, 22vw, 28rem);`.
+     - `.internal-hero-picture, .internal-hero-image`: `right: 0; width: clamp(65rem, 59vw, 75rem); max-width: none;`.
+     - `.internal-hero-picture .internal-hero-img, .internal-hero-image`: `object-fit: contain; object-position: right center;`.
+   - The contained 8:3 image terminates cleanly at the physical browser right edge (`visibleImageRight == viewportWidth`) with zero right-side navy gutter.
+   - Moderate height growth (~422px at 1920px, capped at 448px at 2560px) allows the full 8:3 image to scale up and extend significantly farther left into the viewport (~796px at 1920px, ~1368px at 2560px; +90.1px and +158.4px farther left than Candidate A), bridging the empty center chasm while maintaining an elegant, non-dominant hero height.
+3. **Relaxed Ultra-Wide Horizontal Copy-Protection Overlay (C1R11 / C1R12 Refinement):**
+   - Replaced the rejected right-edge gutter dissolve with the canvas-anchored relaxed horizontal gradient:
+     `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem), rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem), rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem), rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem))`
+   - Under C1R12, finalized the transition to Candidate H1: solid navy extends 6rem farther right (to `gutter + 30rem`), maintaining 88% opacity at `+40rem` (where image enters at x=796px at 1920px), completely eliminating the perceptible vertical tonal seam under headings on wide monitors while ensuring antenna subjects past `+72rem` remain clear and unshaded.
+   - Layered under the accepted Candidate D vertical top/bottom fade (`linear-gradient(to bottom, navy 0%, 75% navy 5%, transparent 18%, transparent 88%, 45% navy 96%, navy 100%)`).
+   - Guarantees 100% solid contrast behind typography (max-width 44rem) while allowing graphic details to emerge smoothly without tonal seams or artificial dark bands. Zero right-to-left gutter fade.
+4. **Uniform Cross-Route Architecture & Invariance:**
+   - Applied uniformly across all 10 image-backed internal heroes (`/products`, `/about-us`, `/contact-us`, `/request-a-quote`, and all 6 product-family routes).
+   - Preserves complete 8:3 source imagery containment with zero cropping, distortion, or source asset modification.
+   - Homepage hero remains separate and unmodified. Technical Resources hero will inherit this shared architecture upon eventual implementation.
+**Reason:** Production implementation of project-lead-selected Candidate B right-anchored ultra-wide hero composition under USAP-CATALOG-002-C1R11/R2.
+
+---
+
+## DEC-041 — USAP-CATALOG-002-C1R13-R1: Rotator & Control Systems Hero Route-Specific Asset-Entry Mask
+
+**Date:** 2026-09-24
+**Decision:**
+1. **Asset-Driven Route-Specific Exception (Candidate R2 Selection):**
+   - Implemented a route-specific CSS image mask on `.internal-hero--family-antenna-rotator-control-systems .internal-hero-picture` under `@media (min-width: 100rem)`:
+     `-webkit-mask-image` / `mask-image`: `linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.55) 4rem, rgba(0, 0, 0, 0.85) 8rem, #000 12rem)`.
+   - Fades the source image's alpha channel from 0% to 100% over the left 12rem (192px) of the media region, dissolving the sharp rectangular left entrance of the technical blueprint asset into the underlying `#0d1b2e` hero canvas without any contrast step.
+2. **Preservation of Shared Architecture & Invariance:**
+   - Global shared hero architecture remains 100% unchanged across the other nine internal heroes.
+   - Candidate D vertical top/bottom fade remains controlling.
+   - Candidate H1 horizontal copy-protection blend remains controlling.
+   - Ultra-wide geometry (height clamp, width clamp, right pinning, zero right gutter, `object-fit: contain`) remains 100% unchanged.
+   - No behavior changes below 100rem (verified at 1440×900 and 1366×768 where image enters under solid navy).
+   - Mobile and tablet responsive cover behavior remains 100% untouched.
+3. **No Razor Markup Modifications:**
+   - Isolated cleanly using the pre-existing semantic family class rendered by `Family.cshtml` (`.internal-hero--family-antenna-rotator-control-systems`).
+4. **Deferred Ultra-Wide Copy Layout Enhancement:**
+   - Retained project-lead observation that internal hero copy on larger/wider monitors should later receive additional horizontal space; deferred to the future visual-enhancement workstream.
+**Reason:** Production implementation of project-lead/Architect-selected Candidate R2 mask following the USAP-CATALOG-002-C1R13 prototype study to eliminate the Rotator hero asset's hard entrance seam.

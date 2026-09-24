@@ -28,6 +28,78 @@ public class ProductCatalogService : IProductCatalogService
             ["tower-systems-accessories"] = new[] { "t-3002" }
         };
 
+    private static readonly HashSet<string> InterimResourceIds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "doc-lp-high-power",
+        "doc-lp-1018ba",
+        "doc-lp-1019",
+        "doc-1910-2024",
+        "doc-aperiodic",
+        "doc-t-3002-oct2016"
+    };
+
+    /// <summary>
+    /// Required 1942 NVIS configuration identifiers (all 6 published in provisional public catalog).
+    /// </summary>
+    public static readonly IReadOnlyList<string> Required1942ConfigurationCodes = new[]
+    {
+        "1942-RT",
+        "1942-TA",
+        "1942-GM",
+        "1942-RT-LP",
+        "1942-TA-LP",
+        "1942-GM-LP"
+    };
+
+    public static readonly IReadOnlyList<string> LowPower1942ConfigurationCodes = new[]
+    {
+        "1942-RT-LP",
+        "1942-TA-LP",
+        "1942-GM-LP"
+    };
+
+    private static readonly IReadOnlyList<string> ProhibitedTokensAndClaims = new[]
+    {
+        // Internal governance and research tokens
+        "ApprovalStatus",
+        "PublicationRecommendation",
+        "SpecificationStatus",
+        "ConflictHolds",
+        "SourceNotes",
+        "SourcePresence",
+        "CommercialAvailability",
+        "ClientConfirmation",
+        "HoldDisputedSpecs",
+
+        // Prohibited held claim strings and unconfirmed marketing phrases
+        "complete 30-foot mast field system",
+        "antenna-only configuration",
+        "rapid-deployment",
+        "400 W PEP",
+        "2 kW PEP",
+        "4,300 in-lb",
+        "10,000 lb vertical load",
+        "9,000 in-lb",
+        "23,000 in-lb",
+        "23,700 in-lb",
+        "60,000 in-lb",
+        "20,000 lb vertical load",
+        "compatible with the DRC-3",
+        "paired with the DRC-4",
+        "standalone and PC control",
+        "microprocessor-based",
+        "rackmount",
+        "19-inch",
+        "gap-free",
+        "no-skip-zone",
+        "guaranteed coverage",
+        "continuous-rotation capability on compatible rotators",
+        "documented for selected rotator systems",
+        "50 ohms pressurized",
+        "1-5/8 in EIA coaxial flange",
+        "Complete field-system package record"
+    };
+
     private readonly IReadOnlyList<ProductFamilyRecord> _families;
     private readonly IReadOnlyList<ProductGroupRecord> _productGroups;
     private readonly IReadOnlyList<ProductResourceRecord> _resources;
@@ -43,33 +115,40 @@ public class ProductCatalogService : IProductCatalogService
 
         ValidateCatalog(families, productGroups, resources);
 
-        _families = families.OrderBy(f => f.DisplayOrder).ToList();
-        _productGroups = productGroups.OrderBy(p => p.DisplayOrder).ToList();
-        _resources = resources.ToList();
+        _families = families;
+        _productGroups = productGroups;
+        _resources = resources;
 
         _familiesById = _families.ToDictionary(f => f.Id, StringComparer.OrdinalIgnoreCase);
         _familiesBySlug = _families.ToDictionary(f => f.Slug, StringComparer.OrdinalIgnoreCase);
-        _productGroupsById = _productGroups.ToDictionary(p => p.Id, StringComparer.OrdinalIgnoreCase);
+        _productGroupsById = _productGroups.ToDictionary(g => g.Id, StringComparer.OrdinalIgnoreCase);
 
-        _productGroupsByFamilyId = _families.ToDictionary(
-            f => f.Id,
-            _ => new List<ProductGroupRecord>(),
-            StringComparer.OrdinalIgnoreCase);
-
+        _productGroupsByFamilyId = new Dictionary<string, List<ProductGroupRecord>>(StringComparer.OrdinalIgnoreCase);
         foreach (var group in _productGroups)
         {
-            if (_productGroupsByFamilyId.TryGetValue(group.FamilyId, out var list))
+            if (!_productGroupsByFamilyId.TryGetValue(group.FamilyId, out var groupList))
             {
-                list.Add(group);
+                groupList = new List<ProductGroupRecord>();
+                _productGroupsByFamilyId[group.FamilyId] = groupList;
             }
+
+            groupList.Add(group);
         }
     }
 
     public IReadOnlyList<ProductFamilyRecord> GetFamilies() => _families;
 
-    public ProductFamilyRecord? GetFamilyBySlug(string slug)
+    public IReadOnlyList<ProductFamilyRecord> GetFeaturedFamilies()
     {
-        if (string.IsNullOrWhiteSpace(slug))
+        return _families
+            .Where(f => f.DisplayOrder is 1 or 2 or 5 or 6)
+            .OrderBy(f => f.DisplayOrder)
+            .ToList();
+    }
+
+    public ProductFamilyRecord? GetFamilyBySlug(string? slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug) || !SlugRegex.IsMatch(slug))
         {
             return null;
         }
@@ -77,7 +156,7 @@ public class ProductCatalogService : IProductCatalogService
         return _familiesBySlug.GetValueOrDefault(slug);
     }
 
-    public ProductFamilyRecord? GetFamilyById(string id)
+    public ProductFamilyRecord? GetFamilyById(string? id)
     {
         if (string.IsNullOrWhiteSpace(id))
         {
@@ -87,7 +166,7 @@ public class ProductCatalogService : IProductCatalogService
         return _familiesById.GetValueOrDefault(id);
     }
 
-    public IReadOnlyList<ProductGroupRecord> GetProductGroupsByFamily(string familyId)
+    public IReadOnlyList<ProductGroupRecord> GetProductGroupsByFamily(string? familyId)
     {
         if (string.IsNullOrWhiteSpace(familyId))
         {
@@ -99,7 +178,7 @@ public class ProductCatalogService : IProductCatalogService
             : Array.Empty<ProductGroupRecord>();
     }
 
-    public ProductGroupRecord? GetProductGroupById(string id)
+    public ProductGroupRecord? GetProductGroupById(string? id)
     {
         if (string.IsNullOrWhiteSpace(id))
         {
@@ -114,28 +193,7 @@ public class ProductCatalogService : IProductCatalogService
         AltText: "Technical visualization of antenna systems and engineering studies in a blue outdoor landscape.",
         IsPlaceholder: false);
 
-    private static readonly IReadOnlyList<string> FeaturedFamilyIds = new[]
-    {
-        "log-periodic-antennas",
-        "portable-transportable-antennas",
-        "antenna-rotator-control-systems",
-        "tower-systems-accessories"
-    };
-
-    private static readonly HashSet<string> ApprovedResourceIds = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "doc-lp-high-power",
-        "doc-lp-1018ba",
-        "doc-lp-1019",
-        "doc-1910-2024",
-        "doc-aperiodic",
-        "doc-t-3002-oct2016"
-    };
-
-    public IReadOnlyList<ProductFamilyRecord> GetFeaturedFamilies() =>
-        FeaturedFamilyIds.Select(id => _familiesById[id]).ToList();
-
-    public IReadOnlyList<ProductResourceRecord> GetApprovedResourcesForGroup(string groupId)
+    public IReadOnlyList<ProductResourceRecord> GetApprovedResourcesForGroup(string? groupId)
     {
         if (string.IsNullOrWhiteSpace(groupId))
         {
@@ -143,330 +201,354 @@ public class ProductCatalogService : IProductCatalogService
         }
 
         return _resources
-            .Where(r => string.Equals(r.ProductGroupId, groupId, StringComparison.OrdinalIgnoreCase)
-                        && ApprovedResourceIds.Contains(r.Id)
-                        && (string.Equals(r.ApprovalStatus, "Provisional", StringComparison.OrdinalIgnoreCase)
-                            || string.Equals(r.ApprovalStatus, "PreferredProvisional", StringComparison.OrdinalIgnoreCase)))
+            .Where(r => string.Equals(r.ProductGroupId, groupId, StringComparison.OrdinalIgnoreCase) && InterimResourceIds.Contains(r.Id))
             .ToList();
     }
 
-    public static void ValidateCatalog(
+    private static void ValidateCatalog(
         IReadOnlyList<ProductFamilyRecord> families,
         IReadOnlyList<ProductGroupRecord> productGroups,
         IReadOnlyList<ProductResourceRecord> resources)
     {
-        // 1. Family count must be exactly 6
         if (families.Count != 6)
         {
-            throw new InvalidOperationException($"Catalog must define exactly 6 families, found {families.Count}.");
+            throw new InvalidOperationException($"Expected exactly 6 canonical product families, found {families.Count}.");
         }
 
-        // 2. Family IDs and Slugs must be unique
-        var familyIdSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var familySlugSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var family in families)
+        var familySlugs = families.Select(f => f.Slug).ToList();
+        for (var i = 0; i < CanonicalFamilyOrder.Count; i++)
         {
-            if (!familyIdSet.Add(family.Id))
+            if (!string.Equals(familySlugs[i], CanonicalFamilyOrder[i], StringComparison.Ordinal))
             {
-                throw new InvalidOperationException($"Duplicate family ID detected: '{family.Id}'.");
-            }
-
-            if (!familySlugSet.Add(family.Slug))
-            {
-                throw new InvalidOperationException($"Duplicate family slug detected: '{family.Slug}'.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.Slug) || !SlugRegex.IsMatch(family.Slug))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has an invalid route slug '{family.Slug}'.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.CardTitle))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' is missing required CardTitle.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.CardSummary))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' is missing required CardSummary.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.CardEyebrow))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' is missing required CardEyebrow.");
-            }
-
-            if (family.CardAsset == null)
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' is missing required CardAsset.");
-            }
-
-            if (!family.CardAsset.IsPlaceholder)
-            {
-                if (string.IsNullOrWhiteSpace(family.CardAsset.ImagePath))
-                {
-                    throw new InvalidOperationException($"Family '{family.Id}' has non-placeholder CardAsset without ImagePath.");
-                }
-
-                if (string.IsNullOrWhiteSpace(family.CardAsset.AltText))
-                {
-                    throw new InvalidOperationException($"Family '{family.Id}' has non-placeholder CardAsset without AltText.");
-                }
-            }
-
-            if (family.ResponsiveHero == null)
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' is missing required ResponsiveHero.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.ResponsiveHero.DesktopImagePath) || !family.ResponsiveHero.DesktopImagePath.StartsWith("/images/products/"))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has invalid DesktopImagePath '{family.ResponsiveHero.DesktopImagePath}'.");
-            }
-
-            if (family.ResponsiveHero.DesktopWidth != 1536 || family.ResponsiveHero.DesktopHeight != 576)
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has invalid desktop dimensions ({family.ResponsiveHero.DesktopWidth}x{family.ResponsiveHero.DesktopHeight}), expected 1536x576.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.ResponsiveHero.MobileImagePath) || !family.ResponsiveHero.MobileImagePath.StartsWith("/images/products/"))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has invalid MobileImagePath '{family.ResponsiveHero.MobileImagePath}'.");
-            }
-
-            if (family.ResponsiveHero.MobileWidth != 768 || family.ResponsiveHero.MobileHeight != 768)
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has invalid mobile dimensions ({family.ResponsiveHero.MobileWidth}x{family.ResponsiveHero.MobileHeight}), expected 768x768.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.ResponsiveHero.AltText))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has empty ResponsiveHero AltText.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.ResponsiveHero.AssetClassification))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has empty ResponsiveHero AssetClassification.");
-            }
-
-            if (string.IsNullOrWhiteSpace(family.ResponsiveHero.ApprovalStatus))
-            {
-                throw new InvalidOperationException($"Family '{family.Id}' has empty ResponsiveHero ApprovalStatus.");
+                throw new InvalidOperationException($"Product family order mismatch at index {i}: expected '{CanonicalFamilyOrder[i]}', found '{familySlugs[i]}'.");
             }
         }
 
-        // 3. Display order must be 1..6 without duplicates or gaps
-        var orderedFamilies = families.OrderBy(f => f.DisplayOrder).ToList();
-        for (var i = 0; i < orderedFamilies.Count; i++)
-        {
-            var expectedOrder = i + 1;
-            if (orderedFamilies[i].DisplayOrder != expectedOrder)
-            {
-                throw new InvalidOperationException(
-                    $"Family display orders are invalid. Expected {expectedOrder}, found {orderedFamilies[i].DisplayOrder} on family '{orderedFamilies[i].Id}'.");
-            }
-
-            if (!string.Equals(orderedFamilies[i].Id, CanonicalFamilyOrder[i], StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException(
-                    $"Family at position {expectedOrder} must be '{CanonicalFamilyOrder[i]}', but found '{orderedFamilies[i].Id}'.");
-            }
-        }
-
-        // 4. Product group count must be exactly 16 distinct groups
         if (productGroups.Count != 16)
         {
-            throw new InvalidOperationException($"Catalog must define exactly 16 distinct product groups, found {productGroups.Count}.");
+            throw new InvalidOperationException($"Expected exactly 16 product groups, found {productGroups.Count}.");
         }
 
-        var productGroupMap = new Dictionary<string, ProductGroupRecord>(StringComparer.OrdinalIgnoreCase);
-        var primaryFamilyByGroup = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var familyGroupMap = productGroups
+            .GroupBy(g => g.FamilyId, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.Id).ToList(), StringComparer.OrdinalIgnoreCase);
 
-        foreach (var group in productGroups)
+        foreach (var (familyId, expectedGroupIds) in CanonicalFamilyGroupDistribution)
         {
-            if (!familyIdSet.Contains(group.FamilyId))
+            if (!familyGroupMap.TryGetValue(familyId, out var actualGroupIds))
             {
-                throw new InvalidOperationException($"Product group '{group.Id}' references unknown family '{group.FamilyId}'.");
+                throw new InvalidOperationException($"Missing expected groups for family '{familyId}'.");
             }
 
-            if (!productGroupMap.TryAdd(group.Id, group))
-            {
-                throw new InvalidOperationException($"Duplicate product group ID detected: '{group.Id}'.");
-            }
-
-            if (primaryFamilyByGroup.TryGetValue(group.Id, out var existingFamily))
-            {
-                throw new InvalidOperationException(
-                    $"Product group '{group.Id}' belongs to multiple primary families: '{existingFamily}' and '{group.FamilyId}'.");
-            }
-
-            primaryFamilyByGroup[group.Id] = group.FamilyId;
-        }
-
-        // 5. Per-family group distribution must match canonical 5 / 3 / 1 / 1 / 5 / 1 mapping exactly
-        foreach (var family in orderedFamilies)
-        {
-            if (!CanonicalFamilyGroupDistribution.TryGetValue(family.Id, out var expectedGroupIds))
-            {
-                throw new InvalidOperationException($"No canonical group distribution registered for family '{family.Id}'.");
-            }
-
-            var actualGroupIds = family.ProductGroupIds;
             if (actualGroupIds.Count != expectedGroupIds.Count)
             {
-                throw new InvalidOperationException(
-                    $"Family '{family.Id}' must contain exactly {expectedGroupIds.Count} groups, but contains {actualGroupIds.Count}.");
+                throw new InvalidOperationException($"Family '{familyId}' group count mismatch: expected {expectedGroupIds.Count}, found {actualGroupIds.Count}.");
             }
 
-            for (var g = 0; g < expectedGroupIds.Count; g++)
+            for (var i = 0; i < expectedGroupIds.Count; i++)
             {
-                if (!string.Equals(actualGroupIds[g], expectedGroupIds[g], StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(actualGroupIds[i], expectedGroupIds[i], StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new InvalidOperationException(
-                        $"Family '{family.Id}' group mismatch at index {g}: expected '{expectedGroupIds[g]}', found '{actualGroupIds[g]}'.");
-                }
-            }
-
-            // Verify groups assigned to this family in productGroups list match family.ProductGroupIds
-            var matchingGroups = productGroups
-                .Where(p => string.Equals(p.FamilyId, family.Id, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(p => p.DisplayOrder)
-                .Select(p => p.Id)
-                .ToList();
-
-            if (matchingGroups.Count != expectedGroupIds.Count)
-            {
-                throw new InvalidOperationException(
-                    $"Product groups assigned to family '{family.Id}' count {matchingGroups.Count}, expected {expectedGroupIds.Count}.");
-            }
-
-            for (var g = 0; g < expectedGroupIds.Count; g++)
-            {
-                if (!string.Equals(matchingGroups[g], expectedGroupIds[g], StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new InvalidOperationException(
-                        $"Product groups assigned to family '{family.Id}' at index {g} is '{matchingGroups[g]}', expected '{expectedGroupIds[g]}'.");
+                    throw new InvalidOperationException($"Group mismatch in family '{familyId}' at position {i}: expected '{expectedGroupIds[i]}', found '{actualGroupIds[i]}'.");
                 }
             }
         }
 
-        // 6. Explicit canonical business assertions
-        // LP-1112MR belongs primarily to Log Periodic
-        if (!string.Equals(productGroupMap["lp-1112mr"].FamilyId, "log-periodic-antennas", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("LP-1112MR must belong primarily to Log Periodic Antennas ('log-periodic-antennas').");
-        }
-
-        // LP-1402-1403 belongs to Portable & Transportable and NOT Log Periodic
-        if (!string.Equals(productGroupMap["lp-1402-1403"].FamilyId, "portable-transportable-antennas", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("LP-1402-1403 must belong to Portable & Transportable Antenna Systems ('portable-transportable-antennas'), not Log Periodic.");
-        }
-
-        if (CanonicalFamilyGroupDistribution["log-periodic-antennas"].Contains("lp-1402-1403", StringComparer.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("LP-1402-1403 must not be assigned to Log Periodic Antennas.");
-        }
-
-        // 1910 belongs to Portable & Transportable
-        if (!string.Equals(productGroupMap["1910"].FamilyId, "portable-transportable-antennas", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("1910 Tactical Dipoles must belong to Portable & Transportable Antenna Systems ('portable-transportable-antennas').");
-        }
-
-        // APERIODIC is the only Aperiodic Loop group
-        if (!string.Equals(productGroupMap["aperiodic"].FamilyId, "aperiodic-loop-antennas", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("APERIODIC must belong to Aperiodic Loop Antennas ('aperiodic-loop-antennas').");
-        }
-
-        var aperiodicGroups = productGroups.Where(p => string.Equals(p.FamilyId, "aperiodic-loop-antennas", StringComparison.OrdinalIgnoreCase)).ToList();
-        if (aperiodicGroups.Count != 1 || !string.Equals(aperiodicGroups[0].Id, "aperiodic", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("APERIODIC must be the sole product group under Aperiodic Loop Antennas.");
-        }
-
-        // All five R3500/R3501/R3503/DRC-3/DRC-4 groups belong to Rotator & Control
-        var expectedRotatorGroups = new[] { "r3500", "r3501", "r3503", "drc-3", "drc-4" };
-        foreach (var rotId in expectedRotatorGroups)
-        {
-            if (!productGroupMap.TryGetValue(rotId, out var rotGroup) ||
-                !string.Equals(rotGroup.FamilyId, "antenna-rotator-control-systems", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException($"Group '{rotId}' must belong to Antenna Rotator & Control Systems ('antenna-rotator-control-systems').");
-            }
-        }
-
-        // T-3002 is the only Tower group and its configurations remain children
-        var towerGroups = productGroups.Where(p => string.Equals(p.FamilyId, "tower-systems-accessories", StringComparison.OrdinalIgnoreCase)).ToList();
-        if (towerGroups.Count != 1 || !string.Equals(towerGroups[0].Id, "t-3002", StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("T-3002 must be the sole product group under Tower Systems & Accessories ('tower-systems-accessories').");
-        }
-
-        var t3002 = productGroupMap["t-3002"];
-        var expectedT3002Models = new[] { "T-3002", "3002FA", "3002FB", "3002SS", "3002SS-80" };
-        var actualT3002Models = t3002.Models.Select(m => m.ModelCode).ToList();
-        foreach (var expectedModel in expectedT3002Models)
-        {
-            if (!actualT3002Models.Contains(expectedModel, StringComparer.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException($"T-3002 group must contain configuration child model '{expectedModel}'.");
-            }
-        }
-
-        // 7. Model and configuration inventory checks: exactly 30 named models + 1 unnamed aperiodic loop line
+        var productGroupMap = productGroups.ToDictionary(g => g.Id, StringComparer.OrdinalIgnoreCase);
+        var modelCodeSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var publicModelCodes = new List<string>();
         var namedModelCount = 0;
-        var unnamedModelCount = 0;
 
         foreach (var group in productGroups)
         {
+            if (!group.HasPublishedModelNumber)
+            {
+                if (group.Models.Count != 0)
+                {
+                    throw new InvalidOperationException($"Group '{group.Id}' declares HasPublishedModelNumber = false but contains {group.Models.Count} models.");
+                }
+                continue;
+            }
+
+            if (group.Models.Count == 0)
+            {
+                throw new InvalidOperationException($"Group '{group.Id}' has no models defined.");
+            }
+
             foreach (var model in group.Models)
             {
                 if (string.IsNullOrWhiteSpace(model.ModelCode))
                 {
-                    unnamedModelCount++;
+                    throw new InvalidOperationException($"Product group '{group.Id}' contains a model with an empty ModelCode. Aperiodic must use HasPublishedModelNumber = false instead of empty model codes.");
                 }
-                else
+
+                if (!modelCodeSet.Add(model.ModelCode))
                 {
-                    namedModelCount++;
+                    throw new InvalidOperationException($"Product group '{group.Id}' contains duplicate model code '{model.ModelCode}'.");
+                }
+
+                namedModelCount++;
+                publicModelCodes.Add(model.ModelCode);
+
+                if (model.Characteristics != null)
+                {
+                    foreach (var c in model.Characteristics)
+                    {
+                        if (string.IsNullOrWhiteSpace(c.Label) || string.IsNullOrWhiteSpace(c.DisplayValue))
+                        {
+                            throw new InvalidOperationException($"Model '{model.ModelCode}' in group '{group.Id}' contains empty characteristic label or value.");
+                        }
+                    }
+                }
+            }
+
+            // Validate explicitly curated OverviewCharacteristics
+            if (group.OverviewCharacteristics != null)
+            {
+                if (group.OverviewCharacteristics.Count > 3)
+                {
+                    throw new InvalidOperationException($"Group '{group.Id}' overview characteristics exceed limit of 3 (found {group.OverviewCharacteristics.Count}).");
+                }
+
+                var overviewLabels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var c in group.OverviewCharacteristics)
+                {
+                    if (string.IsNullOrWhiteSpace(c.Label) || string.IsNullOrWhiteSpace(c.DisplayValue))
+                    {
+                        throw new InvalidOperationException($"Group '{group.Id}' contains empty overview characteristic label or value.");
+                    }
+                    if (!overviewLabels.Add(c.Label))
+                    {
+                        throw new InvalidOperationException($"Group '{group.Id}' contains duplicate overview characteristic '{c.Label}'.");
+                    }
+                }
+            }
+
+            // Validate explicitly curated DetailedCharacteristics
+            if (group.DetailedCharacteristics != null)
+            {
+                var detailedLabels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var overviewLabels = (group.OverviewCharacteristics ?? Array.Empty<ProductCharacteristic>())
+                    .Select(c => c.Label)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var c in group.DetailedCharacteristics)
+                {
+                    if (string.IsNullOrWhiteSpace(c.Label) || string.IsNullOrWhiteSpace(c.DisplayValue))
+                    {
+                        throw new InvalidOperationException($"Group '{group.Id}' contains empty detailed characteristic label or value.");
+                    }
+                    if (!detailedLabels.Add(c.Label))
+                    {
+                        throw new InvalidOperationException($"Group '{group.Id}' contains duplicate detailed characteristic '{c.Label}'.");
+                    }
+                    if (overviewLabels.Contains(c.Label))
+                    {
+                        throw new InvalidOperationException($"Group '{group.Id}' contains overlapping characteristic '{c.Label}' in both overview and detailed collections.");
+                    }
                 }
             }
         }
 
+        // C1 Binding Count Clarification:
+        // Must be exactly 30 rendered named identifiers across 15 groups + 1 unnamed Aperiodic group record
         if (namedModelCount != 30)
         {
-            throw new InvalidOperationException($"Catalog must contain exactly 30 named model/configuration codes, found {namedModelCount}.");
+            throw new InvalidOperationException($"Public projection must contain exactly 30 named model/configuration codes, found {namedModelCount}.");
         }
 
-        if (unnamedModelCount != 1)
+        // 7. Aperiodic group handling: 0 named models, HasPublishedModelNumber == false
+        var aperiodicGroup = productGroupMap["aperiodic"];
+        if (aperiodicGroup.Models.Count != 0)
         {
-            throw new InvalidOperationException($"Catalog must contain exactly 1 unnamed Aperiodic Loop product-line record, found {unnamedModelCount}.");
+            throw new InvalidOperationException($"Aperiodic group must have 0 models in public projection, found {aperiodicGroup.Models.Count}.");
         }
 
-        // 8. Resource references an existing canonical product group
+        if (aperiodicGroup.HasPublishedModelNumber)
+        {
+            throw new InvalidOperationException("Aperiodic group must set HasPublishedModelNumber to false.");
+        }
+
+        if (string.IsNullOrWhiteSpace(aperiodicGroup.ModelNote))
+        {
+            throw new InvalidOperationException("Aperiodic group must provide an explicit factual ModelNote.");
+        }
+
+        // 8. 1942 NVIS configuration validation: all 6 configuration names must be present
+        foreach (var required1942Code in Required1942ConfigurationCodes)
+        {
+            if (!publicModelCodes.Contains(required1942Code, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Required 1942 configuration identifier '{required1942Code}' is missing from public catalog models.");
+            }
+        }
+
+        // Low-power 1942 variants must render without unpublished ratings, power, or weight claims
+        var nvisGroup = productGroupMap["1942"];
+        foreach (var lpCode in LowPower1942ConfigurationCodes)
+        {
+            var lpModel = nvisGroup.Models.FirstOrDefault(m => string.Equals(m.ModelCode, lpCode, StringComparison.OrdinalIgnoreCase));
+            if (lpModel == null)
+            {
+                throw new InvalidOperationException($"Low-power 1942 model '{lpCode}' not found in NVIS group.");
+            }
+
+            if (lpModel.Characteristics != null)
+            {
+                foreach (var c in lpModel.Characteristics)
+                {
+                    if (c.Label.Contains("Power", StringComparison.OrdinalIgnoreCase) ||
+                        c.Label.Contains("Weight", StringComparison.OrdinalIgnoreCase) ||
+                        c.Label.Contains("Gain", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException($"Low-power 1942 model '{lpCode}' must not publish unverified '{c.Label}' characteristic.");
+                    }
+                }
+            }
+        }
+
+        // 9. Technical Resource interim links: exactly 6 current interim documents
+        if (resources.Count != 6)
+        {
+            throw new InvalidOperationException($"Current interim technical resources must contain exactly 6 approved records, found {resources.Count}.");
+        }
+
         foreach (var resource in resources)
         {
+            if (!InterimResourceIds.Contains(resource.Id))
+            {
+                throw new InvalidOperationException($"Resource '{resource.Id}' is not in the interim document set.");
+            }
+
             if (!productGroupMap.ContainsKey(resource.ProductGroupId))
             {
                 throw new InvalidOperationException($"Resource '{resource.Id}' references unknown product group '{resource.ProductGroupId}'.");
             }
+
+            if (string.IsNullOrWhiteSpace(resource.Title) || string.IsNullOrWhiteSpace(resource.CurrentSourceUrl))
+            {
+                throw new InvalidOperationException($"Resource '{resource.Id}' has missing Title or CurrentSourceUrl.");
+            }
         }
 
-        // 9. AssociatedAsset validation
+        // 10. AssociatedAsset validation: all 16 product groups must have an intentional AssociatedAsset in C1
+        if (productGroups.Count != 16)
+        {
+            throw new InvalidOperationException($"Expected exactly 16 product groups, found {productGroups.Count}.");
+        }
+
         foreach (var group in productGroups)
         {
-            if (group.AssociatedAsset != null)
+            if (group.AssociatedAsset == null)
             {
-                if (string.IsNullOrWhiteSpace(group.AssociatedAsset.ImagePath) || !group.AssociatedAsset.ImagePath.StartsWith("/images/products/"))
+                throw new InvalidOperationException($"Product group '{group.Id}' must have an AssociatedAsset in C1.");
+            }
+
+            if (string.IsNullOrWhiteSpace(group.AssociatedAsset.ImagePath) || !group.AssociatedAsset.ImagePath.StartsWith("/images/products/"))
+            {
+                throw new InvalidOperationException($"Product group '{group.Id}' has invalid AssociatedAsset ImagePath '{group.AssociatedAsset.ImagePath}'.");
+            }
+
+            if (string.IsNullOrWhiteSpace(group.AssociatedAsset.AltText))
+            {
+                throw new InvalidOperationException($"Product group '{group.Id}' has AssociatedAsset without AltText.");
+            }
+        }
+
+        // 11. Prohibited governance tokens and held claims scan across all public data
+        var allPublicTexts = new List<string>();
+
+        foreach (var f in families)
+        {
+            allPublicTexts.Add(f.CardTitle);
+            allPublicTexts.Add(f.CardSummary);
+            allPublicTexts.Add(f.CardEyebrow);
+            if (f.SectionEyebrow != null)
+            {
+                allPublicTexts.Add(f.SectionEyebrow);
+            }
+            if (f.SectionHeading != null)
+            {
+                allPublicTexts.Add(f.SectionHeading);
+            }
+            if (f.SectionIntro != null)
+            {
+                allPublicTexts.Add(f.SectionIntro);
+            }
+            if (f.PageTitle != null)
+            {
+                allPublicTexts.Add(f.PageTitle);
+            }
+            if (f.MetaDescription != null)
+            {
+                allPublicTexts.Add(f.MetaDescription);
+            }
+        }
+
+        foreach (var g in productGroups)
+        {
+            allPublicTexts.Add(g.Name);
+            allPublicTexts.Add(g.ShortDescription);
+            allPublicTexts.Add(g.ExpandedIntroduction);
+            if (g.ModelNote != null)
+            {
+                allPublicTexts.Add(g.ModelNote);
+            }
+
+            if (g.AllGroupCharacteristics != null)
+            {
+                foreach (var c in g.AllGroupCharacteristics)
                 {
-                    throw new InvalidOperationException($"Product group '{group.Id}' has invalid AssociatedAsset ImagePath '{group.AssociatedAsset.ImagePath}'.");
+                    allPublicTexts.Add(c.Label);
+                    allPublicTexts.Add(c.DisplayValue);
+                }
+            }
+
+            if (g.AssociatedAsset != null)
+            {
+                allPublicTexts.Add(g.AssociatedAsset.AltText);
+                if (g.AssociatedAsset.Caption != null)
+                {
+                    allPublicTexts.Add(g.AssociatedAsset.Caption);
+                }
+            }
+
+            foreach (var m in g.Models)
+            {
+                allPublicTexts.Add(m.ModelCode);
+                if (m.DisplayName != null)
+                {
+                    allPublicTexts.Add(m.DisplayName);
                 }
 
-                if (string.IsNullOrWhiteSpace(group.AssociatedAsset.AltText))
+                if (m.Description != null)
                 {
-                    throw new InvalidOperationException($"Product group '{group.Id}' has AssociatedAsset without AltText.");
+                    allPublicTexts.Add(m.Description);
+                }
+
+                if (m.Characteristics != null)
+                {
+                    foreach (var c in m.Characteristics)
+                    {
+                        allPublicTexts.Add(c.Label);
+                        allPublicTexts.Add(c.DisplayValue);
+                    }
+                }
+            }
+        }
+
+        foreach (var r in resources)
+        {
+            allPublicTexts.Add(r.Title);
+        }
+
+        foreach (var text in allPublicTexts)
+        {
+            foreach (var prohibited in ProhibitedTokensAndClaims)
+            {
+                if (text.Contains(prohibited, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new InvalidOperationException($"Prohibited token or held claim detected in public catalog text: '{prohibited}' in '{text}'.");
                 }
             }
         }
@@ -497,7 +579,7 @@ public class ProductCatalogService : IProductCatalogService
                 CurrentSourceUrls: new[] { "https://www.usantennaproducts.com/products/log-periodic-antennas/" },
                 LegacySourceUrls: Array.Empty<string>(),
                 ApprovalStatus: "ProjectSelectedReferenceCandidatePendingApproval",
-                SourceNotes: "Primary category on public site. LP-1112MR is primarily classified here; transportable nature noted in group attributes. A2F candidate visual pending USAP review.",
+                SourceNotes: "Primary category on public site. LP-1112MR is primarily classified here; transportable nature noted in group attributes.",
                 ConflictHolds: new[]
                 {
                     "LP-1001: Input impedance conflict across legacy datasheets (HTML 5 ohms vs PDF 50 ohms)",
@@ -516,14 +598,19 @@ public class ProductCatalogService : IProductCatalogService
                     AltText: "Log periodic antenna array in an outdoor installation.",
                     AssetClassification: "conceptual/reference-grounded family visual",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "PRODUCT MODELS & CONFIGURATIONS",
+                SectionHeading: "Log Periodic Antenna Models & Configurations",
+                SectionIntro: "Review USAP log periodic models, available configurations, published operating characteristics, and associated technical documentation for directional broadband applications across published frequency ranges.",
+                PageTitle: "Log Periodic Antennas",
+                MetaDescription: "Broadband directional log periodic antenna models, configurations, published operating characteristics, and technical documentation from United States Antenna Products."
             ),
             new(
                 Id: "portable-transportable-antennas",
                 Slug: "portable-transportable-antennas",
                 Name: "Portable & Transportable Antenna Systems",
                 DisplayOrder: 2,
-                CardEyebrow: "Rapid Deployment / HF & VHF",
+                CardEyebrow: "Field Deployable / HF & VHF",
                 CardTitle: "Portable & Transportable",
                 CardSummary: "Field-deployable antenna systems covering HF and VHF communications.",
                 CardAsset: new CatalogAsset(
@@ -539,10 +626,10 @@ public class ProductCatalogService : IProductCatalogService
                 },
                 LegacySourceUrls: Array.Empty<string>(),
                 ApprovalStatus: "ProjectSelectedPlaceholderPendingApproval",
-                SourceNotes: "Approved taxonomy consolidation combining current Portable Discone Antenna System and Transportable HF Antennas categories. A2F placeholder pending USAP review.",
+                SourceNotes: "Approved taxonomy consolidation combining current Portable Discone Antenna System and Transportable HF Antennas categories.",
                 ConflictHolds: new[]
                 {
-                    "V-4213: Model designation vs wind rating inconsistency (60 vs 81 mph) across datasheets",
+                    "V-4213: Model designation vs wind rating inconsistency across datasheets",
                     "LP-1402-1403: Model-specific power rating discrepancy between HTML and PDF",
                     "1910: VSWR and power rating differences between legacy 2016 and preferred 2024 datasheets"
                 },
@@ -554,30 +641,35 @@ public class ProductCatalogService : IProductCatalogService
                     MobileImagePath: "/images/products/usap-family-portable-transportable-hero-a3s-mobile-768x768.png",
                     MobileWidth: 768,
                     MobileHeight: 768,
-                    AltText: "Field-deployed tactical antenna system on a tripod mast.",
+                    AltText: "Field antenna mast deployed in a coastal terrain landscape.",
                     AssetClassification: "source-guided photorealistic product visualization",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "PRODUCT MODELS & CONFIGURATIONS",
+                SectionHeading: "Portable & Transportable Antenna Models",
+                SectionIntro: "Compare documented portable and transportable antenna configurations, including published discone, log periodic, and tactical dipole models for field-oriented applications.",
+                PageTitle: "Portable & Transportable Antenna Systems",
+                MetaDescription: "Documented portable and transportable antenna configurations including discone, log periodic, and tactical dipole models from United States Antenna Products."
             ),
             new(
                 Id: "aperiodic-loop-antennas",
                 Slug: "aperiodic-loop-antennas",
                 Name: "Aperiodic Loop Antennas",
                 DisplayOrder: 3,
-                CardEyebrow: "Directional Receiving Arrays",
+                CardEyebrow: "Directional HF Receiving Arrays",
                 CardTitle: "Aperiodic Loop Antennas",
-                CardSummary: "Receive-focused fixed and transportable loop-array solutions.",
+                CardSummary: "Receive-oriented directional HF loop arrays for fixed and transportable installations.",
                 CardAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-family-card-aperiodic-loop-element-v1.png",
-                    AltText: "Aperiodic loop antenna element on a transportable tripod.",
+                    AltText: "Aperiodic loop antenna element mounted on a tripod in a remote installation.",
                     IsPlaceholder: false),
                 HeroAsset: null,
                 Route: "/products/aperiodic-loop-antennas",
                 CurrentSourceUrls: new[] { "https://www.usantennaproducts.com/products/aperiodic-loop-antennas/" },
                 LegacySourceUrls: Array.Empty<string>(),
-                ApprovalStatus: "ProjectSelectedReferenceCandidatePendingApproval",
-                SourceNotes: "Public site category includes unnamed aperiodic loop antenna. A2F single-element reference candidate pending USAP review.",
-                ConflictHolds: new[] { "No published model number; configuration options subject to USAP confirmation" },
+                ApprovalStatus: "ProjectSelectedPlaceholderPendingApproval",
+                SourceNotes: "Covers untuned balanced loop arrays. R1 verified single public loop group.",
+                ConflictHolds: new[] { "Aperiodic: Complete array geometry, spacing, and preamplifier details require client input" },
                 ProductGroupIds: new[] { "aperiodic" },
                 ResponsiveHero: new ResponsiveHeroAsset(
                     DesktopImagePath: "/images/products/usap-family-aperiodic-loop-antennas-hero-candidate-a-v1-desktop-preview.png",
@@ -589,7 +681,12 @@ public class ProductCatalogService : IProductCatalogService
                     AltText: "Aperiodic loop antenna element mounted on a tripod in a remote installation.",
                     AssetClassification: "reference-grounded single-element visualization",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "SYSTEM CONFIGURATION & TECHNICAL DETAILS",
+                SectionHeading: "Aperiodic Loop Antenna System & Configuration Details",
+                SectionIntro: "Review the USAP aperiodic loop receiving system, its published operating characteristics, configuration guidance, and available technical documentation for directional reception.",
+                PageTitle: "Aperiodic Loop Antennas",
+                MetaDescription: "Broadband aperiodic loop receiving antenna system, published operating characteristics, configuration guidance, and technical documentation from United States Antenna Products."
             ),
             new(
                 Id: "nvis-antennas",
@@ -598,7 +695,7 @@ public class ProductCatalogService : IProductCatalogService
                 DisplayOrder: 4,
                 CardEyebrow: "Near Vertical Incidence Skywave",
                 CardTitle: "NVIS Antennas",
-                CardSummary: "Near Vertical Incidence Skywave antenna configurations for HF communications.",
+                CardSummary: "Short-to-medium-range HF antenna systems in rooftop, transportable, and ground-mount configurations.",
                 CardAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-family-card-nvis-1942-family-visual-v1.png",
                     AltText: "Field-deployed NVIS antenna system with a central mast and broad wire footprint.",
@@ -607,9 +704,9 @@ public class ProductCatalogService : IProductCatalogService
                 Route: "/products/nvis-antennas",
                 CurrentSourceUrls: new[] { "https://www.usantennaproducts.com/products/nvis-antennas/" },
                 LegacySourceUrls: Array.Empty<string>(),
-                ApprovalStatus: "ProjectSelectedReferenceCandidatePendingApproval",
-                SourceNotes: "Dedicated NVIS product category covering 1942 series. A2F 1942-family visual pending USAP review.",
-                ConflictHolds: new[] { "1942: Low-power variant availability and weight-unit discrepancies across datasheets" },
+                ApprovalStatus: "ProjectSelectedPlaceholderPendingApproval",
+                SourceNotes: "Primary NVIS category. R1 verified Model 1942 series.",
+                ConflictHolds: new[] { "1942 series: PDF lists low-power variants not mentioned on HTML page" },
                 ProductGroupIds: new[] { "1942" },
                 ResponsiveHero: new ResponsiveHeroAsset(
                     DesktopImagePath: "/images/products/usap-family-nvis-antennas-hero-candidate-a-v2-desktop-preview.png",
@@ -621,30 +718,31 @@ public class ProductCatalogService : IProductCatalogService
                     AltText: "Field-deployed NVIS antenna array configured for high-angle skywave communications.",
                     AssetClassification: "1942-family-level reference-grounded visualization",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "PRODUCT MODELS & CONFIGURATIONS",
+                SectionHeading: "1942 NVIS Antenna Models & Configurations",
+                SectionIntro: "Review the six published 1942 identifiers covering rooftop, transportable, ground-mount, and corresponding low-power configurations for Near Vertical Incidence Skywave applications.",
+                PageTitle: "1942 NVIS Antennas",
+                MetaDescription: "Published 1942 Near Vertical Incidence Skywave (NVIS) antenna identifiers covering rooftop, transportable, and ground-mount configurations from United States Antenna Products."
             ),
             new(
                 Id: "antenna-rotator-control-systems",
                 Slug: "antenna-rotator-control-systems",
                 Name: "Antenna Rotator & Control Systems",
                 DisplayOrder: 5,
-                CardEyebrow: "Mechanical Rotators & Digital Controllers",
+                CardEyebrow: "Positioning Hardware & Controllers",
                 CardTitle: "Rotator & Control Systems",
-                CardSummary: "Mechanical rotators and digital control systems for directional antenna installations.",
+                CardSummary: "Medium- to heavy-duty antenna rotators and digital controllers for precise azimuth positioning.",
                 CardAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-family-card-rotator-control-r3500-drc4-a3s-recommended-v1.png",
                     AltText: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization.",
                     IsPlaceholder: false),
                 HeroAsset: null,
                 Route: "/products/antenna-rotator-control-systems",
-                CurrentSourceUrls: new[]
-                {
-                    "https://www.usantennaproducts.com/products/antenna-rotator-systems/",
-                    "https://www.usantennaproducts.com/products/digital-rotator-controller/"
-                },
+                CurrentSourceUrls: new[] { "https://www.usantennaproducts.com/products/antenna-rotator-control-systems/" },
                 LegacySourceUrls: Array.Empty<string>(),
-                ApprovalStatus: "ProjectSelectedCandidateBPendingApproval",
-                SourceNotes: "Approved taxonomy consolidation combining current Antenna Rotator Systems and Digital Rotator Controller categories. A3S Candidate B recommended visual pending USAP review.",
+                ApprovalStatus: "ProjectSelectedCandidatePendingApproval",
+                SourceNotes: "Covers R3500, R3501, R3503 rotators and DRC-3, DRC-4 controllers.",
                 ConflictHolds: new[]
                 {
                     "R3500 series: Controller compatibility matrix variance",
@@ -661,7 +759,12 @@ public class ProductCatalogService : IProductCatalogService
                     AltText: "Heavy-duty antenna rotator paired with a tabletop digital controller on an engineering bench.",
                     AssetClassification: "source-guided photorealistic product visualization",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "POSITIONING & CONTROL EQUIPMENT",
+                SectionHeading: "Antenna Rotator & Controller Models",
+                SectionIntro: "Compare USAP antenna rotators and digital controllers using published positioning and control information, drive configurations, and documented system relationships.",
+                PageTitle: "Antenna Rotator & Control Systems",
+                MetaDescription: "Antenna rotator and controller models, published positioning and control information, and documented system relationships from United States Antenna Products."
             ),
             new(
                 Id: "tower-systems-accessories",
@@ -680,7 +783,7 @@ public class ProductCatalogService : IProductCatalogService
                 CurrentSourceUrls: new[] { "https://www.usantennaproducts.com/products/tower-systems-and-accessories/" },
                 LegacySourceUrls: Array.Empty<string>(),
                 ApprovalStatus: "ProjectSelectedFallbackPendingApproval",
-                SourceNotes: "Covers T-3002 series tower systems and ordering configurations. A2F non-configurational fallback visual pending USAP review.",
+                SourceNotes: "Covers T-3002 series tower systems and ordering configurations.",
                 ConflictHolds: new[] { "T-3002 duplicate public classification consolidated under tower systems" },
                 ProductGroupIds: new[] { "t-3002" },
                 ResponsiveHero: new ResponsiveHeroAsset(
@@ -693,32 +796,69 @@ public class ProductCatalogService : IProductCatalogService
                     AltText: "Structural lattice tower section with mast hardware and rigging components.",
                     AssetClassification: "source-guided photorealistic product visualization",
                     ApprovalStatus: "provisional — USAP review pending"
-                )
+                ),
+                SectionEyebrow: "SYSTEM MODELS & ACCESSORIES",
+                SectionHeading: "T-3002 Tower System Models & Accessories",
+                SectionIntro: "Review T-3002 tower-system models and published tower-system configuration, rotation, installation, and accessory information.",
+                PageTitle: "T-3002 Tower Systems & Accessories",
+                MetaDescription: "T-3002 tower-system models, published structural configurations, rotation specifications, and accessory information from United States Antenna Products."
             )
         };
 
         var productGroups = new List<ProductGroupRecord>
         {
-            // 1. Log Periodic Antennas (5 groups)
+            // 1. Log Periodic Antennas (5 groups, 8 public named models)
             new(
                 Id: "lp-high-power",
                 FamilyId: "log-periodic-antennas",
                 Name: "High-Power HF Log Periodics",
                 DisplayOrder: 1,
                 SectionAnchor: "lp-high-power",
+                ShortDescription: "Directional HF log-periodic antennas with model-specific frequency coverage from 3 to 40 MHz.",
+                ExpandedIntroduction: "The LP-1005, LP-1001, and LP-1002 are directional HF log-periodic arrays for fixed-azimuth or rotatable installations, featuring horizontal polarization and 10–13.5 dBi forward gain.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Polarization", "Horizontal"),
+                    new ProductCharacteristic("Forward Gain", "10–13.5 dBi"),
+                    new ProductCharacteristic("RF Connector", "1-5/8 in EIA")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-high-power-source-guided-candidate-a1-v1.png",
+                    AltText: "Long-boom high-power log-periodic antenna array in an outdoor installation.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1005", "High-power HF directional array", "3–30 MHz; 25 kW average / 50 kW PEP; horizontal polarization", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("LP-1001", "High-power HF directional array", "4–30 MHz; 25 kW average / 50 kW PEP; horizontal polarization", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
-                    new ProductModelRecord("LP-1002", "High-power HF directional array", "6–40 MHz; 25 kW average / 50 kW PEP; horizontal polarization", "Provisional", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Fixed-station directional HF log periodic antennas engineered for high-power communication systems spanning 3–40 MHz across LP-1005, LP-1001, and LP-1002 configurations.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-lp-1005-lp-1001-lp-1002/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "HTML shows LP-1001 input impedance as 5 ohms; PDF shows 50 ohms.",
-                ConflictHolds: new[] { "LP-1001 input impedance conflict between HTML (5 ohms) and PDF (50 ohms)" },
-                ResourceIds: new[] { "doc-lp-high-power" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1005",
+                        DisplayName: "High-Power HF Log Periodic Antenna",
+                        Description: "High-power HF directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "3.0–30.0 MHz"),
+                            new ProductCharacteristic("VSWR", "3:1 (3.0–4.0 MHz), 2:1 (4.0–30.0 MHz)")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "LP-1001",
+                        DisplayName: "High-Power HF Log Periodic Antenna",
+                        Description: "High-power HF directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "4.0–30.0 MHz"),
+                            new ProductCharacteristic("VSWR", "2:1 nominal")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "LP-1002",
+                        DisplayName: "High-Power HF Log Periodic Antenna",
+                        Description: "High-power HF directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "6.0–40.0 MHz"),
+                            new ProductCharacteristic("VSWR", "2:1 nominal")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "lp-1017",
@@ -726,17 +866,30 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "LP-1017 Log Periodic",
                 DisplayOrder: 2,
                 SectionAnchor: "lp-1017",
+                ShortDescription: "A 6.2–30 MHz commercial HF log-periodic antenna for directional communication applications.",
+                ExpandedIntroduction: "LP-1017 is a tower-mounted HF log-periodic array with horizontal polarization. Documented characteristics include 6.2–30 MHz frequency coverage, Type N female connector, 17 elements, and a 37.75-foot boom.",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-1017-source-guided-candidate-a1-v1.png",
+                    AltText: "Tower-mounted long-boom log-periodic antenna array.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1017", "Wideband HF directional array", "6.2–30 MHz; 2 kW average / 4 kW PEP; horizontal polarization", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Wideband directional HF log periodic antenna operating across 6.2–30 MHz, engineered for tactical and base-station communications with horizontal polarization.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-lp-1017/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "Low-frequency vertical radiation angle discrepancy: HTML says 3.5 deg, PDF says 35 deg.",
-                ConflictHolds: new[] { "Low-frequency radiation angle discrepancy between HTML (3.5 deg) and PDF (35 deg)" },
-                ResourceIds: new[] { "doc-lp-1017" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1017",
+                        DisplayName: "Commercial HF Log Periodic Antenna",
+                        Description: "Commercial HF log-periodic directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "6.2–30.0 MHz"),
+                            new ProductCharacteristic("Polarization", "Horizontal"),
+                            new ProductCharacteristic("Forward Gain", "8 dBi at 6.2 MHz; 12 dBi at 30 MHz"),
+                            new ProductCharacteristic("VSWR", "2.5:1 nominal"),
+                            new ProductCharacteristic("RF Connector", "Type N female"),
+                            new ProductCharacteristic("Element Count", "17 elements"),
+                            new ProductCharacteristic("Boom Length", "37.75 ft (11.5 m)")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "lp-1018ba",
@@ -744,17 +897,30 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "LP-1018BA Broadband Log Periodic",
                 DisplayOrder: 3,
                 SectionAnchor: "lp-1018ba",
+                ShortDescription: "A 30–1100 MHz broadband log-periodic antenna for horizontal or vertical orientation, with 8 dB documented gain.",
+                ExpandedIntroduction: "LP-1018BA is a broadband VHF/UHF log-periodic array for transmit or receive use. Documented characteristics include 30–1100 MHz coverage, 50-ohm Type N female input, 2:1 nominal VSWR, and horizontal or vertical orientation.",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-1018ba-source-guided-candidate-a1-v1.png",
+                    AltText: "Broadband log-periodic antenna array mounted on a mast.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1018BA", "Broadband VHF/UHF directional array", "30–1100 MHz; horizontal or vertical orientation; 8 dB gain; 2:1 nominal VSWR", "Provisional", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Broadband VHF/UHF log periodic antenna covering 30–1100 MHz, designed for wideband monitoring and communications with horizontal or vertical polarization mounting.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-lp-1018ba/",
-                ApprovalStatus: "Provisional",
-                SourceNotes: "HTML and PDF core facts agree; pending USAP approval before publication.",
-                ConflictHolds: Array.Empty<string>(),
-                ResourceIds: new[] { "doc-lp-1018ba" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1018BA",
+                        DisplayName: "Broadband Log Periodic Antenna",
+                        Description: "Broadband VHF/UHF directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "30–1100 MHz"),
+                            new ProductCharacteristic("Polarization", "Horizontal or vertical as oriented"),
+                            new ProductCharacteristic("Forward Gain", "8.0 dB"),
+                            new ProductCharacteristic("VSWR", "2.0:1 nominal"),
+                            new ProductCharacteristic("Input Impedance", "50 ohms"),
+                            new ProductCharacteristic("RF Connector", "Type N female"),
+                            new ProductCharacteristic("Boom Length", "16 ft 7 in (5.05 m)")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "lp-1019",
@@ -762,18 +928,44 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "LP-1019 Series",
                 DisplayOrder: 4,
                 SectionAnchor: "lp-1019",
+                ShortDescription: "Compact 100–1100 MHz log-periodic antennas in LP-1019BA and LP-1019SS configurations for horizontal or vertical orientation.",
+                ExpandedIntroduction: "The LP-1019 series covers compact directional VHF/UHF arrays with a 100–1100 MHz operating range, 8 dB documented gain, and 2:1 nominal VSWR in horizontal or vertical orientation.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Frequency Range", "100–1100 MHz"),
+                    new ProductCharacteristic("Forward Gain", "8.0 dB"),
+                    new ProductCharacteristic("Polarization", "Horizontal or vertical as oriented")
+                },
+                DetailedCharacteristics: new[]
+                {
+                    new ProductCharacteristic("VSWR", "2.0:1 nominal")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-1019-source-guided-candidate-a1-v2.png",
+                    AltText: "Compact log-periodic antenna array mounted on a mast.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1019BA", "Broadband VHF/UHF log periodic", "100–1100 MHz; horizontal or vertical orientation; 8 dB gain; 2:1 nominal VSWR", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("LP-1019SS", "Stainless steel VHF/UHF log periodic", "100–1100 MHz; stainless steel construction; horizontal or vertical orientation", "Provisional", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Compact VHF/UHF log periodic directional antennas covering 100–1100 MHz, offering standard (LP-1019BA) and stainless-steel (LP-1019SS) construction options.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-lp-1019-lp-1019ss/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "HTML title shortens first model to LP-1019; table and PDF designate it as LP-1019BA.",
-                ConflictHolds: new[] { "First model naming discrepancy between HTML (LP-1019) and table/PDF (LP-1019BA)" },
-                ResourceIds: new[] { "doc-lp-1019" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1019BA",
+                        DisplayName: "Compact Broadband Log Periodic (Aluminum)",
+                        Description: "Compact VHF/UHF directional array (aluminum construction)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Construction", "Aluminum construction"),
+                            new ProductCharacteristic("RF Connector", "Type N female")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "LP-1019SS",
+                        DisplayName: "Compact Broadband Log Periodic (Stainless Steel)",
+                        Description: "Compact VHF/UHF directional array (stainless-steel construction)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Construction", "Stainless-steel construction")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "lp-1112mr",
@@ -781,38 +973,75 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "LP-1112MR Transportable Log Periodic",
                 DisplayOrder: 5,
                 SectionAnchor: "lp-1112mr",
+                ShortDescription: "A transportable, rotatable HF log-periodic antenna system covering 4–30 MHz with a 60-foot support tower.",
+                ExpandedIntroduction: "LP-1112MR is a transportable directional HF system with horizontal polarization, manual rotation, and a 60-foot support tower.",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-1112mr-source-guided-candidate-a1-v2.png",
+                    AltText: "Wide transportable log-periodic antenna system deployed on a central field mast.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1112MR", "Transportable rotatable HF directional array", "4–30 MHz; rotatable directional array; horizontal polarization", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Transportable rotatable HF directional log periodic antenna array designed for tactical deployment across 4–30 MHz with horizontal polarization.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-lp-1112mr/",
-                ApprovalStatus: "HoldDisputedSpecs",
-                SourceNotes: "Primarily classified under Log Periodic Antennas. Transportable nature noted in group attributes. Discrepancies in average power, gain, connector, and dimensions between HTML and PDF.",
-                ConflictHolds: new[] { "Discrepancies in average power (5 kW vs 7.5 kW), gain (12 vs 11.5 dBi), connector, and dimensions between HTML and PDF" },
-                ResourceIds: new[] { "doc-lp-1112mr" },
-                SpecificationStatus: "HoldDisputedSpecs"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1112MR",
+                        DisplayName: "Transportable Rotatable HF Log Periodic System",
+                        Description: "Transportable rotatable HF directional array",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "4.0–30.0 MHz"),
+                            new ProductCharacteristic("System Type", "Transportable HF log-periodic system"),
+                            new ProductCharacteristic("Polarization", "Horizontal"),
+                            new ProductCharacteristic("Support Structure", "60 ft (18.3 m) tower"),
+                            new ProductCharacteristic("Rotation Mode", "Manually operated rotation system"),
+                            new ProductCharacteristic("VSWR", "2.5:1 nominal")
+                        }
+                    )
+                }
             ),
 
-            // 2. Portable & Transportable Antenna Systems (3 groups)
+            // 2. Portable & Transportable Antenna Systems (3 groups, 6 public named models)
             new(
                 Id: "v-4213",
                 FamilyId: "portable-transportable-antennas",
                 Name: "V-4213 Portable Discone",
                 DisplayOrder: 6,
                 SectionAnchor: "v-4213",
+                ShortDescription: "Portable vertical discone antenna configurations covering 30–88 MHz, represented by equipment package and antenna unit records.",
+                ExpandedIntroduction: "The V-4213 group covers omnidirectional vertical discone antennas with 30–88 MHz coverage. Published records distinguish the V-4213AD and V-4213AC configurations.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Frequency Range", "30–88 MHz"),
+                    new ProductCharacteristic("Radiation Pattern", "Omnidirectional"),
+                    new ProductCharacteristic("Polarization", "Vertical")
+                },
+                DetailedCharacteristics: new[]
+                {
+                    new ProductCharacteristic("RF Connector", "Type N")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-v-4213-source-guided-candidate-a1-v1.png",
+                    AltText: "Portable discone antenna system deployed on a sectional field mast.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("V-4213AD", "Complete mast and antenna system (30 ft mast)", "30–88 MHz; vertical polarization; 100 W average / 200 W PEP; complete 30 ft mast system", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
-                    new ProductModelRecord("V-4213AC", "Antenna only (standard 2-inch pipe mount)", "30–88 MHz; vertical polarization; 100 W average / 200 W PEP; antenna-only configuration", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Omnidirectional VHF discone antenna system covering 30–88 MHz, available in a complete 30-foot mast field system (V-4213AD) or antenna-only configuration (V-4213AC).",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-v-4213-and-v-4213ac/",
-                ApprovalStatus: "HoldDisputedSpecs",
-                SourceNotes: "Two active public pages and PDFs conflict on model designation and 60 vs 81 mph wind rating.",
-                ConflictHolds: new[] { "Model designation and wind rating conflict (60 vs 81 mph) between published datasheets" },
-                ResourceIds: new[] { "doc-v-4213-revised", "doc-v-4213-legacy" },
-                SpecificationStatus: "HoldDisputedSpecs"
+                    new ProductModelRecord(
+                        ModelCode: "V-4213AD",
+                        DisplayName: "Portable Discone Antenna Equipment Package",
+                        Description: "Portable discone equipment-package configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Portable discone equipment-package configuration")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "V-4213AC",
+                        DisplayName: "Portable Discone Antenna Unit",
+                        Description: "Antenna unit record",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Antenna unit record")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "lp-1402-1403",
@@ -820,18 +1049,45 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "LP-1402 / LP-1403 Transportable Log Periodics",
                 DisplayOrder: 7,
                 SectionAnchor: "lp-1402-1403",
+                ShortDescription: "Transportable VHF log-periodic systems covering 30–76 MHz (LP-1402) and 30–88 MHz (LP-1403), with horizontal or vertical orientation.",
+                ExpandedIntroduction: "LP-1402 and LP-1403 are mast-mounted transportable directional arrays with 4.5 dBi documented gain, BNC female input, and 2:1 nominal VSWR in horizontal or vertical orientation.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Polarization", "Horizontal or vertical"),
+                    new ProductCharacteristic("Forward Gain", "4.5 dBi"),
+                    new ProductCharacteristic("VSWR", "2:1 nominal")
+                },
+                DetailedCharacteristics: new[]
+                {
+                    new ProductCharacteristic("RF Connector", "BNC female")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-lp-1402-1403-source-guided-candidate-a1-v1.png",
+                    AltText: "Transportable mast-mounted log-periodic antenna system in a field setting.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("LP-1402", "Transportable VHF directional antenna (7 elements)", "30–76 MHz; 7 elements; horizontal or vertical polarization; 4.5 dBi gain", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
-                    new ProductModelRecord("LP-1403", "Transportable VHF directional antenna (8 elements)", "30–88 MHz; 8 elements; horizontal or vertical polarization; 4.5 dBi gain", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Transportable directional VHF log periodic antennas designed for tactical field deployment across 30–76 MHz (LP-1402) and 30–88 MHz (LP-1403) with mast mounting hardware.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-lp1403-and-lp1402/",
-                ApprovalStatus: "HoldDisputedSpecs",
-                SourceNotes: "HTML and PDF swap model-specific power ratings (65/130 W vs 75/150 W).",
-                ConflictHolds: new[] { "Model-specific power rating discrepancy between HTML and PDF" },
-                ResourceIds: new[] { "doc-lp-1402-1403" },
-                SpecificationStatus: "HoldDisputedSpecs"
+                    new ProductModelRecord(
+                        ModelCode: "LP-1402",
+                        DisplayName: "Transportable VHF Log Periodic Antenna (30–76 MHz)",
+                        Description: "Transportable VHF log-periodic antenna (7 elements)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "30.0–76.0 MHz"),
+                            new ProductCharacteristic("Element Count", "7 elements")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "LP-1403",
+                        DisplayName: "Transportable VHF Log Periodic Antenna (30–88 MHz)",
+                        Description: "Transportable VHF log-periodic antenna (8 elements)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Frequency Range", "30.0–88.0 MHz"),
+                            new ProductCharacteristic("Element Count", "8 elements")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "1910",
@@ -839,87 +1095,187 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "1910 Tactical Dipoles",
                 DisplayOrder: 8,
                 SectionAnchor: "1910",
+                ShortDescription: "Transportable HF dipole antenna configurations covering 2–30 MHz with horizontal polarization.",
+                ExpandedIntroduction: "The 1910AA and 1910BA are broadband center-fed transportable HF dipole systems with horizontal polarization, 50-ohm Type N inputs, and 2.5:1 nominal VSWR in the 2024 technical documentation.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Frequency Range", "2.0–30.0 MHz"),
+                    new ProductCharacteristic("Polarization", "Horizontal"),
+                    new ProductCharacteristic("Input Impedance", "50 ohms")
+                },
+                DetailedCharacteristics: new[]
+                {
+                    new ProductCharacteristic("RF Connector", "Type N"),
+                    new ProductCharacteristic("VSWR", "2.5:1 nominal")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-1910-source-guided-candidate-a1-v1.png",
+                    AltText: "Field-deployed HF wire dipole system supported by a central mast.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("1910AA", "Tactical HF dipole system (400 W PEP)", "2–30 MHz; horizontal polarization; 200 W average / 400 W PEP; under 15 min 2-person setup", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("1910BA", "Tactical HF dipole system (2 kW PEP)", "2–30 MHz; horizontal polarization; 1 kW average / 2 kW PEP; under 15 min 2-person setup", "Provisional", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Rapid-deployment tactical HF dipole antenna systems covering 2–30 MHz, engineered for field communications in 400 W PEP (1910AA) and 2 kW PEP (1910BA) power ratings.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-1910aa-1910ba/",
-                ApprovalStatus: "Provisional",
-                SourceNotes: "Consolidates duplicate 2016 and 2024 public entries; preferred source is 2024 revised datasheet.",
-                ConflictHolds: new[] { "VSWR and power rating differences between legacy 2016 and preferred 2024 datasheets" },
-                ResourceIds: new[] { "doc-1910-2024", "doc-1910-2016" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "1910AA",
+                        DisplayName: "Transportable HF Dipole Configuration (1910AA)",
+                        Description: "Transportable HF dipole configuration (Model 1910AA)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Transportable HF dipole configuration")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1910BA",
+                        DisplayName: "Transportable HF Dipole Configuration (1910BA)",
+                        Description: "Transportable HF dipole configuration (Model 1910BA)",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Transportable HF dipole configuration")
+                        }
+                    )
+                }
             ),
 
-            // 3. Aperiodic Loop Antennas (1 group)
+            // 3. Aperiodic Loop Antennas (1 group, 0 named models, 1 unnamed group record)
             new(
                 Id: "aperiodic",
                 FamilyId: "aperiodic-loop-antennas",
                 Name: "USAP Aperiodic Loop Antenna",
                 DisplayOrder: 9,
                 SectionAnchor: "aperiodic",
-                Models: new[]
+                ShortDescription: "A receive-oriented directional HF loop-array concept covering 2–32 MHz in fixed and transportable configurations.",
+                ExpandedIntroduction: "USAP's aperiodic loop documentation describes untuned balanced loop elements arranged as an end-fire receive array covering 2–32 MHz. Each documented loop element is an aluminum-alloy assembly for tripod or post mounting. No published model number is provided for this antenna system.",
+                OverviewCharacteristics: new[]
                 {
-                    new ProductModelRecord(string.Empty, "Fixed and transportable HF receiving loop configurations", "2–32 MHz; receive-focused directional end-fire loop array; vertical loop plane", "ClientConfirmation", SpecificationStatus: "Confirmed from current HTML")
+                    new ProductCharacteristic("Frequency Range", "2.0–32.0 MHz"),
+                    new ProductCharacteristic("System Type", "Receive-oriented directional loop array"),
+                    new ProductCharacteristic("Array Element", "Welded aluminum-alloy loop element (approx. 10 lb)")
                 },
-                ShortDescription: "Receive-oriented HF directional end-fire loop antenna system covering 2–32 MHz, engineered for fixed-station and transportable installations requiring directional receiving performance.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/usap-aperiodic-loop-antenna/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "No published model number; fixed and transportable descriptions are variants/characteristics, not separate product groups. PDF references a full catalog pending retrieval.",
-                ConflictHolds: new[] { "No published model number; configuration options subject to USAP confirmation" },
-                ResourceIds: new[] { "doc-aperiodic" },
-                SpecificationStatus: "Confirmed from current HTML"
+                DetailedCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Polarization", "Vertical loop plane"),
+                    new ProductCharacteristic("Mounting", "Tripod or post mount")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-aperiodic-single-loop-source-guided-candidate-a1-v1.png",
+                    AltText: "One aperiodic loop and preamplifier element on a transportable tripod.",
+                    IsPlaceholder: false),
+                Models: Array.Empty<ProductModelRecord>(),
+                HasPublishedModelNumber: false,
+                ModelNote: "No published model number is provided for this antenna system."
             ),
 
-            // 4. NVIS Antennas (1 group)
+            // 4. NVIS Antennas (1 group, 6 public named configurations: 3 primary + 3 low-power)
             new(
                 Id: "1942",
                 FamilyId: "nvis-antennas",
                 Name: "1942 NVIS Series",
                 DisplayOrder: 10,
                 SectionAnchor: "1942",
+                ShortDescription: "A 2–30 MHz NVIS antenna series with rooftop, transportable, and ground-mount configurations for regional HF communications.",
+                ExpandedIntroduction: "The 1942 series provides near-vertical incidence skywave (NVIS) antenna configurations covering 2–30 MHz with a 20-foot mast, stainless-steel elements, and ground radials.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Frequency Range", "2.0–30.0 MHz"),
+                    new ProductCharacteristic("Mast Height", "20 ft (6.1 m) mast"),
+                    new ProductCharacteristic("RF Connector", "Type N")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-1942-source-guided-candidate-a1-v1.png",
+                    AltText: "Field-deployed NVIS antenna system with a central mast and broad low wire footprint.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("1942-RT", "Roof-top mounting configuration (20 ft mast)", "2–30 MHz; 1 kW average / 2 kW PEP; 20 ft mast roof-top configuration", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("1942-TA", "Transportable field configuration", "2–30 MHz; 1 kW average / 2 kW PEP; transportable field setup under 30 min", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("1942-GM", "Ground-mount configuration", "2–30 MHz; 1 kW average / 2 kW PEP; ground mount setup under 120 min", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("1942-RT-LP", "Low-power roof-top configuration", "Low-power configuration named only in PDF", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
-                    new ProductModelRecord("1942-TA-LP", "Low-power transportable configuration", "Low-power configuration named only in PDF", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs"),
-                    new ProductModelRecord("1942-GM-LP", "Low-power ground-mount configuration", "Low-power configuration named only in PDF", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Near Vertical Incidence Skywave (NVIS) HF antenna systems covering 2–30 MHz for short-to-medium-range communications in roof-top, transportable, and ground-mount configurations.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/models-1943-rt-1942-ta-1942-gm/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "Legacy URL slug typo says 1943. 1942-RT-LP, 1942-TA-LP, and 1942-GM-LP are PDF-only low-power configurations on conflict hold pending confirmation.",
-                ConflictHolds: new[] { "Low-power variant availability and weight-unit discrepancies across published datasheets" },
-                ResourceIds: new[] { "doc-1942" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "1942-RT",
+                        DisplayName: "1942 Roof-Top Configuration",
+                        Description: "Rooftop mounting configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Rooftop mount"),
+                            new ProductCharacteristic("VSWR", "2.5:1 nominal")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1942-TA",
+                        DisplayName: "1942 Transportable Configuration",
+                        Description: "Transportable field configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Transportable field mount"),
+                            new ProductCharacteristic("VSWR", "1.8:1 nominal")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1942-GM",
+                        DisplayName: "1942 Ground-Mount Configuration",
+                        Description: "Ground-mount configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Ground mount"),
+                            new ProductCharacteristic("Deployment Area", "50 ft x 50 ft (15.25 m square)"),
+                            new ProductCharacteristic("VSWR", "1.8:1 nominal")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1942-RT-LP",
+                        DisplayName: "1942 Low-Power Roof-Top Configuration",
+                        Description: "Low-power rooftop configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Low-power rooftop mount")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1942-TA-LP",
+                        DisplayName: "1942 Low-Power Transportable Configuration",
+                        Description: "Low-power transportable field configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Low-power transportable field mount")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "1942-GM-LP",
+                        DisplayName: "1942 Low-Power Ground-Mount Configuration",
+                        Description: "Low-power ground-mount configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration", "Low-power ground mount")
+                        }
+                    )
+                }
             ),
 
-            // 5. Antenna Rotator & Control Systems (5 groups)
+            // 5. Antenna Rotator & Control Systems (5 groups, 5 public named models, 5 associated assets)
             new(
                 Id: "r3500",
                 FamilyId: "antenna-rotator-control-systems",
-                Name: "R3500 Heavy Duty Rotator with DRC-4 Rotator Control Unit",
+                Name: "R3500 Heavy Duty Antenna Rotator",
                 DisplayOrder: 11,
                 SectionAnchor: "r3500",
-                Models: new[]
-                {
-                    new ProductModelRecord("R3500", "Medium-to-heavy-duty rotator unit paired with DRC-4", "4,300 in-lb rotating torque; 10,000 lb vertical load capacity; worm gear drive", "ClientConfirmation", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Heavy-duty antenna rotator unit paired with the tabletop DRC-4 digital controller, providing 4,300 in-lb rotating torque and 10,000 lb vertical load capacity for directional antenna positioning.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-r3500/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "Confirm current DRC 4 bundle and product naming.",
-                ConflictHolds: new[] { "DRC 4 bundle compatibility and product naming confirmation" },
-                ResourceIds: new[] { "doc-r3500" },
-                SpecificationStatus: "Confirmed from current HTML",
+                ShortDescription: "A mechanical antenna rotator with continuous or centered rotation options for directional antenna positioning.",
+                ExpandedIntroduction: "R3500 is a heavy-duty mechanical rotator for antenna positioning. Documented characteristics include 1.25 RPM maximum rotation speed, ±1° position accuracy, 115 or 230 VAC operation, and an 18 × 23 × 7 inch housing.",
                 AssociatedAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-r3500-drc4-source-guided-relationship-a3s-v1.png",
-                    AltText: "Heavy-duty R3500 rotator and tabletop DRC-4 controller shown together in a source-guided technical visualization.",
-                    IsPlaceholder: false)
+                    AltText: "Heavy-duty antenna rotator and tabletop controller shown together in a technical studio scene.",
+                    IsPlaceholder: false),
+                Models: new[]
+                {
+                    new ProductModelRecord(
+                        ModelCode: "R3500",
+                        DisplayName: "Heavy-Duty Antenna Rotator",
+                        Description: "Heavy-duty mechanical antenna rotator",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Drive Type", "Worm-gear drive"),
+                            new ProductCharacteristic("Rotation Speed", "Up to 1.25 RPM"),
+                            new ProductCharacteristic("Position Accuracy", "±1°"),
+                            new ProductCharacteristic("Housing Dimensions", "18 in W × 23 in L × 7 in H (46 × 58 × 18 cm)"),
+                            new ProductCharacteristic("Mast Acceptance", "Accepts 2–3 in mast shaft and up to 1-5/8 in transmission line"),
+                            new ProductCharacteristic("Operating Voltage", "115 / 230 VAC")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "r3501",
@@ -927,17 +1283,30 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "R3501 Universal Rotator System",
                 DisplayOrder: 12,
                 SectionAnchor: "r3501",
+                ShortDescription: "A universal antenna rotator system for directional antenna positioning.",
+                ExpandedIntroduction: "R3501 is a mechanical rotator adaptable to top, side, tower, or pole mounting. Documented characteristics include 1 RPM rotation speed, ±1° position accuracy, 115/230 VAC operation, and a 19 × 24 × 14.5 inch housing.",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-r3501-source-guided-candidate-a1-v1.png",
+                    AltText: "Source-guided visualization of an R3501 open-frame antenna rotator assembly.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("R3501", "Universal rotator unit compatible with DRC-3", "9,000 in-lb rotating torque; 23,000 in-lb braking torque; 1,000 lb vertical load", "ClientConfirmation", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Universal antenna rotator system engineered for 9,000 in-lb rotating torque and 23,000 in-lb braking torque, compatible with the DRC-3 digital rotator controller.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-r3501/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "Confirm controller compatibility and current configuration.",
-                ConflictHolds: new[] { "Controller compatibility and current configuration confirmation" },
-                ResourceIds: new[] { "doc-r3501" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "R3501",
+                        DisplayName: "Universal Antenna Rotator",
+                        Description: "Universal mechanical antenna rotator",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Equipment Type", "Mechanical antenna rotator"),
+                            new ProductCharacteristic("Drive Type", "Gear-and-chain drive"),
+                            new ProductCharacteristic("Rotation Speed", "1 RPM"),
+                            new ProductCharacteristic("Position Accuracy", "±1°"),
+                            new ProductCharacteristic("Housing Dimensions", "19 in W × 24 in L × 14.5 in H"),
+                            new ProductCharacteristic("Mast Acceptance", "Accepts 1-1/4–2-1/2 in mast shaft and up to 1-5/8 in transmission line"),
+                            new ProductCharacteristic("Operating Voltage", "115 / 230 VAC")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "r3503",
@@ -945,17 +1314,29 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "R3503 Heavy Duty Rotating System",
                 DisplayOrder: 13,
                 SectionAnchor: "r3503",
+                ShortDescription: "A heavy-duty rotating system engineered for large communication antenna arrays.",
+                ExpandedIntroduction: "R3503 is a heavy-duty rotating system engineered for large communication antenna arrays. Documented specifications include up to 1.25 RPM speed, ±2° position accuracy, and 115/230 VAC operation.",
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-r3503-source-guided-candidate-a1-v1.png",
+                    AltText: "Source-guided visualization of an R3503 heavy-duty open-frame antenna rotator assembly.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("R3503", "Heavy-duty rotating system compatible with DRC-3", "23,700 in-lb rotating torque; 60,000 in-lb braking torque; 20,000 lb vertical load", "ClientConfirmation", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "High-capacity antenna rotating system engineered for 23,700 in-lb rotating torque, 60,000 in-lb braking torque, and 20,000 lb vertical load capacity, compatible with the DRC-3 controller.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-r3503/",
-                ApprovalStatus: "ClientConfirmation",
-                SourceNotes: "Confirm current DRC compatibility and software support.",
-                ConflictHolds: new[] { "DRC compatibility and software support confirmation" },
-                ResourceIds: new[] { "doc-r3503" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "R3503",
+                        DisplayName: "Heavy-Duty Antenna Rotating System",
+                        Description: "Heavy-duty antenna rotating system",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Equipment Type", "Heavy-duty antenna rotating system"),
+                            new ProductCharacteristic("Drive Type", "Gear-and-chain drive"),
+                            new ProductCharacteristic("Rotation Speed", "Up to 1.25 RPM"),
+                            new ProductCharacteristic("Position Accuracy", "±2°"),
+                            new ProductCharacteristic("Operating Voltage", "115 / 230 VAC"),
+                            new ProductCharacteristic("Shipping Weight", "Approx. 1,260 lb")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "drc-3",
@@ -963,21 +1344,26 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "DRC-3 Digital Rotator Controller",
                 DisplayOrder: 14,
                 SectionAnchor: "drc-3",
-                Models: new[]
-                {
-                    new ProductModelRecord("DRC-3", "Digital rotator controller for R3501 and R3503 systems", "Microprocessor-based controller for R3501 and R3503 rotator systems", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Large industrial antenna-rotator control enclosure with display and control components.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/drc-3/",
-                ApprovalStatus: "HoldDisputedSpecs",
-                SourceNotes: "Do not publish OS/software, remote-user, or Internet-control claims until USAP confirms current support and security.",
-                ConflictHolds: new[] { "Operating system, software support, and remote-user/Internet-control claims unverified" },
-                ResourceIds: new[] { "doc-drc-3" },
-                SpecificationStatus: "HoldDisputedSpecs",
+                ShortDescription: "An industrial antenna-rotator control enclosure with local manual controls, digital heading display, and continuous-rotation capability.",
+                ExpandedIntroduction: "DRC-3 is an industrial antenna-rotator control enclosure featuring local manual controls and digital heading display.",
                 AssociatedAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-drc3-source-guided-product-visual-a3s-v1.png",
-                    AltText: "Large industrial antenna-rotator control enclosure with display and control components.",
-                    IsPlaceholder: false)
+                    AltText: "Industrial antenna-rotator control enclosure with display and front-panel controls.",
+                    IsPlaceholder: false),
+                Models: new[]
+                {
+                    new ProductModelRecord(
+                        ModelCode: "DRC-3",
+                        DisplayName: "Industrial Rotator Control Enclosure",
+                        Description: "Industrial antenna-rotator control enclosure",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Equipment Classification", "Industrial antenna-rotator control enclosure"),
+                            new ProductCharacteristic("Control Features", "Local clockwise and counterclockwise manual controls, digital heading display"),
+                            new ProductCharacteristic("Rotation Functions", "360-degree continuous rotation")
+                        }
+                    )
+                }
             ),
             new(
                 Id: "drc-4",
@@ -985,69 +1371,116 @@ public class ProductCatalogService : IProductCatalogService
                 Name: "DRC-4 Digital Rotator Controller",
                 DisplayOrder: 15,
                 SectionAnchor: "drc-4",
-                Models: new[]
-                {
-                    new ProductModelRecord("DRC-4", "Digital rotator controller unit paired with R3500", "Standalone and PC control digital rotator controller paired with R3500", "HoldDisputedSpecs", SpecificationStatus: "HoldDisputedSpecs")
-                },
-                ShortDescription: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/drc-4/",
-                ApprovalStatus: "HoldDisputedSpecs",
-                SourceNotes: "Do not publish software, serial/USB, or remote-access compatibility claims until confirmed.",
-                ConflictHolds: new[] { "Software, serial/USB, and remote-access compatibility claims unverified" },
-                ResourceIds: new[] { "doc-drc-4" },
-                SpecificationStatus: "HoldDisputedSpecs",
+                ShortDescription: "A horizontal tabletop digital antenna-rotator controller with digital display, rotary dial, and front controls.",
+                ExpandedIntroduction: "DRC-4 is a horizontal tabletop digital antenna-rotator controller featuring front-panel controls and digital heading display.",
                 AssociatedAsset: new CatalogAsset(
                     ImagePath: "/images/products/usap-drc4-source-guided-product-visual-a3s-v1.png",
-                    AltText: "Tabletop antenna-rotator controller with digital display, rotary dial, and front controls.",
-                    IsPlaceholder: false)
+                    AltText: "Horizontal tabletop antenna-rotator controller with digital display, rotary dial, and front controls.",
+                    IsPlaceholder: false),
+                Models: new[]
+                {
+                    new ProductModelRecord(
+                        ModelCode: "DRC-4",
+                        DisplayName: "Tabletop Digital Rotator Controller",
+                        Description: "Horizontal tabletop digital rotator controller",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Equipment Classification", "Horizontal tabletop digital controller"),
+                            new ProductCharacteristic("Control Features", "Digital heading display, rotary dial, front-panel controls"),
+                            new ProductCharacteristic("Rotation Functions", "360-degree continuous-rotation control")
+                        }
+                    )
+                }
             ),
 
-            // 6. Tower Systems & Accessories (1 group)
+            // 6. Tower Systems & Accessories (1 group, 5 public named models, 1 associated asset)
             new(
                 Id: "t-3002",
                 FamilyId: "tower-systems-accessories",
                 Name: "T-3002 RLPA Tower System",
                 DisplayOrder: 16,
                 SectionAnchor: "t-3002",
+                ShortDescription: "A rotatable HF log-periodic tower system with 100-foot and 80-foot dual-guyed or self-supporting configurations.",
+                ExpandedIntroduction: "T-3002 is a tower-and-rotating-mast system for large HF log-periodic installations. Documented specifications include dual-guyed and self-supporting structural forms, 100-foot and 80-foot heights, and up to 1.25 RPM rotation.",
+                OverviewCharacteristics: new[]
+                {
+                    new ProductCharacteristic("Rotation Speed", "Up to 1.25 RPM"),
+                    new ProductCharacteristic("Operating Voltage", "115 / 230 VAC, 50/60 Hz")
+                },
+                AssociatedAsset: new CatalogAsset(
+                    ImagePath: "/images/products/groups/usap-product-group-t-3002-source-guided-candidate-a1-v1.png",
+                    AltText: "Tower-system components including lattice supports, a rotating mast, and a directional antenna.",
+                    IsPlaceholder: false),
                 Models: new[]
                 {
-                    new ProductModelRecord("T-3002", "Rotatable log periodic antenna tower system", "80 ft or 100 ft rotatable log periodic antenna tower system; 115/230 VAC rotation", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("3002FA", "100 ft dual-guyed tower configuration", "100 ft tower; dual-guyed configuration with rotation and feedline hardware", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("3002FB", "80 ft dual-guyed tower configuration", "80 ft tower; dual-guyed configuration with rotation and feedline hardware", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("3002SS", "100 ft self-supporting tower configuration", "100 ft tower; self-supporting configuration with rotation and feedline hardware", "Provisional", SpecificationStatus: "Confirmed from current HTML"),
-                    new ProductModelRecord("3002SS-80", "80 ft self-supporting tower configuration", "80 ft tower; self-supporting configuration with rotation and feedline hardware", "Provisional", SpecificationStatus: "Confirmed from current HTML")
-                },
-                ShortDescription: "Rotatable log periodic antenna tower system providing 80 ft and 100 ft heights in dual-guyed and self-supporting structural configurations with rotation and feedline hardware.",
-                CurrentSourceUrl: "https://www.usantennaproducts.com/antennas/model-t-3002/",
-                ApprovalStatus: "Provisional",
-                SourceNotes: "Consolidates duplicate public entries. The four ordering configurations (3002FA, 3002FB, 3002SS, 3002SS-80) are children of T-3002, not separate product groups.",
-                ConflictHolds: Array.Empty<string>(),
-                ResourceIds: new[] { "doc-t-3002-oct2016", "doc-t-3002-jun2016" },
-                SpecificationStatus: "Confirmed from current HTML"
+                    new ProductModelRecord(
+                        ModelCode: "T-3002",
+                        DisplayName: "RLPA Tower System Parent Line",
+                        Description: "Rotatable log periodic antenna tower system parent line",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("System Type", "Parent tower-system line"),
+                            new ProductCharacteristic("Available Heights", "80 ft or 100 ft overall"),
+                            new ProductCharacteristic("Structural Options", "Dual-guyed (0.31-acre installation area) or self-supporting (under 100 sq ft)")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "3002FA",
+                        DisplayName: "100 ft Dual-Guyed Configuration",
+                        Description: "100 ft dual-guyed tower configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Dual-guyed rotating-mast system"),
+                            new ProductCharacteristic("Overall Height", "100 ft (30.4 m)"),
+                            new ProductCharacteristic("Installation Footprint", "Approx. 0.31 acres")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "3002FB",
+                        DisplayName: "80 ft Dual-Guyed Configuration",
+                        Description: "80 ft dual-guyed tower configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Dual-guyed rotating-mast system"),
+                            new ProductCharacteristic("Overall Height", "80 ft (24.4 m) rotating mast (60 ft tower sections)"),
+                            new ProductCharacteristic("Installation Footprint", "Approx. 0.31 acres")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "3002SS",
+                        DisplayName: "100 ft Self-Supporting Configuration",
+                        Description: "100 ft self-supporting tower configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Self-supporting rotating-mast system"),
+                            new ProductCharacteristic("Overall Height", "100 ft (30.4 m)"),
+                            new ProductCharacteristic("Installation Footprint", "Under 100 sq ft")
+                        }
+                    ),
+                    new ProductModelRecord(
+                        ModelCode: "3002SS-80",
+                        DisplayName: "80 ft Self-Supporting Configuration",
+                        Description: "80 ft self-supporting tower configuration",
+                        Characteristics: new[]
+                        {
+                            new ProductCharacteristic("Configuration Type", "Self-supporting rotating-mast system"),
+                            new ProductCharacteristic("Overall Height", "80 ft (24.4 m) rotating mast (60 ft tower sections)"),
+                            new ProductCharacteristic("Installation Footprint", "Under 100 sq ft")
+                        }
+                    )
+                }
             )
         };
 
+        // 6 interim technical documents (not a permanent ceiling; R2 identified 17 canonical migration documents for later technical documentation scope)
         var resources = new List<ProductResourceRecord>
         {
-            new("doc-v-4213-revised", "v-4213", "V-4213 Data Sheet (May 2016 Revised)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/4213cutsheet-revised.pdf", "CandidateOnly"),
-            new("doc-lp-1402-1403", "lp-1402-1403", "LP-1402 / LP-1403 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1402AC_1403AB.pdf", "ConflictHold"),
-            new("doc-1910-legacy", "1910", "Model 1910 Data Sheet (May 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1910AA_1910BA.pdf", "SupersededCandidate"),
-            new("doc-lp-1017", "lp-1017", "LP-1017 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet-4.pdf", "ConflictHold"),
-            new("doc-lp-1112mr", "lp-1112mr", "LP-1112MR Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1112-data-sheet-revised.pdf", "ConflictHold"),
-            new("doc-lp-high-power", "lp-high-power", "LP-1001, LP-1002, LP-1005 High-Power Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1001_1002_1005-data-sheet.pdf", "Provisional"),
-            new("doc-lp-1018ba", "lp-1018ba", "LP-1018BA Broadband Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/LP_1018BA_data_sheet_revised.pdf", "Provisional"),
-            new("doc-v-4213-legacy", "v-4213", "Model V-4213 Data Sheet (June 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/Model-V4213-data-sheet-revised.pdf", "CandidateOnly"),
-            new("doc-lp-1019", "lp-1019", "LP-1019 / LP-1019SS Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1019-and-1019-ss-data-sheet.pdf", "Provisional"),
-            new("doc-1910-2024", "1910", "1910AA / 1910BA Data Sheet (February 2024 Revised)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2024/02/1910AA_1910BA-revised-1.pdf", "PreferredProvisional"),
-            new("doc-t-3002-jun2016", "t-3002", "T-3002 Data Sheet (June 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/T-3002-Data-Sheet.pdf", "DuplicateCandidate"),
-            new("doc-drc-3", "drc-3", "DRC 3 Digital Rotator Controller Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/DRC-3-Data-Sheet-revised.pdf", "ConflictHold"),
-            new("doc-aperiodic", "aperiodic", "USAP Aperiodic Loop Antenna Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/USAP-Aperiodic-Loop-Antenna-data-sheet.pdf", "Provisional"),
-            new("doc-1942", "1942", "Model 1942 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/MODEL-1942-data-sheet-revised.pdf", "ConflictHold"),
-            new("doc-r3500", "r3500", "Model R3500 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/07/MODEL-R3500-data-sheet.doc.pdf", "ConflictHold"),
-            new("doc-t-3002-oct2016", "t-3002", "T-3002 RLPA Tower System Data Sheet (October 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/T3002_data_sheet.pdf", "PreferredProvisional"),
-            new("doc-r3501", "r3501", "Model R3501 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/Model-R3501-CORRECTED-COPY.pdf", "ConflictHold"),
-            new("doc-drc-4", "drc-4", "DRC 4 Digital Rotator Controller Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/DRC-4-Data-Sheet.pdf", "ConflictHold"),
-            new("doc-r3503", "r3503", "Model R3503 Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/MODEL-R3503-data-sheet.doc.pdf", "ConflictHold")
+            new("doc-lp-high-power", "lp-high-power", "LP-1001, LP-1002, LP-1005 High-Power Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1001_1002_1005-data-sheet.pdf"),
+            new("doc-lp-1018ba", "lp-1018ba", "LP-1018BA Broadband Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/LP_1018BA_data_sheet_revised.pdf"),
+            new("doc-lp-1019", "lp-1019", "LP-1019 / LP-1019SS Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1019-and-1019-ss-data-sheet.pdf"),
+            new("doc-1910-2024", "1910", "1910AA / 1910BA Data Sheet (February 2024 Revised)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2024/02/1910AA_1910BA-revised-1.pdf"),
+            new("doc-aperiodic", "aperiodic", "USAP Aperiodic Loop Antenna Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/USAP-Aperiodic-Loop-Antenna-data-sheet.pdf"),
+            new("doc-t-3002-oct2016", "t-3002", "T-3002 RLPA Tower System Data Sheet (October 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/T3002_data_sheet.pdf")
         };
 
         return (families, productGroups, resources);

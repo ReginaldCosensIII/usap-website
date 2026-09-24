@@ -6,21 +6,26 @@
 
 @{
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    var currentPath = ViewContext.HttpContext.Request.Path.Value?.TrimEnd('/') ?? string.Empty;
 
-    // Return "is-active" class and aria-current attribute values per route.
-    string HomeClass    = currentPage == "/Index" ? "primary-nav-link is-active" : "primary-nav-link";
-    string ProdClass    = currentPage.StartsWith("/Products", StringComparison.OrdinalIgnoreCase) ? "primary-nav-link is-active" : "primary-nav-link";
-    string ResClass     = currentPage == "/TechnicalResources" ? "primary-nav-link is-active" : "primary-nav-link";
-    string AboutClass   = currentPage == "/AboutUs" ? "primary-nav-link is-active" : "primary-nav-link";
-    string ContactClass = currentPage == "/ContactUs" ? "primary-nav-link is-active" : "primary-nav-link";
-    string QuoteClass   = currentPage == "/RequestAQuote" ? "nav-cta is-active" : "nav-cta";
+    // Active-route detection
+    bool isProductsActive = currentPath.StartsWith("/products", StringComparison.OrdinalIgnoreCase) ||
+                            currentPage.StartsWith("/Products", StringComparison.OrdinalIgnoreCase);
+
+    string HomeClass       = currentPage == "/Index" ? "primary-nav-link is-active" : "primary-nav-link";
+    string ProdToggleClass = isProductsActive ? "primary-nav-link nav-dropdown-toggle is-active" : "primary-nav-link nav-dropdown-toggle";
+    string ResClass        = currentPage == "/TechnicalResources" ? "primary-nav-link is-active" : "primary-nav-link";
+    string AboutClass      = currentPage == "/AboutUs" ? "primary-nav-link is-active" : "primary-nav-link";
+    string ContactClass    = currentPage == "/ContactUs" ? "primary-nav-link is-active" : "primary-nav-link";
+    string QuoteClass      = currentPage == "/RequestAQuote" ? "nav-cta is-active" : "nav-cta";
 
     string HomeCurrent    = currentPage == "/Index" ? "page" : "";
-    string ProdCurrent    = currentPage.StartsWith("/Products", StringComparison.OrdinalIgnoreCase) ? "page" : "";
     string ResCurrent     = currentPage == "/TechnicalResources" ? "page" : "";
     string AboutCurrent   = currentPage == "/AboutUs" ? "page" : "";
     string ContactCurrent = currentPage == "/ContactUs" ? "page" : "";
     string QuoteCurrent   = currentPage == "/RequestAQuote" ? "page" : "";
+
+    bool isAllProducts = currentPath.Equals("/products", StringComparison.OrdinalIgnoreCase) || currentPage == "/Products/Index";
 }
 
 <header class="site-header" role="banner">
@@ -69,42 +74,98 @@
                         <a class="@HomeClass"
                            asp-page="/Index"
                            aria-current="@(HomeCurrent != "" ? HomeCurrent : null)">
-                            Home
+                            <span class="nav-item-label">Home</span>
                         </a>
                     </li>
-                    <li>
-                        <a class="@ProdClass"
-                           asp-page="/Products/Index"
-                           aria-current="@(ProdCurrent != "" ? ProdCurrent : null)">
-                            Products
-                        </a>
+                    <li class="nav-item-dropdown">
+                        <details class="nav-dropdown" id="nav-products-dropdown">
+                            <summary class="@ProdToggleClass" aria-label="Products menu">
+                                <span class="nav-dropdown-summary-group">
+                                    <span class="nav-item-label">Products</span>
+                                    <svg class="nav-dropdown-chevron" aria-hidden="true" focusable="false" viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </summary>
+                            <ul class="nav-dropdown-menu" role="list">
+                                <li>
+                                    <a class="nav-dropdown-link @(isAllProducts ? "is-active" : "")"
+                                       href="/products"
+                                       aria-current="@(isAllProducts ? "page" : null)">
+                                        All Products
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/log-periodic-antennas", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/log-periodic-antennas"
+                                       aria-current="@(currentPath.Equals("/products/log-periodic-antennas", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        Log Periodic Antennas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/portable-transportable-antennas", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/portable-transportable-antennas"
+                                       aria-current="@(currentPath.Equals("/products/portable-transportable-antennas", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        Portable &amp; Transportable Antenna Systems
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/aperiodic-loop-antennas", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/aperiodic-loop-antennas"
+                                       aria-current="@(currentPath.Equals("/products/aperiodic-loop-antennas", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        Aperiodic Loop Antennas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/nvis-antennas", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/nvis-antennas"
+                                       aria-current="@(currentPath.Equals("/products/nvis-antennas", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        NVIS Antennas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/antenna-rotator-control-systems", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/antenna-rotator-control-systems"
+                                       aria-current="@(currentPath.Equals("/products/antenna-rotator-control-systems", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        Antenna Rotator &amp; Control Systems
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="nav-dropdown-link @(currentPath.Equals("/products/tower-systems-accessories", StringComparison.OrdinalIgnoreCase) ? "is-active" : "")"
+                                       href="/products/tower-systems-accessories"
+                                       aria-current="@(currentPath.Equals("/products/tower-systems-accessories", StringComparison.OrdinalIgnoreCase) ? "page" : null)">
+                                        Tower Systems &amp; Accessories
+                                    </a>
+                                </li>
+                            </ul>
+                        </details>
                     </li>
                     <li>
                         <a class="@ResClass"
                            asp-page="/TechnicalResources"
                            aria-current="@(ResCurrent != "" ? ResCurrent : null)">
-                            Technical Resources
+                            <span class="nav-item-label">Technical Resources</span>
                         </a>
                     </li>
                     <li>
                         <a class="@AboutClass"
                            asp-page="/AboutUs"
                            aria-current="@(AboutCurrent != "" ? AboutCurrent : null)">
-                            About Us
+                            <span class="nav-item-label">About Us</span>
                         </a>
                     </li>
                     <li>
                         <a class="@ContactClass"
                            asp-page="/ContactUs"
                            aria-current="@(ContactCurrent != "" ? ContactCurrent : null)">
-                            Contact Us
+                            <span class="nav-item-label">Contact Us</span>
                         </a>
                     </li>
                     <li>
                         <a class="@QuoteClass"
                            asp-page="/RequestAQuote"
                            aria-current="@(QuoteCurrent != "" ? QuoteCurrent : null)">
-                            Request a Quote
+                            <span class="nav-item-label">Request a Quote</span>
                         </a>
                     </li>
                 </ul>
@@ -113,3 +174,4 @@
         </div>
     </div>
 </header>
+<div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
