@@ -28,15 +28,6 @@ public class ProductCatalogService : IProductCatalogService
             ["tower-systems-accessories"] = new[] { "t-3002" }
         };
 
-    private static readonly HashSet<string> InterimResourceIds = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "doc-lp-high-power",
-        "doc-lp-1018ba",
-        "doc-lp-1019",
-        "doc-1910-2024",
-        "doc-aperiodic",
-        "doc-t-3002-oct2016"
-    };
 
     /// <summary>
     /// Required 1942 NVIS configuration identifiers (all 6 published in provisional public catalog).
@@ -201,8 +192,40 @@ public class ProductCatalogService : IProductCatalogService
         }
 
         return _resources
-            .Where(r => string.Equals(r.ProductGroupId, groupId, StringComparison.OrdinalIgnoreCase) && InterimResourceIds.Contains(r.Id))
+            .Where(r => r.ProductGroupIds.Contains(groupId, StringComparer.OrdinalIgnoreCase))
             .ToList();
+    }
+
+    public IReadOnlyList<ProductResourceRecord> GetAllTechnicalDocuments()
+    {
+        return _resources;
+    }
+
+    public IReadOnlyList<ProductResourceRecord> GetTechnicalDocumentsByFamily(string? familySlug)
+    {
+        if (string.IsNullOrWhiteSpace(familySlug))
+        {
+            return Array.Empty<ProductResourceRecord>();
+        }
+
+        return _resources
+            .Where(r => string.Equals(r.FamilySlug, familySlug, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    public ProductResourceRecord? GetTechnicalDocumentBySlug(string? slug)
+    {
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            return null;
+        }
+
+        var clean = slug.Trim();
+        return _resources.FirstOrDefault(r =>
+            string.Equals(r.Slug, clean, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r.Id, clean, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(r.Slug.Replace("usap-", ""), clean.Replace("usap-", ""), StringComparison.OrdinalIgnoreCase)
+        );
     }
 
     private static void ValidateCatalog(
@@ -407,27 +430,51 @@ public class ProductCatalogService : IProductCatalogService
             }
         }
 
-        // 9. Technical Resource interim links: exactly 6 current interim documents
-        if (resources.Count != 6)
+        // 9. Technical Resource validation: exactly 17 canonical documents
+        if (resources.Count != 17)
         {
-            throw new InvalidOperationException($"Current interim technical resources must contain exactly 6 approved records, found {resources.Count}.");
+            throw new InvalidOperationException($"Canonical technical resources must contain exactly 17 approved records, found {resources.Count}.");
         }
 
+        var resourceIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var resource in resources)
         {
-            if (!InterimResourceIds.Contains(resource.Id))
+            if (!resourceIds.Add(resource.Id))
             {
-                throw new InvalidOperationException($"Resource '{resource.Id}' is not in the interim document set.");
+                throw new InvalidOperationException($"Duplicate technical resource ID detected: '{resource.Id}'.");
             }
 
-            if (!productGroupMap.ContainsKey(resource.ProductGroupId))
+            if (string.IsNullOrWhiteSpace(resource.Title) || string.IsNullOrWhiteSpace(resource.LocalPdfPath))
             {
-                throw new InvalidOperationException($"Resource '{resource.Id}' references unknown product group '{resource.ProductGroupId}'.");
+                throw new InvalidOperationException($"Resource '{resource.Id}' has missing Title or LocalPdfPath.");
             }
 
-            if (string.IsNullOrWhiteSpace(resource.Title) || string.IsNullOrWhiteSpace(resource.CurrentSourceUrl))
+            if (!resource.LocalPdfPath.StartsWith("/") || resource.LocalPdfPath.StartsWith("//"))
             {
-                throw new InvalidOperationException($"Resource '{resource.Id}' has missing Title or CurrentSourceUrl.");
+                throw new InvalidOperationException($"Resource '{resource.Id}' has invalid LocalPdfPath '{resource.LocalPdfPath}'. Must start with a single '/'.");
+            }
+
+            if (string.IsNullOrWhiteSpace(resource.FamilySlug) || string.IsNullOrWhiteSpace(resource.FamilyName))
+            {
+                throw new InvalidOperationException($"Resource '{resource.Id}' has missing FamilySlug or FamilyName.");
+            }
+
+            if (resource.ProductGroupIds.Count == 0)
+            {
+                throw new InvalidOperationException($"Resource '{resource.Id}' has no associated product groups.");
+            }
+
+            foreach (var groupId in resource.ProductGroupIds)
+            {
+                if (!productGroupMap.ContainsKey(groupId))
+                {
+                    throw new InvalidOperationException($"Resource '{resource.Id}' references unknown product group '{groupId}'.");
+                }
+            }
+
+            if (resource.PageCount <= 0)
+            {
+                throw new InvalidOperationException($"Resource '{resource.Id}' has invalid PageCount '{resource.PageCount}'.");
             }
         }
 
@@ -540,6 +587,10 @@ public class ProductCatalogService : IProductCatalogService
         foreach (var r in resources)
         {
             allPublicTexts.Add(r.Title);
+            if (!string.IsNullOrWhiteSpace(r.Description))
+            {
+                allPublicTexts.Add(r.Description);
+            }
         }
 
         foreach (var text in allPublicTexts)
@@ -1472,15 +1523,332 @@ public class ProductCatalogService : IProductCatalogService
             )
         };
 
-        // 6 interim technical documents (not a permanent ceiling; R2 identified 17 canonical migration documents for later technical documentation scope)
+        // 17 canonical technical documents
         var resources = new List<ProductResourceRecord>
         {
-            new("doc-lp-high-power", "lp-high-power", "LP-1001, LP-1002, LP-1005 High-Power Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1001_1002_1005-data-sheet.pdf"),
-            new("doc-lp-1018ba", "lp-1018ba", "LP-1018BA Broadband Log Periodic Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/LP_1018BA_data_sheet_revised.pdf"),
-            new("doc-lp-1019", "lp-1019", "LP-1019 / LP-1019SS Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1019-and-1019-ss-data-sheet.pdf"),
-            new("doc-1910-2024", "1910", "1910AA / 1910BA Data Sheet (February 2024 Revised)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2024/02/1910AA_1910BA-revised-1.pdf"),
-            new("doc-aperiodic", "aperiodic", "USAP Aperiodic Loop Antenna Data Sheet", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/06/USAP-Aperiodic-Loop-Antenna-data-sheet.pdf"),
-            new("doc-t-3002-oct2016", "t-3002", "T-3002 RLPA Tower System Data Sheet (October 2016)", "Datasheet", "https://www.usantennaproducts.com/wp-content/uploads/2016/10/T3002_data_sheet.pdf")
+            new(
+                "DOC-LP-HIGH-POWER",
+                "LP-1001, LP-1002 and LP-1005 High-Power HF Log Periodic Antennas",
+                "/technical-resources/documents/log-periodic-antennas/usap-lp-1001-lp-1002-lp-1005-data-sheet.pdf",
+                "log-periodic-antennas",
+                "Log Periodic Antennas",
+                new[] { "lp-high-power" },
+                new[] { "LP-1001", "LP-1002", "LP-1005" },
+                "Data sheet",
+                "Electrical and structural specifications, construction, environmental loading, and optional system information for high-power HF log periodic antennas.",
+                2,
+                1,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1001_1002_1005-data-sheet.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2019/04/1001_1002_1005-data-sheet.pdf"
+                },
+                "LP-1001 LP-1002 LP-1005 High-Power HF Log Periodic Antennas lp-high-power log periodic antennas data sheet"
+            ),
+            new(
+                "DOC-LP-1017",
+                "LP-1017 Commercial HF Log Periodic Antenna",
+                "/technical-resources/documents/log-periodic-antennas/usap-lp-1017-data-sheet.pdf",
+                "log-periodic-antennas",
+                "Log Periodic Antennas",
+                new[] { "lp-1017" },
+                new[] { "LP-1017" },
+                "Data sheet",
+                "Electrical and structural specifications, antenna photograph, take-off-angle table, and installation details.",
+                2,
+                2,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet-1.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet-2.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet-3.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet-4.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1017-data-sheet.pdf"
+                },
+                "LP-1017 Commercial HF Log Periodic Antenna lp-1017 log periodic antennas data sheet"
+            ),
+            new(
+                "DOC-LP-1018BA",
+                "LP-1018BA Broadband Log Periodic Antenna",
+                "/technical-resources/documents/log-periodic-antennas/usap-lp-1018ba-data-sheet.pdf",
+                "log-periodic-antennas",
+                "Log Periodic Antennas",
+                new[] { "lp-1018ba" },
+                new[] { "LP-1018BA" },
+                "Data sheet",
+                "Electrical and mechanical specifications, power capability across frequencies, construction, and mounting details.",
+                2,
+                3,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/LP_1018BA_data_sheet.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/LP_1018BA_data_sheet_revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2024/02/LP_1018BA_data_sheet_revised.pdf"
+                },
+                "LP-1018BA Broadband Log Periodic Antenna lp-1018ba log periodic antennas data sheet"
+            ),
+            new(
+                "DOC-LP-1019",
+                "LP-1019BA and LP-1019SS Log Periodic Antennas",
+                "/technical-resources/documents/log-periodic-antennas/usap-lp-1019-series-data-sheet.pdf",
+                "log-periodic-antennas",
+                "Log Periodic Antennas",
+                new[] { "lp-1019" },
+                new[] { "LP-1019BA", "LP-1019SS" },
+                "Data sheet",
+                "Model-by-model electrical, structural, material, feedline, and power information plus VSWR performance curve.",
+                2,
+                4,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1019-and-1019-ss-data-sheet.pdf"
+                },
+                "LP-1019BA LP-1019SS Log Periodic Antennas lp-1019 log periodic antennas data sheet"
+            ),
+            new(
+                "DOC-LP-1112MR",
+                "LP-1112MR Transportable Log Periodic Antenna",
+                "/technical-resources/documents/log-periodic-antennas/usap-lp-1112mr-data-sheet.pdf",
+                "log-periodic-antennas",
+                "Log Periodic Antennas",
+                new[] { "lp-1112mr" },
+                new[] { "LP-1112MR" },
+                "Data sheet",
+                "Transportable system overview, electrical and mechanical specifications, and VSWR performance curve.",
+                4,
+                5,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1112-data-sheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1112-data-sheet.pdf"
+                },
+                "LP-1112MR Transportable Log Periodic Antenna lp-1112mr log periodic antennas data sheet"
+            ),
+            new(
+                "DOC-V4213-OVERVIEW",
+                "V-4213 Portable Discone Antenna System Overview",
+                "/technical-resources/documents/portable-transportable-antennas/usap-v4213-portable-discone-overview.pdf",
+                "portable-transportable-antennas",
+                "Portable & Transportable Antenna Systems",
+                new[] { "v-4213" },
+                new[] { "V-4213AD", "V-4213AC" },
+                "Product overview",
+                "Portable discone overview, equipment-level distinction, and core electrical and mechanical specifications.",
+                2,
+                6,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/4213cutsheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/4213cutsheet.pdf"
+                },
+                "V-4213 V-4213AD V-4213AC Portable Discone Antenna System Overview v-4213 portable transportable product overview"
+            ),
+            new(
+                "DOC-V4213-CONFIG",
+                "V-4213AD and V-4213AC Configuration Data",
+                "/technical-resources/documents/portable-transportable-antennas/usap-v4213ad-v4213ac-data-sheet.pdf",
+                "portable-transportable-antennas",
+                "Portable & Transportable Antenna Systems",
+                new[] { "v-4213" },
+                new[] { "V-4213AD", "V-4213AC" },
+                "Data sheet",
+                "Equipment-level package description, electrical and mechanical specifications, and radiation-pattern figures.",
+                3,
+                7,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/Model-V4213-data-sheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/Model-V4213-data-sheet.pdf"
+                },
+                "V-4213AD V-4213AC Configuration Data v-4213 portable transportable data sheet"
+            ),
+            new(
+                "DOC-LP-1402-1403",
+                "LP-1402 and LP-1403 Transportable Log Periodic Antennas",
+                "/technical-resources/documents/portable-transportable-antennas/usap-lp-1402-lp-1403-data-sheet.pdf",
+                "portable-transportable-antennas",
+                "Portable & Transportable Antenna Systems",
+                new[] { "lp-1402-1403" },
+                new[] { "LP-1402", "LP-1403" },
+                "Data sheet",
+                "Transportable system overview and model-specific electrical and structural specifications.",
+                2,
+                8,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1402AC_1403AB.pdf"
+                },
+                "LP-1402 LP-1403 Transportable Log Periodic Antennas lp-1402-1403 portable transportable data sheet"
+            ),
+            new(
+                "DOC-1910",
+                "1910AA and 1910BA Broadband HF Dipole Antennas",
+                "/technical-resources/documents/portable-transportable-antennas/usap-1910aa-1910ba-data-sheet.pdf",
+                "portable-transportable-antennas",
+                "Portable & Transportable Antenna Systems",
+                new[] { "1910" },
+                new[] { "1910AA", "1910BA" },
+                "Data sheet",
+                "Model comparison, electrical and mechanical specifications, packaging, and high-frequency dipole configurations.",
+                2,
+                9,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/05/1910AA_1910BA.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1910-data-sheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/1910-data-sheet.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2024/02/1910AA_1910BA-revised-1.pdf"
+                },
+                "1910AA 1910BA Broadband HF Dipole Antennas 1910 portable transportable data sheet"
+            ),
+            new(
+                "DOC-APERIODIC",
+                "USAP Aperiodic Loop Antenna",
+                "/technical-resources/documents/aperiodic-loop-antennas/usap-aperiodic-loop-antenna-data-sheet.pdf",
+                "aperiodic-loop-antennas",
+                "Aperiodic Loop Antennas",
+                new[] { "aperiodic" },
+                Array.Empty<string>(),
+                "Technical overview",
+                "Receive-loop operating principles, array configuration, element construction, and selection data.",
+                2,
+                10,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/USAP-Aperiodic-Loop-Antenna-data-sheet.pdf"
+                },
+                "USAP Aperiodic Loop Antenna aperiodic loop antennas technical overview"
+            ),
+            new(
+                "DOC-1942",
+                "1942 NVIS Antenna Systems",
+                "/technical-resources/documents/nvis-antennas/usap-1942-nvis-series-data-sheet.pdf",
+                "nvis-antennas",
+                "NVIS Antennas",
+                new[] { "1942" },
+                new[] { "1942-RT", "1942-TA", "1942-GM", "1942-RT-LP", "1942-TA-LP", "1942-GM-LP" },
+                "Data sheet",
+                "Configuration descriptions, available options, electrical and mechanical comparison, and conditional NVIS application context.",
+                2,
+                11,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/MODEL-1942-data-sheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/MODEL-1942-data-sheet.pdf"
+                },
+                "1942 NVIS Antenna Systems 1942-RT 1942-TA 1942-GM 1942-RT-LP 1942-TA-LP 1942-GM-LP 1942 nvis data sheet"
+            ),
+            new(
+                "DOC-R3500",
+                "R3500 Heavy-Duty Antenna Rotator",
+                "/technical-resources/documents/antenna-rotator-control-systems/usap-r3500-rotator-data-sheet.pdf",
+                "antenna-rotator-control-systems",
+                "Antenna Rotator & Control Systems",
+                new[] { "r3500" },
+                new[] { "R3500" },
+                "Data sheet",
+                "Mechanical specifications, mounting options, feedline details, and optional hardware context.",
+                2,
+                12,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/07/MODEL-R3500-data-sheet.doc.pdf"
+                },
+                "R3500 Heavy-Duty Antenna Rotator r3500 antenna rotator control systems data sheet"
+            ),
+            new(
+                "DOC-R3501",
+                "R3501 Universal Antenna Rotator System",
+                "/technical-resources/documents/antenna-rotator-control-systems/usap-r3501-rotator-data-sheet.pdf",
+                "antenna-rotator-control-systems",
+                "Antenna Rotator & Control Systems",
+                new[] { "r3501" },
+                new[] { "R3501" },
+                "Data sheet",
+                "Mechanical specifications, mounting and feedline details, and system operating parameters.",
+                1,
+                13,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/10/MODEL-R3501-data-sheet.doc.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/10/Model-R3501-CORRECTED-COPY.pdf"
+                },
+                "R3501 Universal Antenna Rotator System r3501 antenna rotator control systems data sheet"
+            ),
+            new(
+                "DOC-R3503",
+                "R3503 Heavy-Duty Rotating System",
+                "/technical-resources/documents/antenna-rotator-control-systems/usap-r3503-rotator-data-sheet.pdf",
+                "antenna-rotator-control-systems",
+                "Antenna Rotator & Control Systems",
+                new[] { "r3503" },
+                new[] { "R3503" },
+                "Data sheet",
+                "Mechanical specifications and system operational parameters for the R3503 rotating system.",
+                1,
+                14,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/10/MODEL-R3503-data-sheet.doc.pdf"
+                },
+                "R3503 Heavy-Duty Rotating System r3503 antenna rotator control systems data sheet"
+            ),
+            new(
+                "DOC-DRC3",
+                "DRC-3 Digital Rotator Controller",
+                "/technical-resources/documents/antenna-rotator-control-systems/usap-drc-3-controller-data-sheet.pdf",
+                "antenna-rotator-control-systems",
+                "Antenna Rotator & Control Systems",
+                new[] { "drc-3" },
+                new[] { "DRC-3" },
+                "Data sheet",
+                "Digital rotator controller operational features, enclosure specifications, networking capabilities, and upgrade options.",
+                3,
+                15,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/DRC-3-Data-Sheet-revised.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/DRC-3-Data-Sheet.pdf"
+                },
+                "DRC-3 Digital Rotator Controller drc-3 antenna rotator control systems data sheet"
+            ),
+            new(
+                "DOC-DRC4",
+                "DRC-4 Digital Rotator Controller",
+                "/technical-resources/documents/antenna-rotator-control-systems/usap-drc-4-controller-data-sheet.pdf",
+                "antenna-rotator-control-systems",
+                "Antenna Rotator & Control Systems",
+                new[] { "drc-4" },
+                new[] { "DRC-4" },
+                "Data sheet",
+                "Digital rotator controller features, operating functions, control interfaces, and optional hardware.",
+                2,
+                16,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/10/DRC-4-Data-Sheet.pdf"
+                },
+                "DRC-4 Digital Rotator Controller drc-4 antenna rotator control systems data sheet"
+            ),
+            new(
+                "DOC-T3002",
+                "T-3002 RLPA Tower System",
+                "/technical-resources/documents/tower-systems-accessories/usap-t-3002-tower-system-data-sheet.pdf",
+                "tower-systems-accessories",
+                "Tower Systems & Accessories",
+                new[] { "t-3002" },
+                new[] { "T-3002", "3002FA", "3002FB", "3002SS", "3002SS-80" },
+                "Data sheet",
+                "Tower system overview, specification summary, configuration options, and installation accessories.",
+                3,
+                17,
+                new[]
+                {
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/06/T-3002-Data-Sheet.pdf",
+                    "https://www.usantennaproducts.com/wp-content/uploads/2016/10/T3002_data_sheet.pdf"
+                },
+                "T-3002 3002FA 3002FB 3002SS 3002SS-80 RLPA Tower System t-3002 tower systems accessories data sheet"
+            )
         };
 
         return (families, productGroups, resources);

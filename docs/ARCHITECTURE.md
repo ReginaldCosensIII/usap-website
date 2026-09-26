@@ -44,6 +44,13 @@ usap-website/
 │   └── *.md
 └── src/
     └── USAP.Web/
+        ├── Middleware/
+        │   └── LegacyDocumentRedirectMiddleware.cs   HTTP 301 legacy PDF redirects
+        ├── Models/
+        │   └── Catalog/
+        │       ├── ProductFamilyRecord.cs
+        │       ├── ProductGroupRecord.cs
+        │       └── ProductResourceRecord.cs          Canonical technical document model
         ├── Pages/
         │   ├── Products/     /products and /products/{familySlug}
         │   ├── Shared/
@@ -61,8 +68,15 @@ usap-website/
         │   └── Error.cshtml
         ├── Properties/launchSettings.json
         ├── wwwroot/
-        │   ├── css/site.css          design system tokens, layout, components
-        │   ├── js/site-navigation.js  dependency-free mobile nav module
+        │   ├── css/
+        │   │   ├── site.css          design system tokens, layout, components
+        │   │   └── technical-resources.css   library grid, filters, and cards
+        │   ├── js/
+        │   │   ├── site-navigation.js  dependency-free mobile nav module
+        │   │   ├── disclosure.js       native accessible disclosure controller
+        │   │   └── technical-resources.js    client-side search and category filtering
+        │   ├── documents/
+        │   │   └── technical/        17 canonical first-party PDF binaries
         │   ├── robots.txt
         │   └── sitemap.xml
         ├── appsettings.json
@@ -287,16 +301,30 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
   - Preserves full `object-fit: contain; object-position: right center;` with zero cropping, distortion, or source asset changes.
   - Homepage hero remains separate and unmodified. Technical Resources hero will inherit this shared architecture upon eventual implementation.
 
+- **Technical Resources Architecture & Document Migration (USAP-TECHDOC-001 / USAP-TECHDOC-001-R1 / USAP-TECHDOC-001-R2)**:
+  - **Direct Public Access**: Implemented direct public access to locally hosted technical PDFs without lead capture gating per project-lead directive (DEC-042).
+  - **Local Canonical Document Hosting & Preferred Public URL**: 17 verified first-party canonical PDFs hosted under `src/USAP.Web/wwwroot/documents/technical/{family-slug}/{filename}`. Established `/technical-resources/documents/{family-slug}/{filename}` as the singular preferred public raw-PDF URL. Alternate `/documents/technical/...` paths issue permanent HTTP 301 redirects to the preferred path via `LegacyDocumentRedirectMiddleware` to prevent dual indexable URLs for identical binaries (DEC-043).
+  - **PDF Byte Preservation & Metadata Policy**: Strict byte-for-byte fidelity with the verified R2 source package is maintained across all 17 PDFs. Embedded metadata/title anomalies in historical PDF binaries are not modified in binary files; title clarity is established purely via HTML document-detail views, `<title>` tags, and structured metadata. Evaluation of metadata-normalized publication derivatives or a controlled viewer is deferred after baseline commit (DEC-044).
+  - **Branded HTML Document-Detail Experience**: Implemented reusable data-driven Razor Page `/technical-resources/document/{slug}` with hero heading, relocated semantic breadcrumbs below hero matching Product Family architecture, covered model badges, format/page metadata, direct PDF actions, streamlined native browser embedded PDF viewing (`<object>` / `<iframe>`) with clean fallback, related product group links, and standard closing CTA.
+  - **Metadata Model & Service**: `ProductResourceRecord` encapsulates complete technical metadata (`Id`, `Slug`, `DetailUrl`, `Title`, `LocalPdfPath`, `FamilySlug`, `FamilyName`, `ProductGroupIds`, `ModelCodes`, `DocumentType`, `Description`, `PageCount`, `SortOrder`, `LegacySourceUrls`, `SearchText`). `ProductCatalogService` provides `GetTechnicalDocumentBySlug(slug)` alongside family and group resource queries.
+  - **Homepage Deep-Link Taxonomy & Preset Views**: Four homepage preview cards deep-link to structured views: `type=data-sheet` (15 data sheets), `view=antenna-systems` (11 antenna documents), `category=antenna-rotator-control-systems` (5 documents), and `category=tower-systems-accessories` (1 document), accompanied by an active filter banner with clear action. Redundant reset buttons are suppressed when preset banner is visible.
+  - **Search Toolbar & Hero Artwork**: Toolbar features a right-aligned contained layout on desktop (max-width 32rem) with visible submit button, balancing against left-aligned family filters. Full-width responsive layout on mobile/tablet. Hero graphic `usap-technical-resources-hero-requirements-document-candidate-b-v1.png` is integrated into the shared `.internal-hero` architecture.
+  - **Card Footer & Link State System**: Restored atomic, nowrap page-count indicators (`1 page`, `2 pages`) with restrained document SVG icon, paired with compact `View Document` and `Download PDF` actions. Explicit `:link`, `:visited`, `:hover`, and `:focus-visible` styling guarantees zero default browser purple link colors across card titles, metadata, and detail navigation.
+  - **Permanent Legacy Document Redirects**: `LegacyDocumentRedirectMiddleware` provides HTTP 301 permanent redirects for all 34 known legacy `/wp-content/uploads/...pdf` URLs, preserving bookmarks and query strings.
+  - **Progressive Enhancement & SEO Foundation**: Fully usable without JavaScript via server-side GET handling. Unique server-rendered HTML `<title>`, description, H1, and contextual product links serve as indexable search engine content.
+
 ## Deferred decisions
 
 | Decision | Deferred to |
 |---|---|
-| Static content data format and location | Catalog & Resources |
+| Static content data format and location | Catalog & Resources (Completed for products and technical documents) |
 | SMTP/email service | Forms & Search (Currently simulated in Development with `DevelopmentInquirySubmissionService`; unavailable elsewhere) |
 | Analytics (GA4) | Forms & Search |
-| Advanced Technical Resources filtering | Separately authorized |
-| Legacy URL redirect map | The initial redirect map now exists. Redirect implementation remains deferred until the catalog/resource mapping and IIS review are complete. |
+| Advanced Technical Resources filtering | Separately authorized (basic search, family category filters, and homepage preset views implemented) |
+| Legacy page redirect map | Technical document redirects (34 URLs) are fully implemented via `LegacyDocumentRedirectMiddleware`. Legacy WordPress category and product URLs remain deferred to Milestone C3. |
 | Internal hero text width and placement on ultra-wide displays | Visual Enhancements (On larger/wider desktop monitors, internal hero copy remains relatively constrained toward the left despite increased space; layout expansion deferred to later visual-enhancement workstream) |
+| Metadata-normalized PDF publication derivatives or controlled viewer | Post-Baseline Enhancement (Evaluate after baseline TECHDOC feature commit) |
+| Document-detail hero image visual treatment | Post-Baseline Enhancement (Evaluate after baseline TECHDOC stabilization) |
 
 ## Forms and Validation
 

@@ -7,7 +7,7 @@
 | `/` | `Pages/Index.cshtml` | Provisional | Section 5 integrates shared `_ProductFamilyCard.cshtml` featuring 4 canonical families via `IProductCatalogService`, linking to `/products/{slug}` with section-level `View All Products` linking to `/products`. | `HF, VHF & UHF Antenna Systems` (index, follow) |
 | `/products` | `Pages/Products/Index.cshtml` | Provisional (USAP-CATALOG-001-C2) | Structured 6-family catalog landing page with Direction C hero, unified shared card grid (3-column), Candidate B rotator card, 3 actionable guidance pathways with inline continuation, 6-question FAQ, and closing CTA. | `Antenna Products & Systems` (index, follow) |
 | `/products/{familySlug}` | `Pages/Products/Family.cshtml` | Provisional (USAP-CATALOG-002-C1R6) | Six canonical family routes with responsive hero, breadcrumbs, structured product groups, Configuration Support, and standardized closing sequence. Unique titles/meta descriptions and family-specific headings. Validates slugs with HTTP 404 for invalid slugs. | `[Family Name] | United States Antenna Products` (index, follow — production intent) |
-| `/technical-resources` | `Pages/TechnicalResources.cshtml` | Stub | Pending approved documents and organization | `Technical Resources` (index, follow) |
+| `/technical-resources` | `Pages/TechnicalResources.cshtml` | Complete (USAP-TECHDOC-001) | Direct public access canonical resource library featuring all 17 canonical documents, client-side keyword search, family category filtering with live counts, responsive cards, direct PDF actions, empty state, and 100% progressive enhancement. | `Technical Resources` (index, follow) |
 | `/about-us` | `Pages/AboutUs.cshtml` | Provisional | Reference-grounded imagery integrated; shared hero and closing CTA; client approval pending | `About Us` (index, follow) |
 | `/contact-us` | `Pages/ContactUs.cshtml` | Provisional | Shared internal hero and sidebar with verified contact details and Google Maps embed; form behavior preserved | `Contact Us` (index, follow) |
 | `/request-a-quote` | `Pages/RequestAQuote.cshtml` | Provisional | Shared internal hero and sidebar with verified contact details and Google Maps embed; form behavior preserved | `Request a Quote` (index, follow) |
@@ -86,15 +86,23 @@
 
 
 * **Disputed Specifications Policy:** Specifications on hold are withheld and replaced with restrained engineering guidance. Internal governance metadata (`ConflictHolds`, `SourceNotes`, `ApprovalStatus`, etc.) is never exposed publicly.
-* **Interim Technical Documents:** Six current interim product-page resource links are wired and validated (`doc-lp-high-power`, `doc-lp-1018ba`, `doc-lp-1019`, `doc-1910-2024`, `doc-aperiodic`, `doc-t-3002-oct2016`). The data architecture remains extensible for R2's 17 canonical PDFs planned for future migration under `USAP-TECHDOC-001`, without treating six as a permanent ceiling or classifying remaining PDFs as rejected.
+* **Canonical Technical Documents:** Under `USAP-TECHDOC-001`, the interim 6 external document links were superseded by the complete 17-document canonical first-party library hosted locally under `wwwroot/documents/technical/`. All 16 product groups reference local canonical paths with zero WordPress dependencies. Groups with multiple canonical documents (e.g. `v-4213`) associate both documents cleanly.
 * **Slug Validation & True 404:** Slugs are strictly validated against `IProductCatalogService.GetFamilyBySlug(familySlug)`. Unrecognized slugs return HTTP 404.
-* **Legacy Public Redirects (Deferred to C3):** Legacy WordPress category and product URLs from the current public site are mapped in the research workbook and will be implemented in Milestone C3.
+* **Legacy Public Redirects:** All 34 known legacy WordPress PDF URLs are permanently redirected (HTTP 301) via `LegacyDocumentRedirectMiddleware` to their respective canonical local documents under `/technical-resources/documents/`. Legacy category/product page redirects remain scheduled for Milestone C3.
 
-## Technical Resources scope
+## Technical Resources Library (USAP-TECHDOC-001 / USAP-TECHDOC-001-R1 / USAP-TECHDOC-001-R2)
 
-Fixed-scope baseline: organized static resource library with approved documents, categories, and organization.
-* The selected Technical Resources hero image candidate (`usap-technical-resources-hero-requirements-document-candidate-b-v1.png`) is stored in `wwwroot/images/technical-resources/` but remains strictly unimplemented and unreferenced during C1.
-* Advanced search and filtering is separately authorized and is not included in the fixed 48-hour scope.
+The `/technical-resources` route provides an accessible, searchable, and category-filtered public document library:
+* **Direct Public Access:** All 17 canonical documents are directly viewable and downloadable without a lead capture gate.
+* **Canonical Document Corpus:** Exactly 17 first-party PDFs migrated from R2 research package, organized by product family.
+* **Search & Filter Controls:** Right-aligned contained desktop search toolbar (max-width 32rem) with visible submit button, keyword search across title/family/models/description, and 6 product-family category filter pills plus `All` with real-time document counts. Full width on mobile/tablet.
+* **Homepage Deep-Link Taxonomy:** Reconciled entry points supporting `type=data-sheet`, `view=antenna-systems`, `category=antenna-rotator-control-systems`, and `category=tower-systems-accessories`, with an active filter badge and clear action. Redundant reset controls suppressed.
+* **Card Footers & Atomic Page Counts:** Restored visual organization with restrained document SVG icon and atomic `nowrap` page indicators (`1 page`, `2 pages`), paired with compact `View Document` and `Download PDF` action buttons fitting on a single row in 3-column desktop layout.
+* **Link State Protection:** Explicit `:link`, `:visited`, `:hover`, and `:focus-visible` styling ensures card titles, metadata, and breadcrumbs remain dark navy and branded red, with zero browser-default purple link colors.
+* **Branded HTML Document Detail Routes (`/technical-resources/document/{slug}`):** Data-driven detail pages for all 17 canonical documents featuring H1 title, relocated semantic breadcrumbs below hero matching Product Family architecture, metadata, covered models, primary download/open actions, related product group links, and native browser embedded PDF preview (`<object>` / `<iframe>`). Redundant Back button removed.
+* **Progressive Enhancement:** 100% functional without JavaScript. Server-side GET filtering provides baseline access, while unobtrusive JavaScript adds instant client-side updates, live region status announcements, and smooth filter resets.
+* **Hero Artwork & Controlled Closing CTA:** Hero image `usap-technical-resources-hero-requirements-document-candidate-b-v1.png` is integrated into the shared `.internal-hero` architecture. Standard USAP closing CTA (`.closing-cta--default`) with approved controlled copy ("Ready to Discuss Your Antenna Requirements?") precedes the footer across library and detail routes. Mobile-specific hero derivative remains deferred.
+
 
 ## Forms
 

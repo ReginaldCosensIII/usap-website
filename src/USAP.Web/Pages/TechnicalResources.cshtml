@@ -4,18 +4,220 @@
     ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
     {
         Title = "Technical Resources",
-        Description = "Access available product datasheets and technical information for USAP antenna systems, rotators, controls, and related equipment.",
+        Description = "Access available product datasheets and technical documentation for USAP antenna systems, rotators, and accessories.",
         CanonicalPath = "/technical-resources",
         Robots = "index, follow",
         OpenGraphType = "website"
     };
 }
 
-<div class="container section">
-    <h1>Technical Resources</h1>
-    <div class="page-placeholder">
-        <p><strong>[PLACEHOLDER]</strong> Technical resource library will be implemented in the Catalog &amp; Resources task.</p>
-        <p>The fixed-scope baseline is an organized resource library with approved documents, categories, and organization. Advanced search and filtering is separately authorized work.</p>
-        <p>See <code>docs/CONTENT_AND_ASSETS.md</code> for outstanding client-input requirements.</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/technical-resources.css" asp-append-version="true" />
+}
+
+<!-- Section 1: Hero / Introductory Banner -->
+<section class="internal-hero internal-hero--technical-resources" aria-labelledby="technical-resources-heading">
+    <div class="internal-hero-bg" aria-hidden="true"></div>
+    <img class="internal-hero-image"
+         src="~/images/technical-resources/usap-technical-resources-hero-requirements-document-candidate-b-v1.png"
+         alt=""
+         width="2048"
+         height="768"
+         fetchpriority="high"
+         decoding="async" />
+    <div class="internal-hero-overlay" aria-hidden="true"></div>
+    <div class="container">
+        <div class="internal-hero-content">
+            <span class="eyebrow internal-hero-eyebrow">Documentation Library</span>
+            <h1 id="technical-resources-heading" class="internal-hero-title">Technical Resources</h1>
+            <p class="internal-hero-lead">Access official data sheets, system overviews, and technical specifications for USAP antenna systems, positioning rotators, and tower accessories.</p>
+        </div>
     </div>
-</div>
+</section>
+
+<!-- Section 2: Technical Resources Library -->
+<section class="section technical-resources-section" aria-label="Technical documents library">
+    <div class="container">
+        <!-- Toolbar: Search and Family Filter Controls -->
+        <div class="resources-toolbar" role="search" aria-label="Search and filter technical resources">
+            <form method="get" action="/technical-resources" class="resources-search-form" id="tech-search-form">
+                <div class="resources-search-wrapper">
+                    <label for="tech-search-input" class="sr-only">Search technical documents by model, keyword, or title</label>
+                    <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="search"
+                           id="tech-search-input"
+                           name="q"
+                           value="@Model.Q"
+                           class="resources-search-input"
+                           placeholder="Search by model, title, or keyword (e.g. LP-1017, discone, rotator)..."
+                           autocomplete="off"
+                           aria-describedby="search-live-status" />
+                    <button type="button" id="clear-search-btn" class="resources-search-clear" aria-label="Clear search input" hidden>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-secondary resources-search-submit">Search</button>
+            </form>
+
+            <div class="resources-filter-bar" role="group" aria-label="Filter documents by product family">
+                @foreach (var cat in Model.Categories)
+                {
+                    var isSelected = string.Equals(Model.ActiveFamily, cat.Slug, StringComparison.OrdinalIgnoreCase);
+                    <button type="button"
+                            class="filter-pill @(isSelected ? "filter-pill--active" : "")"
+                            data-family="@cat.Slug"
+                            aria-pressed="@(isSelected ? "true" : "false")">
+                        <span class="filter-pill__label">@cat.Name</span>
+                        <span class="filter-pill__count">@cat.Count</span>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Active Preset Filter Banner (e.g. Data Sheets or Antenna Systems) -->
+        <div class="active-filter-banner @(string.IsNullOrWhiteSpace(Model.ActiveFilterLabel) ? "active-filter-banner--hidden" : "")" id="active-filter-banner">
+            <span class="active-filter-text">Filtered by: <strong id="active-filter-label">@(Model.ActiveFilterLabel ?? "")</strong></span>
+            <a href="/technical-resources" class="active-filter-clear" id="active-filter-clear-btn" aria-label="Clear active filter">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Clear filter
+            </a>
+        </div>
+
+        <!-- Live Status and Results Count -->
+        <div id="search-live-status" class="sr-only" aria-live="polite" aria-atomic="true">
+            Showing @Model.FilteredDocuments.Count of @Model.TotalDocumentCount technical documents
+        </div>
+
+        <div class="resources-status-bar">
+            <span class="resources-count" id="resources-count-display">
+                Showing <strong id="visible-count">@Model.FilteredDocuments.Count</strong> of @Model.TotalDocumentCount technical documents
+            </span>
+            <button type="button" id="toolbar-reset-btn" class="btn-text resources-reset-link" hidden>
+                Reset filters
+            </button>
+        </div>
+
+        <!-- Document Cards Grid -->
+        <div class="resources-grid" id="resources-grid" role="list">
+            @foreach (var doc in Model.AllDocuments)
+            {
+                var isInitiallyVisible = Model.FilteredDocuments.Any(f => f.Id == doc.Id);
+                var isAntennaFamily = doc.FamilySlug == "log-periodic-antennas" ||
+                                      doc.FamilySlug == "portable-transportable-antennas" ||
+                                      doc.FamilySlug == "aperiodic-loop-antennas" ||
+                                      doc.FamilySlug == "nvis-antennas";
+                <article class="resource-card @(!isInitiallyVisible ? "resource-card--hidden" : "")"
+                         role="listitem"
+                         data-id="@doc.Id"
+                         data-slug="@doc.Slug"
+                         data-family="@doc.FamilySlug"
+                         data-type="@(string.Equals(doc.DocumentType, "Data sheet", StringComparison.OrdinalIgnoreCase) ? "data-sheet" : "other")"
+                         data-is-antenna="@(isAntennaFamily ? "true" : "false")"
+                         data-search="@doc.SearchText.ToLowerInvariant()"
+                         data-title="@doc.Title.ToLowerInvariant()"
+                         data-models="@string.Join(" ", doc.ModelCodes).ToLowerInvariant()">
+                    <div class="resource-card__header">
+                        <span class="resource-card__family">@doc.FamilyName</span>
+                        <div class="resource-card__badges">
+                            <span class="resource-badge resource-badge--type">@doc.DocumentType</span>
+                            <span class="resource-badge resource-badge--format">PDF</span>
+                        </div>
+                    </div>
+
+                    <h2 class="resource-card__title">
+                        <a href="@doc.DetailUrl" class="resource-card__title-link">@doc.Title</a>
+                    </h2>
+
+                    @if (doc.ModelCodes.Count > 0)
+                    {
+                        <div class="resource-card__models" aria-label="Covered models">
+                            <span class="resource-card__models-label">Covered Models:</span>
+                            <ul class="resource-card__model-tags" role="list">
+                                @foreach (var modelCode in doc.ModelCodes)
+                                {
+                                    <li class="resource-card__model-tag"><code>@modelCode</code></li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <p class="resource-card__desc">@doc.Description</p>
+
+                    <div class="resource-card__footer">
+                        <div class="resource-card__meta">
+                            <span class="resource-card__pages">
+                                <svg class="resource-card__pages-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                <span class="resource-card__pages-text">@(doc.PageCount) @(doc.PageCount == 1 ? "page" : "pages")</span>
+                            </span>
+                        </div>
+                        <div class="resource-card__actions">
+                            <a href="@doc.DetailUrl"
+                               class="btn btn-primary btn-sm resource-card__action-btn"
+                               aria-label="View document details for @doc.Title">
+                                <span>View Document</span>
+                            </a>
+                            <a href="@doc.LocalPdfPath"
+                               download
+                               class="btn btn-outline btn-sm resource-card__download-btn"
+                               aria-label="Download @doc.Title (PDF, @(doc.PageCount) pages)">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                <span>Download PDF</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+
+        <!-- Empty State (No Results) -->
+        <div class="resources-empty @(Model.FilteredDocuments.Count > 0 ? "resources-empty--hidden" : "")" id="resources-empty" aria-live="polite">
+            <div class="resources-empty__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    <line x1="8" y1="11" x2="14" y2="11"></line>
+                </svg>
+            </div>
+            <h2 class="resources-empty__title">No matching technical documents</h2>
+            <p class="resources-empty__message">No documents matched your current search or category filter. Adjust your search terms, select another product family, or reset all filters.</p>
+            <div class="resources-empty__actions">
+                <button type="button" id="reset-filters-btn" class="btn btn-secondary">Reset Filters</button>
+                <a href="/contact-us" class="btn btn-primary">Contact Engineering</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section 3: Shared Closing CTA -->
+<section class="closing-cta closing-cta--default tech-resources-closing-cta" aria-labelledby="closing-cta-heading">
+    <div class="container">
+        <div class="closing-cta-content">
+            <h2 id="closing-cta-heading">Ready to Discuss Your Antenna Requirements?</h2>
+            <p>Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.</p>
+            <div class="closing-cta-actions">
+                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
+                <a href="/contact-us" class="btn btn-inverse">Request Information</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/technical-resources.js" asp-append-version="true" defer></script>
+}

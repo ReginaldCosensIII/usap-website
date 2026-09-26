@@ -820,3 +820,101 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 4. **Deferred Ultra-Wide Copy Layout Enhancement:**
    - Retained project-lead observation that internal hero copy on larger/wider monitors should later receive additional horizontal space; deferred to the future visual-enhancement workstream.
 **Reason:** Production implementation of project-lead/Architect-selected Candidate R2 mask following the USAP-CATALOG-002-C1R13 prototype study to eliminate the Rotator hero asset's hard entrance seam.
+
+---
+
+## DEC-042 — USAP-TECHDOC-001: Technical Resources Library and Canonical PDF Migration
+
+**Date:** 2026-09-24
+**Decision:**
+1. **Canonical Technical Document Migration:**
+   - Migrated exactly 17 canonical first-party technical PDF binaries from the verified R2 source package into the application under `src/USAP.Web/wwwroot/documents/technical/{family-slug}/{filename}`.
+   - All 17 files verified byte-for-byte and SHA-256 identical to the R2 manifest. No binary modification or superseded duplicates deployed.
+2. **Direct Public Access Model:**
+   - Adopted direct public access for all technical documentation as directed by the project lead. Visitors can directly view and download canonical PDFs without a lead capture gate.
+3. **Application Document Architecture:**
+   - Extended `ProductResourceRecord` to represent full canonical technical document metadata (`Id`, `Title`, `LocalPdfPath`, `FamilySlug`, `FamilyName`, `ProductGroupIds`, `ModelCodes`, `DocumentType`, `Description`, `PageCount`, `SortOrder`, `LegacySourceUrls`, `SearchText`).
+   - Maintained backwards-compatible accessors (`ProductGroupId`, `ResourceType`, `CurrentSourceUrl`) for existing product views.
+   - Updated `IProductCatalogService` and `ProductCatalogService` to register all 17 canonical documents and provide retrieval by group (`GetApprovedResourcesForGroup`) and family (`GetTechnicalDocumentsByFamily`), plus full library retrieval (`GetAllTechnicalDocuments`).
+4. **Product Catalog Document Reconciliation:**
+   - Reconciled all 16 product groups to reference local canonical documents, eliminating all external legacy WordPress PDF links.
+   - Supported multi-document association on product groups where R2 established multiple canonical documents (`v-4213` associates both `DOC-V4213-OVERVIEW` and `DOC-V4213-CONFIG`). All other 15 groups associate their singular canonical document.
+   - Preserved all factual constraints and prohibited token rules.
+5. **Permanent Legacy Document Redirects (HTTP 301):**
+   - Implemented `LegacyDocumentRedirectMiddleware` in ASP.NET Core request pipeline to handle all 34 known legacy `/wp-content/uploads/...pdf` URLs.
+   - Mapped each legacy URL directly to its canonical destination (`/technical-resources/documents/{family-slug}/{filename}`), preserving query strings.
+   - Configured static file serving at `/technical-resources/documents` mapped to disk path `wwwroot/documents/technical`, ensuring both `/technical-resources/documents/...` and `/documents/technical/...` return HTTP 200 OK.
+6. **Technical Resources Library UI & Progressive Enhancement:**
+   - Built a semantic, accessible resource library on `/technical-resources` with keyword search, category filter pills (`All` + 6 canonical product families with live counts), responsive cards, empty state, and filter reset.
+   - Guaranteed 100% progressive enhancement: library is completely visible and filterable without JavaScript, with instant client-side enhancement when JavaScript is enabled.
+
+---
+
+## DEC-043 — USAP-TECHDOC-001-R1: Document Detail Experience, Canonical PDF Canonicalization, Homepage Deep-Link Taxonomy, and Hero Integration
+
+**Date:** 2026-09-25
+**Decision:**
+1. **Branded HTML Document-Detail Route Architecture:**
+   - Implemented a reusable, data-driven Razor Page (`/technical-resources/document/{slug}`) mapping all 17 canonical documents via `GetTechnicalDocumentBySlug(slug)`.
+   - Displays breadcrumb navigation, H1 document title, product family link, covered model badges, format/page metadata, direct PDF download and open actions, and related product group links.
+   - Incorporates native browser PDF viewing using a semantic `<object data="..." type="application/pdf">` / `<iframe>` container with clean fallback for unsupported devices.
+2. **Technical Resources Library Card & Product Action Alignment:**
+   - Changed library card primary viewing action from opening raw PDF directly to the branded HTML detail page (`View Document`).
+   - Retained explicit `Download PDF` action pointing directly to the local canonical PDF binary.
+   - Aligned product family group disclosure links to navigate to the branded detail page while offering direct PDF downloads.
+3. **Canonical Raw-PDF URL Reconciliation:**
+   - Established `/technical-resources/documents/{family-slug}/{filename}` as the singular preferred public raw-PDF destination.
+   - Configured `LegacyDocumentRedirectMiddleware` to issue HTTP 301 permanent redirects from alternate `/documents/technical/...` paths to `/technical-resources/documents/...` to eliminate dual indexable URLs for identical binaries.
+4. **PDF Byte Preservation & Metadata Policy:**
+   - Reaffirmed strict policy: PDF binaries must remain byte-for-byte identical to the verified first-party R2 source package.
+   - Prohibited editing internal PDF binary metadata to change legacy/imperfect embedded document titles (e.g. Word cut sheet titles).
+   - Solved visitor-facing and SEO title clarity purely through branded HTML document detail pages, descriptive HTML `<title>` tags, clean public filenames, and structured catalog metadata.
+5. **Homepage Deep-Link Taxonomy & Preset Filter UX:**
+   - Reconciled the four homepage Technical Resources preview cards against structured metadata:
+     - `Product Data Sheets`: links to `/technical-resources?type=data-sheet`, dynamically filtering to documents where `DocumentType == "Data sheet"`.
+     - `Antenna Systems`: links to `/technical-resources?view=antenna-systems`, dynamically filtering to the 4 canonical antenna families (`log-periodic-antennas`, `portable-transportable-antennas`, `aperiodic-loop-antennas`, `nvis-antennas`).
+     - `Rotators & Controls`: links to `/technical-resources?category=antenna-rotator-control-systems`.
+     - `Tower Systems & Accessories`: links to `/technical-resources?category=tower-systems-accessories`.
+     - `Browse Technical Resources`: links to `/technical-resources` with all 17 documents visible.
+   - Implemented an active filter banner (`Filtered by: [Label] [Clear]`) that visually communicates active presets and provides an instant clear action.
+6. **Search Toolbar Desktop Containment:**
+   - Refined the search toolbar to form a contained, left-aligned group on desktop (max-width ~52rem) with a clear visual gap between the search input and visible Search submit button.
+7. **Hero Artwork & Closing CTA Integration:**
+   - Integrated existing hero graphic `usap-technical-resources-hero-requirements-document-candidate-b-v1.png` into `/technical-resources` using the shared `.internal-hero` architecture. Verified readable contrast and responsive behavior; recorded mobile derivative as a deferred visual enhancement item.
+   - Added standard USAP closing CTA (`.closing-cta.closing-cta--default`) before footer on `/technical-resources` and document detail views directing visitors to Contact Us and Request a Quote.
+8. **Document Detail SEO Foundation:**
+   - Provided unique `<title>`, unique meta description, canonical URL, and OpenGraph metadata for all 17 document detail routes based strictly on approved R2 safe summary content. Raw PDF text extraction is not dumped automatically to prevent publishing status-sensitive historical details.
+
+---
+
+## DEC-044 — USAP-TECHDOC-001-R2: Technical Resources UI Cleanup, Card Footer Restoration, Breadcrumb Relocation, and Baseline Stabilization
+
+**Date:** 2026-09-25
+**Decision:**
+1. **Desktop Search Toolbar Right Alignment:**
+   - Refined desktop and wide-desktop toolbar layout so the contained search group (`max-width: 32rem; width: 100%`) aligns to the right side of the main content container (`margin-left: auto; margin-right: 0`), balancing cleanly against the left-aligned product family filter pills.
+   - Retained responsive full-width behavior on tablet and mobile viewports (`max-width: 100%; margin-left: 0`) with zero horizontal overflow.
+2. **Technical Document Card Footer & Atomic Page Count Restoration:**
+   - Restored the visual organization of the earlier card footer: `[document icon] 2 pages    [View Document] [Download PDF]`.
+   - Guaranteed that page indicators (`1 page`, `2 pages`, etc.) remain strictly on one line as an atomic flex item (`white-space: nowrap`), preventing unwanted line wrapping between numbers and the word "page/pages".
+   - Compacted action button proportions (`View Document` and `Download PDF`) so footers fit on a single row in standard 3-column desktop grid configurations.
+3. **Card-Title and UI Link State Protection:**
+   - Explicitly styled `:link`, `:visited`, `:hover`, `:focus-visible`, and `:active` states on card title links, document property metadata links, breadcrumbs, viewer notes, and related group cards.
+   - Normal and visited states strictly preserve intended dark navy / branded link colors, completely preventing browser-default purple link colors from leaking into the UI.
+4. **Document-Detail Breadcrumb Architecture Repair:**
+   - Relocated breadcrumbs on `/technical-resources/document/{slug}` to appear immediately below the hero, adhering to the approved breadcrumb hierarchy and styling from Product Family pages.
+   - Reused shared `.breadcrumbs` classes, eliminating browser-default numbered list markers.
+5. **Detail Hero Action Streamlining:**
+   - Removed the redundant and low-contrast `Back to Resource Library` button from the document-detail hero; return navigation is now handled cleanly by the relocated breadcrumbs.
+   - Preserved clear primary `Download PDF` and secondary `Open PDF in New Tab` actions in the hero, while streamlining the embedded viewer header to remove adjacent button duplication.
+6. **Closing CTA Content Alignment:**
+   - Replaced custom guidance copy with the approved, controlled USAP Closing Inquiry CTA across both `/technical-resources` and all `/technical-resources/document/{slug}` routes:
+     - Heading: `Ready to Discuss Your Antenna Requirements?`
+     - Copy: `Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.`
+     - Primary Action: `Request a Quote` (`/request-a-quote`).
+     - Secondary Action: `Request Information` (`/contact-us`).
+7. **Preset Filter UI Simplification:**
+   - Suppressed redundant "Reset filters" link when active preset filter banner (`Filtered by: [Label] Clear filter`) is showing, providing a single clear status indicator and reset action.
+8. **Explicitly Deferred Post-Baseline Items:**
+   - Evaluated embedded PDF title anomalies (e.g. Word cut sheet titles) and reaffirmed byte-for-byte binary preservation for this baseline; deferred evaluation of metadata-normalized publication derivatives or a controlled/custom viewer after baseline commit.
+   - Explicitly deferred image-backed hero exploration on document-detail pages until after baseline stabilization.

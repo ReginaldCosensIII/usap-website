@@ -1174,3 +1174,133 @@ To prevent recurrence:
     - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore` (exit code 0).
 * **Review Package:**
   * `USAP-CATALOG-002-C1R13-R1-rotator-mask-production-review-package.zip`.
+
+---
+
+## 2026-09-24 — USAP-TECHDOC-001: Technical Resources Library and Canonical PDF Migration QA
+
+* **Scope & Implementation Summary:**
+  * **Canonical Document Migration:**
+    - Exactly 17 first-party canonical PDF binaries copied into `src/USAP.Web/wwwroot/documents/technical/{family-slug}/{filename}`.
+    - Verified 17 of 17 PDF binaries against R2 `MANIFEST.txt`: 100% byte count and SHA-256 hash match.
+    - Zero superseded or duplicate binaries deployed to `wwwroot`.
+  * **Direct Public Access & Technical Resources Route (`/technical-resources`):**
+    - Upgraded `/technical-resources` to a fully responsive, semantic public library.
+    - Direct public access model implemented: direct view and download actions for all 17 PDFs without a lead capture gate.
+    - Keyword search input filters documents across title, model numbers, product family, description, and search tokens.
+    - Category filter bar features 6 product family categories plus `All` with accurate live document counts.
+    - Accessible no-results empty state with filter reset action.
+    - Live region (`aria-live="polite"`) announces visible document counts to assistive technology.
+    - 100% progressive enhancement: library is completely functional without JavaScript (via server GET handling), and enhanced with instant client-side updates when JavaScript is enabled.
+  * **Product Catalog Document Reconciliation:**
+    - Replaced all 6 interim WordPress-hosted links across the catalog with local canonical PDF paths.
+    - Reconciled all 16 product groups to their respective canonical documents.
+    - Supported multi-document groups (`v-4213` associates both `DOC-V4213-OVERVIEW` and `DOC-V4213-CONFIG`). All other 15 groups associate their singular canonical document.
+    - Total catalog document links: exactly 17 links across all 6 family pages.
+    - Zero external WordPress links remain anywhere in application markup.
+  * **Legacy Document Redirects (HTTP 301):**
+    - Implemented `LegacyDocumentRedirectMiddleware` in ASP.NET Core pipeline before `UseStaticFiles`.
+    - Tested all 34 known legacy `/wp-content/uploads/...pdf` URLs from `USAP-CATALOG-002-R2-LEGACY-DOCUMENT-REDIRECT-MATRIX.csv`.
+    - 34 of 34 URLs verified returning HTTP 301 Moved Permanently with Location header matching the expected canonical destination.
+    - Query string preservation verified (e.g. `?src=test&ref=manual` passes through intact).
+  * **Dual Static File Serving:**
+    - Configured `PhysicalFileProvider` for `/technical-resources/documents` alongside default `/documents/technical`.
+    - All 17 canonical PDFs verified returning HTTP 200 OK and `Content-Type: application/pdf` under `/technical-resources/documents/...`.
+    - All 17 canonical PDFs verified returning HTTP 200 OK and `Content-Type: application/pdf` under `/documents/technical/...`.
+  * **Responsive & Accessibility Verification:**
+    - Tested desktop (1440×900, 1280×800), tablet (768×1024), and mobile (390×844) viewports.
+    - Zero horizontal overflow (`scrollWidth <= innerWidth`) on all viewports.
+    - Fully keyboard-operable search input, clear button, and category pills with ArrowLeft / ArrowRight navigation.
+    - Visible focus rings (`--color-focus`, 2px/3px outline) verified on all interactive elements.
+    - Reduced motion preferences honored with transitions and transforms suppressed.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check`: 0 issues (exit code 0).
+    - `dotnet restore USAP.Web.sln`: Success (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 warnings, 0 errors (exit code 0).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (exit code 0).
+
+---
+
+## 2026-09-25 — USAP-TECHDOC-001-R1: Technical Resources Presentation, Document Detail Experience, SEO Foundation, Homepage Resource Routing, Evidence Repair, and Runtime Hygiene QA
+
+* **Scope & Implementation Summary:**
+  * **Runtime Target & Preflight Reconciliation:**
+    - Reconciled runtime baseline: .NET SDK `10.0.400`, `net10.0` target framework in `USAP.Web.csproj` and `global.json`.
+    - Confirmed all build outputs and verification logs cleanly show `net10.0`.
+  * **Development-Server Ownership & Process Hygiene:**
+    - Inspected existing runtime state: user-owned dev server processes identified (PIDs 24992, 33552, 34168). All user-owned processes preserved; zero termination or replacement.
+    - Automated verification executed on isolated Agent-owned test server on dedicated port `5396` (PIDs 24692, 21840).
+    - Confirmed complete cleanup: all Agent-owned processes terminated and port 5396 closed (`Agent-owned development server cleanup: PASS`).
+  * **Search Toolbar Refinement:**
+    - Refined desktop and wide-desktop search form to a contained, left-aligned container (`max-width: 52rem; width: 100%`) rather than stretching across the entire 72rem content grid.
+    - Integrated a prominent "Search" submit button with a clear visual gap (`--space-2`), maintaining full keyboard and no-JS form submission support.
+    - Mobile and tablet layouts retain fluid full-width behavior with zero horizontal overflow.
+  * **Homepage Deep-Link Reconciliation & Active Preset Filter Banner:**
+    - Reconciled the 4 homepage Technical Resources preview cards to structured, query-driven entry points:
+      - Product Data Sheets: `/technical-resources?type=data-sheet` (derives count dynamically from `DocumentType == "Data Sheet"`).
+      - Antenna Systems: `/technical-resources?view=antenna-systems` (covers all 4 antenna families: Log Periodic, Portable/Transportable, Aperiodic Loop, NVIS).
+      - Rotators & Controls: `/technical-resources?category=antenna-rotator-control-systems`.
+      - Tower Systems & Accessories: `/technical-resources?category=tower-systems-accessories`.
+      - Browse Technical Resources CTA: `/technical-resources` (unfiltered, all 17 documents).
+    - Added an active filter notification banner (`.resources-active-filter-banner`) displaying the active preset (e.g., "Filtered by: Product Data Sheets") with an accessible "Clear filter" reset link.
+  * **Technical Resources Hero Artwork Integration:**
+    - Integrated project asset `usap-technical-resources-hero-requirements-document-candidate-b-v1.png` onto `/technical-resources` using the established `.internal-hero` architecture and Candidate D gradient overlay system.
+    - Verified desktop, ultra-wide (1600px+ / 1920px), tablet, and mobile viewports. Text contrast and responsive media containment verified.
+  * **Closing CTA Integration:**
+    - Added standard site closing CTA (`.closing-cta.closing-cta--default`) immediately preceding the footer on `/technical-resources` and all `/technical-resources/document/{slug}` detail pages.
+    - Links to Contact Us (`/contact-us`) and Request a Quote (`/request-a-quote`) verified.
+  * **HTML Technical Document Detail Experience (`/technical-resources/document/{slug}`):**
+    - Built a reusable, data-driven Razor Page resolving all 17 canonical documents by URL slug.
+    - Features hierarchical breadcrumbs, metadata badges (type, file size, pages), covered models/configurations, safe public description, native PDF `<object>`/`<iframe>` viewer with download fallback, related product family card, and closing CTA.
+    - Fully server-rendered and SEO-indexable (unique `<title>`, meta description, canonical link, H1).
+    - Card primary actions on `/technical-resources` updated to "View Document" navigating to the detail page, while retaining a direct "Download PDF" action.
+    - Product group disclosure resource links updated to detail pages with direct download secondary links.
+  * **Canonical Raw-PDF URL Reconciliation & Redirects:**
+    - Preferred public raw-PDF route confirmed: `/technical-resources/documents/{family-slug}/{filename}`.
+    - Configured `LegacyDocumentRedirectMiddleware` to issue HTTP 301 permanent redirects for `/documents/technical/...` -> `/technical-resources/documents/...`.
+    - Tested all 17 canonical raw PDFs: 17/17 preferred paths return HTTP 200 `application/pdf`; 17/17 alternate paths return HTTP 301.
+    - Tested all 34 legacy WordPress PDF URLs: 34/34 return HTTP 301 to canonical destination.
+  * **PDF Metadata & Source Fidelity Policy:**
+    - Zero modification of PDF binaries. All 17 canonical files remain byte-for-byte identical to R2 source package (17/17 SHA-256 matches).
+  * **Review-Package Evidence Repair:**
+    - Completely regenerated `CANONICAL_PDF_MIGRATION_REGISTER.md`, `LEGACY_REDIRECT_QA_MATRIX.md`, `VALIDATION_OUTPUTS.md`, and `CHANGED_FILE_REGISTER.md` with real, verified data—eliminating all malformed `$()`, PowerShell object dumps, and unresolved variables.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check`: 0 issues (exit code 0).
+    - `dotnet restore USAP.Web.sln`: Success (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 warnings, 0 errors (exit code 0, targeting `net10.0`).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (exit code 0).
+
+---
+
+## 2026-09-25 — USAP-TECHDOC-001-R2: Technical Resources UI Cleanup and Baseline Stabilization QA
+
+* **Scope & Implementation Summary:**
+  * **Desktop Search Toolbar Right Alignment:**
+    - Refined `.resources-search-form` on desktop to align to the right edge (`margin-left: auto; margin-right: 0; max-width: 32rem; width: 100%`), balancing against the left-aligned family filter pills.
+    - Verified responsive behavior on tablet (768px) and mobile (390px) where full width is naturally preserved.
+  * **Card Footer & Atomic Page Count Restoration:**
+    - Restored restrained document SVG icon and atomic nowrap page count indicator (`1 page`, `2 pages`, etc.) in `.resource-card__meta`.
+    - Enforced `white-space: nowrap` across page text and meta container to prevent numbers and words from splitting across multiple lines.
+    - Compacted button padding and typography so footers fit on a single row in 3-column desktop layout.
+  * **Link State Protection & Visited Styling:**
+    - Explicitly styled `:link`, `:visited`, `:hover`, and `:focus-visible` on `.resource-card__title-link`, `.breadcrumbs__link`, `.doc-property__link`, `.doc-viewer-card__note a`, and `.doc-related-card__link`.
+    - Confirmed zero browser-default purple link colors leak into the card grid or detail experience.
+  * **Document-Detail Breadcrumbs & Header Cleanup:**
+    - Relocated breadcrumbs on `/technical-resources/document/{slug}` to appear directly below the hero header.
+    - Reused shared `.breadcrumbs` architecture from Product Family pages, eliminating browser-default numbered list styling.
+    - Removed redundant low-contrast `Back to Resource Library` button from detail hero.
+    - Streamlined viewer card header to remove adjacent duplicate new-tab button.
+  * **Closing CTA Copy Alignment:**
+    - Replaced guidance copy with the approved USAP Closing Inquiry CTA across `/technical-resources` and all detail routes:
+      - Heading: `Ready to Discuss Your Antenna Requirements?`
+      - Copy: `Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.`
+      - Actions: `Request a Quote` and `Request Information`.
+  * **Preset Filter Simplification:**
+    - Suppressed redundant `Reset filters` link when active preset banner is displayed, ensuring a single clean status indicator and reset action.
+  * **Source Review Patch Generation:**
+    - Created clean `SOURCE_DIFF.patch` capturing all textual modifications (excluding binary PDFs) for Architect inspection.
+  * **Build, Formatting, & Static Validation:**
+    - `git diff --check`: 0 issues (exit code 0).
+    - `dotnet restore USAP.Web.sln`: Success (exit code 0).
+    - `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 warnings, 0 errors (exit code 0, targeting `net10.0`).
+    - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (exit code 0).

@@ -12,4 +12,7 @@ public interface IProductCatalogService
     CatalogAsset GetLandingHeroAsset();
     IReadOnlyList<ProductFamilyRecord> GetFeaturedFamilies();
     IReadOnlyList<ProductResourceRecord> GetApprovedResourcesForGroup(string groupId);
+    IReadOnlyList<ProductResourceRecord> GetAllTechnicalDocuments();
+    IReadOnlyList<ProductResourceRecord> GetTechnicalDocumentsByFamily(string familySlug);
+    ProductResourceRecord? GetTechnicalDocumentBySlug(string slug);
 }
