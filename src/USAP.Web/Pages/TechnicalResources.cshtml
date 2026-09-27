@@ -9,6 +9,7 @@
         Robots = "index, follow",
         OpenGraphType = "website"
     };
+
 }
 
 @section Styles {
@@ -40,30 +41,35 @@
     <div class="container">
         <!-- Toolbar: Search and Family Filter Controls -->
         <div class="resources-toolbar" role="search" aria-label="Search and filter technical resources">
-            <form method="get" action="/technical-resources" class="resources-search-form" id="tech-search-form">
-                <div class="resources-search-wrapper">
-                    <label for="tech-search-input" class="sr-only">Search technical documents by model, keyword, or title</label>
-                    <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="search"
-                           id="tech-search-input"
-                           name="q"
-                           value="@Model.Q"
-                           class="resources-search-input"
-                           placeholder="Search by model, title, or keyword (e.g. LP-1017, discone, rotator)..."
-                           autocomplete="off"
-                           aria-describedby="search-live-status" />
-                    <button type="button" id="clear-search-btn" class="resources-search-clear" aria-label="Clear search input" hidden>
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
+            <div class="resources-toolbar__row">
+                <div class="resources-toolbar__context">
+                    <span class="resources-toolbar__heading">Browse Technical Documents</span>
                 </div>
-                <button type="submit" class="btn btn-secondary resources-search-submit">Search</button>
-            </form>
+                <form method="get" action="/technical-resources" class="resources-search-form" id="tech-search-form">
+                    <div class="resources-search-wrapper">
+                        <label for="tech-search-input" class="sr-only">Search technical documents by model, keyword, or title</label>
+                        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="search"
+                               id="tech-search-input"
+                               name="q"
+                               value="@Model.Q"
+                               class="resources-search-input"
+                               placeholder="Search by model, title, or keyword (e.g. LP-1017, discone, rotator)..."
+                               autocomplete="off"
+                               aria-describedby="search-live-status" />
+                        <button type="button" id="clear-search-btn" class="resources-search-clear" aria-label="Clear search input" hidden>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-secondary resources-search-submit">Search</button>
+                </form>
+            </div>
 
             <div class="resources-filter-bar" role="group" aria-label="Filter documents by product family">
                 @foreach (var cat in Model.Categories)
@@ -106,82 +112,103 @@
             </button>
         </div>
 
-        <!-- Document Cards Grid -->
-        <div class="resources-grid" id="resources-grid" role="list">
-            @foreach (var doc in Model.AllDocuments)
+        <!-- Grouped Family Sections Directory (Variant C) -->
+        <div class="resources-directory" id="resources-directory">
+            @foreach (var group in Model.FamilyGroups)
             {
-                var isInitiallyVisible = Model.FilteredDocuments.Any(f => f.Id == doc.Id);
-                var isAntennaFamily = doc.FamilySlug == "log-periodic-antennas" ||
-                                      doc.FamilySlug == "portable-transportable-antennas" ||
-                                      doc.FamilySlug == "aperiodic-loop-antennas" ||
-                                      doc.FamilySlug == "nvis-antennas";
-                <article class="resource-card @(!isInitiallyVisible ? "resource-card--hidden" : "")"
-                         role="listitem"
-                         data-id="@doc.Id"
-                         data-slug="@doc.Slug"
-                         data-family="@doc.FamilySlug"
-                         data-type="@(string.Equals(doc.DocumentType, "Data sheet", StringComparison.OrdinalIgnoreCase) ? "data-sheet" : "other")"
-                         data-is-antenna="@(isAntennaFamily ? "true" : "false")"
-                         data-search="@doc.SearchText.ToLowerInvariant()"
-                         data-title="@doc.Title.ToLowerInvariant()"
-                         data-models="@string.Join(" ", doc.ModelCodes).ToLowerInvariant()">
-                    <div class="resource-card__header">
-                        <span class="resource-card__family">@doc.FamilyName</span>
-                        <div class="resource-card__badges">
-                            <span class="resource-badge resource-badge--type">@doc.DocumentType</span>
-                            <span class="resource-badge resource-badge--format">PDF</span>
+                var isGroupVisible = group.MatchingCount > 0;
+
+                <section class="resource-family @(!isGroupVisible ? "resource-family--hidden" : "")"
+                         id="family-@group.Slug"
+                         data-family="@group.Slug"
+                         aria-labelledby="family-heading-@group.Slug">
+                    <header class="resource-family__header">
+                        <div class="resource-family__title-wrapper">
+                            <span class="resource-family__accent-bar" aria-hidden="true"></span>
+                            <h2 id="family-heading-@group.Slug" class="resource-family__title">@group.Name</h2>
                         </div>
-                    </div>
-
-                    <h2 class="resource-card__title">
-                        <a href="@doc.DetailUrl" class="resource-card__title-link">@doc.Title</a>
-                    </h2>
-
-                    @if (doc.ModelCodes.Count > 0)
-                    {
-                        <div class="resource-card__models" aria-label="Covered models">
-                            <span class="resource-card__models-label">Covered Models:</span>
-                            <ul class="resource-card__model-tags" role="list">
-                                @foreach (var modelCode in doc.ModelCodes)
-                                {
-                                    <li class="resource-card__model-tag"><code>@modelCode</code></li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    <p class="resource-card__desc">@doc.Description</p>
-
-                    <div class="resource-card__footer">
-                        <div class="resource-card__meta">
-                            <span class="resource-card__pages">
-                                <svg class="resource-card__pages-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                    <polyline points="14 2 14 8 20 8"></polyline>
-                                </svg>
-                                <span class="resource-card__pages-text">@(doc.PageCount) @(doc.PageCount == 1 ? "page" : "pages")</span>
+                        <div class="resource-family__meta">
+                            <span class="resource-family__count">
+                                <span class="family-visible-count">@group.MatchingCount</span>
+                                <span class="family-count-label">@(group.MatchingCount == 1 ? "DOCUMENT" : "DOCUMENTS")</span>
                             </span>
                         </div>
-                        <div class="resource-card__actions">
-                            <a href="@doc.DetailUrl"
-                               class="btn btn-primary btn-sm resource-card__action-btn"
-                               aria-label="View document details for @doc.Title">
-                                <span>View Document</span>
-                            </a>
-                            <a href="@doc.LocalPdfPath"
-                               download
-                               class="btn btn-outline btn-sm resource-card__download-btn"
-                               aria-label="Download @doc.Title (PDF, @(doc.PageCount) pages)">
-                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                                <span>Download PDF</span>
-                            </a>
-                        </div>
+                    </header>
+
+                    <div class="resource-family__documents" role="list">
+                        @foreach (var doc in group.Documents)
+                        {
+                            var isInitiallyVisible = Model.FilteredDocuments.Any(f => f.Id == doc.Id);
+                            var isAntennaFamily = doc.FamilySlug == "log-periodic-antennas" ||
+                                                  doc.FamilySlug == "portable-transportable-antennas" ||
+                                                  doc.FamilySlug == "aperiodic-loop-antennas" ||
+                                                  doc.FamilySlug == "nvis-antennas";
+
+                            <article class="resource-document-row @(!isInitiallyVisible ? "resource-document-row--hidden" : "")"
+                                     role="listitem"
+                                     data-id="@doc.Id"
+                                     data-slug="@doc.Slug"
+                                     data-family="@doc.FamilySlug"
+                                     data-type="@(string.Equals(doc.DocumentType, "Data sheet", StringComparison.OrdinalIgnoreCase) ? "data-sheet" : "other")"
+                                     data-is-antenna="@(isAntennaFamily ? "true" : "false")"
+                                     data-search="@doc.SearchText.ToLowerInvariant()"
+                                     data-title="@doc.Title.ToLowerInvariant()"
+                                     data-models="@string.Join(" ", doc.ModelCodes).ToLowerInvariant()">
+                                <div class="resource-document-row__main">
+                                    <div class="resource-document-row__header-line">
+                                        <h3 class="resource-document-row__title">
+                                            <a href="@doc.DetailUrl" class="resource-document-row__title-link">@doc.Title</a>
+                                        </h3>
+                                        <span class="resource-document-row__type-badge">@doc.DocumentType</span>
+                                    </div>
+
+                                    @if (doc.ModelCodes.Count > 0)
+                                    {
+                                        <div class="resource-document-row__models" aria-label="Covered models">
+                                            <span class="resource-document-row__models-label">Covered Models:</span>
+                                            <ul class="resource-document-row__model-tags" role="list">
+                                                @foreach (var modelCode in doc.ModelCodes)
+                                                {
+                                                    <li class="resource-document-row__model-tag"><code>@modelCode</code></li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+
+                                    <p class="resource-document-row__desc">@doc.Description</p>
+                                </div>
+
+                                <div class="resource-document-row__utility">
+                                    <span class="resource-document-row__pages">
+                                        <svg class="resource-document-row__pages-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                        <span class="resource-document-row__pages-text">@(doc.PageCount) @(doc.PageCount == 1 ? "page" : "pages")</span>
+                                    </span>
+                                    <div class="resource-document-row__actions">
+                                        <a href="@doc.DetailUrl"
+                                           class="btn btn-secondary btn-sm resource-document-row__action-btn"
+                                           aria-label="View document details for @doc.Title">
+                                            <span>View Document</span>
+                                        </a>
+                                        <a href="@doc.LocalPdfPath"
+                                           download
+                                           class="btn btn-outline btn-sm resource-document-row__download-btn"
+                                           aria-label="Download @doc.Title (PDF, @(doc.PageCount) pages)">
+                                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="7 10 12 15 17 10"></polyline>
+                                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                                            </svg>
+                                            <span>Download PDF</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        }
                     </div>
-                </article>
+                </section>
             }
         </div>
 
@@ -198,7 +225,7 @@
             <p class="resources-empty__message">No documents matched your current search or category filter. Adjust your search terms, select another product family, or reset all filters.</p>
             <div class="resources-empty__actions">
                 <button type="button" id="reset-filters-btn" class="btn btn-secondary">Reset Filters</button>
-                <a href="/contact-us" class="btn btn-primary">Contact Engineering</a>
+                <a href="/contact-us" class="btn btn-primary">Request Information</a>
             </div>
         </div>
     </div>

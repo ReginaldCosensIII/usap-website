@@ -40,6 +40,7 @@ public class TechnicalResourcesModel : PageModel
     public IReadOnlyList<ProductResourceRecord> AllDocuments { get; private set; } = Array.Empty<ProductResourceRecord>();
     public IReadOnlyList<ProductResourceRecord> FilteredDocuments { get; private set; } = Array.Empty<ProductResourceRecord>();
     public IReadOnlyList<ResourceCategoryItem> Categories { get; private set; } = Array.Empty<ResourceCategoryItem>();
+    public IReadOnlyList<ResourceFamilyGroupViewModel> FamilyGroups { get; private set; } = Array.Empty<ResourceFamilyGroupViewModel>();
 
     public string? ActiveFilterLabel { get; private set; }
     public string ActiveFamily { get; private set; } = "all";
@@ -49,13 +50,16 @@ public class TechnicalResourcesModel : PageModel
     {
         AllDocuments = _catalogService.GetAllTechnicalDocuments();
 
+        var families = _catalogService.GetFamilies()
+            .OrderBy(f => f.DisplayOrder)
+            .ToList();
+
         // Build product family category counts
         var categories = new List<ResourceCategoryItem>
         {
             new("all", "All", AllDocuments.Count)
         };
 
-        var families = _catalogService.GetFamilies();
         foreach (var family in families)
         {
             var count = AllDocuments.Count(d => string.Equals(d.FamilySlug, family.Slug, StringComparison.OrdinalIgnoreCase));
@@ -104,7 +108,31 @@ public class TechnicalResourcesModel : PageModel
         }
 
         FilteredDocuments = docs.ToList();
+
+        // Build canonical family groups derived from catalog families and documents
+        var filteredDocIds = new HashSet<string>(FilteredDocuments.Select(d => d.Id));
+        var familyGroups = new List<ResourceFamilyGroupViewModel>();
+
+        foreach (var family in families)
+        {
+            var familyDocs = AllDocuments
+                .Where(d => string.Equals(d.FamilySlug, family.Slug, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(d => d.SortOrder)
+                .ToList();
+
+            var matchingCount = familyDocs.Count(d => filteredDocIds.Contains(d.Id));
+            familyGroups.Add(new ResourceFamilyGroupViewModel(
+                family.Slug,
+                family.Name,
+                family.DisplayOrder,
+                familyDocs,
+                matchingCount
+            ));
+        }
+
+        FamilyGroups = familyGroups;
     }
 
     public record ResourceCategoryItem(string Slug, string Name, int Count);
+    public record ResourceFamilyGroupViewModel(string Slug, string Name, int DisplayOrder, IReadOnlyList<ProductResourceRecord> Documents, int MatchingCount);
 }

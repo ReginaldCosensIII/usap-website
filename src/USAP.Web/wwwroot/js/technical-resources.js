@@ -1,6 +1,6 @@
 /**
  * Technical Resources Library Client-Side Filtering & Search
- * Progressive enhancement for the /technical-resources page.
+ * Progressive enhancement for the /technical-resources page (Variant B Grouped Directory).
  */
 (function () {
   'use strict';
@@ -10,7 +10,8 @@
     var searchForm = document.getElementById('tech-search-form');
     var clearSearchBtn = document.getElementById('clear-search-btn');
     var filterPills = document.querySelectorAll('.filter-pill');
-    var cards = document.querySelectorAll('.resource-card');
+    var panels = document.querySelectorAll('.resource-document-row, .resource-panel, .resource-card');
+    var familyGroups = document.querySelectorAll('.resource-family, .resource-family-group');
     var emptyState = document.getElementById('resources-empty');
     var visibleCountEl = document.getElementById('visible-count');
     var liveStatusEl = document.getElementById('search-live-status');
@@ -20,11 +21,11 @@
     var activeFilterLabel = document.getElementById('active-filter-label');
     var activeFilterClearBtn = document.getElementById('active-filter-clear-btn');
 
-    if (!cards.length) {
+    if (!panels.length) {
       return;
     }
 
-    var totalCount = cards.length;
+    var totalCount = panels.length;
     var currentFamily = 'all';
     var currentType = '';
     var currentView = '';
@@ -91,13 +92,13 @@
 
       var visibleCount = 0;
 
-      cards.forEach(function (card) {
-        var cardFamily = (card.getAttribute('data-family') || '').toLowerCase();
-        var cardType = (card.getAttribute('data-type') || '').toLowerCase();
-        var cardIsAntenna = card.getAttribute('data-is-antenna') === 'true';
-        var cardSearch = (card.getAttribute('data-search') || '') + ' ' +
-                         (card.getAttribute('data-title') || '') + ' ' +
-                         (card.getAttribute('data-models') || '');
+      panels.forEach(function (panel) {
+        var cardFamily = (panel.getAttribute('data-family') || '').toLowerCase();
+        var cardType = (panel.getAttribute('data-type') || '').toLowerCase();
+        var cardIsAntenna = panel.getAttribute('data-is-antenna') === 'true';
+        var cardSearch = (panel.getAttribute('data-search') || '') + ' ' +
+                         (panel.getAttribute('data-title') || '') + ' ' +
+                         (panel.getAttribute('data-models') || '');
 
         var matchesCategory = true;
         if (currentView === 'antenna-systems') {
@@ -119,10 +120,43 @@
         }
 
         if (matchesCategory && matchesQuery) {
-          card.classList.remove('resource-card--hidden');
+          panel.classList.remove('resource-document-row--hidden');
+          panel.classList.remove('resource-panel--hidden');
+          panel.classList.remove('resource-card--hidden');
           visibleCount++;
         } else {
-          card.classList.add('resource-card--hidden');
+          panel.classList.add('resource-document-row--hidden');
+          panel.classList.add('resource-panel--hidden');
+          panel.classList.add('resource-card--hidden');
+        }
+      });
+
+      // Update family groups visibility and section count labels
+      familyGroups.forEach(function (group) {
+        var groupPanels = group.querySelectorAll('.resource-document-row, .resource-panel, .resource-card');
+        var groupVisibleCount = 0;
+        groupPanels.forEach(function (p) {
+          if (!p.classList.contains('resource-document-row--hidden') &&
+              !p.classList.contains('resource-panel--hidden') &&
+              !p.classList.contains('resource-card--hidden')) {
+            groupVisibleCount++;
+          }
+        });
+
+        if (groupVisibleCount > 0) {
+          group.classList.remove('resource-family--hidden');
+          group.classList.remove('resource-family-group--hidden');
+          var countEl = group.querySelector('.family-visible-count');
+          if (countEl) {
+            countEl.textContent = groupVisibleCount;
+          }
+          var labelEl = group.querySelector('.family-count-label');
+          if (labelEl) {
+            labelEl.textContent = groupVisibleCount === 1 ? 'DOCUMENT' : 'DOCUMENTS';
+          }
+        } else {
+          group.classList.add('resource-family--hidden');
+          group.classList.add('resource-family-group--hidden');
         }
       });
 
