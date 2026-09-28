@@ -43,8 +43,8 @@ Wireframes are structural and responsive references. The high-fidelity design co
 |---|---|---|
 | Home | `/` | 🟡 Provisional implementation. Final client copy, imagery, branding, and approval remain pending. |
 | Products listing | `/products` | ✅ Structured 6-family catalog landing page implemented with A2F provisional candidate assets (USAP-CATALOG-001). Detail pages deferred to C2. |
-| Product family detail | `/products/{familySlug}` | ✅ Evidence-safe product detail presentation implemented across all 6 family routes and 16 groups with always-visible overviews and nested native disclosures (USAP-CATALOG-002-C1/C1R4). All 16 product groups feature intentional visual coverage (3 existing rotator visuals + 13 project-lead-selected A1 assets). Full technical library deferred. |
-| Technical Resources | `/technical-resources` | ❌ Documents and organization pending |
+| Product family detail | `/products/{familySlug}` | ✅ Evidence-safe product detail presentation implemented across all 6 family routes and 16 groups with always-visible overviews, nested native disclosures, and local canonical technical document links (USAP-CATALOG-002-C1/TECHDOC-001). All 16 product groups feature intentional visual coverage and local document integration. |
+| Technical Resources | `/technical-resources` | ✅ Complete (USAP-TECHDOC-001 / USAP-TECHDOC-001-R1). Direct public access library hosting 17 canonical PDFs, client-side search, family category filtering, preset deep links, and branded HTML document detail experience (`/technical-resources/document/{slug}`) with embedded native PDF preview and closing CTA. |
 | About Us | `/about-us` | 🟡 Provisionally complete with reference-grounded imagery integrated; uses shared hero and closing CTA. Final client approval, company history, and manufacturing details pending. |
 | Contact Us | `/contact-us` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
 | Request a Quote | `/request-a-quote` | 🟡 Shared hero and two-column form/sidebar layout implemented. Verified public contact details and Google Maps embed added. Form behavior preserved. Copy remains provisional. |
@@ -317,7 +317,33 @@ All 16 product groups feature intentional visual coverage in C1. The project lea
 - [ ] Final count and grouping of product families approved by client (up to six)
 - [ ] For each family: name, slug, descriptions, model names, specifications, frequency ranges, applications, accessories, related products
 - [ ] Original product photography or permission to reuse current-site imagery
-- [ ] Approved PDF/data sheet set with category classification and any distribution restrictions
+- [x] Approved PDF/data sheet set with category classification and distribution restrictions: Reconciled and migrated under `USAP-TECHDOC-001` (17 canonical PDFs, direct public access, 0 WordPress dependencies).
+
+---
+
+## Canonical Technical Documents Register (USAP-TECHDOC-001)
+
+Exactly 17 first-party canonical PDF binaries are deployed locally under `src/USAP.Web/wwwroot/documents/technical/`. All 17 files are verified byte-for-byte and hash-for-hash against the R2 manifest.
+
+| Stable ID | Document Title | Product Family | Models Covered | Type | Pages | Local Path | Verified SHA-256 |
+|---|---|---|---|---|---:|---|---|
+| `DOC-LP-HIGH-POWER` | LP-1001, LP-1002 and LP-1005 High-Power HF Log Periodic Antennas | Log Periodic Antennas | LP-1001, LP-1002, LP-1005 | Data sheet | 2 | `/technical-resources/documents/log-periodic-antennas/usap-lp-1001-lp-1002-lp-1005-data-sheet.pdf` | `dc3c05e4195b1c465a120a16e5d01cbf0adf183efeff97cdfe8791b8cb48bdc6` |
+| `DOC-LP-1017` | LP-1017 Commercial HF Log Periodic Antenna | Log Periodic Antennas | LP-1017 | Data sheet | 2 | `/technical-resources/documents/log-periodic-antennas/usap-lp-1017-data-sheet.pdf` | `bd53cbecb83d07633ee680bb1c9e28280395ef1eaa3093af08fcf039cc0faa25` |
+| `DOC-LP-1018BA` | LP-1018BA Broadband Log Periodic Antenna | Log Periodic Antennas | LP-1018BA | Data sheet | 2 | `/technical-resources/documents/log-periodic-antennas/usap-lp-1018ba-data-sheet.pdf` | `f2bde447af31610e4b6468103752c385dbc0b8411862f638f3de163449d855d8` |
+| `DOC-LP-1019` | LP-1019BA and LP-1019SS Log Periodic Antennas | Log Periodic Antennas | LP-1019BA, LP-1019SS | Data sheet | 2 | `/technical-resources/documents/log-periodic-antennas/usap-lp-1019-series-data-sheet.pdf` | `ef7b63deca466633d9dbd4ea4701f62eb3463dfcb59e7ba2e410fc5527e809d7` |
+| `DOC-LP-1112MR` | LP-1112MR Transportable Log Periodic Antenna | Log Periodic Antennas | LP-1112MR | Data sheet | 4 | `/technical-resources/documents/log-periodic-antennas/usap-lp-1112mr-data-sheet.pdf` | `34941809f48c79a9c4b9cf06d855322c14332cc29b1b751f6248bfefc1c373c7` |
+| `DOC-V4213-OVERVIEW` | V-4213 Portable Discone Antenna System Overview | Portable & Transportable Antenna Systems | V-4213AD, V-4213AC | Product overview | 2 | `/technical-resources/documents/portable-transportable-antennas/usap-v4213-portable-discone-overview.pdf` | `9f9a8f6cd977ea26506606892f3e238b3f5e5b8d14241e460d854997ce4d5435` |
+| `DOC-V4213-CONFIG` | V-4213AD and V-4213AC Configuration Data | Portable & Transportable Antenna Systems | V-4213AD, V-4213AC | Data sheet | 3 | `/technical-resources/documents/portable-transportable-antennas/usap-v4213ad-v4213ac-data-sheet.pdf` | `4dc60b97ee758bf0f15689edb5c19c9807de25dbf14736c0522b4079fb45856f` |
+| `DOC-LP-1402-1403` | LP-1402 and LP-1403 Transportable Log Periodic Antennas | Portable & Transportable Antenna Systems | LP-1402, LP-1403 | Data sheet | 2 | `/technical-resources/documents/portable-transportable-antennas/usap-lp-1402-lp-1403-data-sheet.pdf` | `ef5d461276f562ee309fb53f54c41d8f6f792889feffe7415869e4bb28dfa4e1` |
+| `DOC-1910` | 1910AA and 1910BA Broadband HF Dipole Antennas | Portable & Transportable Antenna Systems | 1910AA, 1910BA | Data sheet | 2 | `/technical-resources/documents/portable-transportable-antennas/usap-1910aa-1910ba-data-sheet.pdf` | `302b5e704a07d257965c9ec29332311b41633d97cd9675c6eb98f0a8bd9e8c2c` |
+| `DOC-APERIODIC` | USAP Aperiodic Loop Antenna | Aperiodic Loop Antennas | None published | Technical overview | 2 | `/technical-resources/documents/aperiodic-loop-antennas/usap-aperiodic-loop-antenna-data-sheet.pdf` | `130622310670dd102bcdf1fc9ee0196efb9d04055d87731c8440d40f57e88e17` |
+| `DOC-1942` | 1942 NVIS Antenna Systems | NVIS Antennas | 1942-RT, 1942-TA, 1942-GM, 1942-RT-LP, 1942-TA-LP, 1942-GM-LP | Data sheet | 2 | `/technical-resources/documents/nvis-antennas/usap-1942-nvis-series-data-sheet.pdf` | `ae1fdc8f5645116488e8f5d517b14e9fe8ece75bc0f22c2f131763bac0b29ede` |
+| `DOC-R3500` | R3500 Heavy-Duty Antenna Rotator | Antenna Rotator & Control Systems | R3500 | Data sheet | 2 | `/technical-resources/documents/antenna-rotator-control-systems/usap-r3500-rotator-data-sheet.pdf` | `a1918ed9bc544dfb645aeee0d05fddc1dfb016b26b1cf6c3510a06ea7e13bfee` |
+| `DOC-R3501` | R3501 Universal Antenna Rotator System | Antenna Rotator & Control Systems | R3501 | Data sheet | 1 | `/technical-resources/documents/antenna-rotator-control-systems/usap-r3501-rotator-data-sheet.pdf` | `a908b7f06a924c329ab8de328ef846912257d02e1213ef9d90719399b911051e` |
+| `DOC-R3503` | R3503 Heavy-Duty Rotating System | Antenna Rotator & Control Systems | R3503 | Data sheet | 1 | `/technical-resources/documents/antenna-rotator-control-systems/usap-r3503-rotator-data-sheet.pdf` | `69b6a0916a47bbe5937ab2b96360688f08bb8a6c27ddc42dd6e49a4c2b9a8142` |
+| `DOC-DRC3` | DRC-3 Digital Rotator Controller | Antenna Rotator & Control Systems | DRC-3 | Data sheet | 3 | `/technical-resources/documents/antenna-rotator-control-systems/usap-drc-3-controller-data-sheet.pdf` | `6e500af890467c7cf92e2b7885a1aaadaf1cb13aa7608abc3a2f4f5652ca7e24` |
+| `DOC-DRC4` | DRC-4 Digital Rotator Controller | Antenna Rotator & Control Systems | DRC-4 | Data sheet | 2 | `/technical-resources/documents/antenna-rotator-control-systems/usap-drc-4-controller-data-sheet.pdf` | `7fd777bd7321c604040f99d3f0c5c58c7ac206127f6940ed81e7c4f431de1219` |
+| `DOC-T3002` | T-3002 RLPA Tower System | Tower Systems & Accessories | T-3002, 3002FA, 3002FB, 3002SS, 3002SS-80 | Data sheet | 3 | `/technical-resources/documents/tower-systems-accessories/usap-t-3002-tower-system-data-sheet.pdf` | `d94cb65015149a2c5e58540f22f1fb5c0e4c952a2d371333248c16c88f4399a9` |
 
 **Priority 3 — before Forms & Search:**
 

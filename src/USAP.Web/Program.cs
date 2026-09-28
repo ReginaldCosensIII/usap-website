@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.FileProviders;
 using System.Threading.RateLimiting;
+using USAP.Web.Middleware;
 using USAP.Web.Services;
 using USAP.Web.Services.Catalog;
 using USAP.Web.Models;
@@ -88,7 +90,22 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Permanent HTTP 301 redirects for legacy WordPress technical document URLs
+app.UseMiddleware<LegacyDocumentRedirectMiddleware>();
+
 app.UseStaticFiles();
+
+// Serve canonical technical documents under the public /technical-resources/documents route
+var technicalDocsPath = Path.Combine(app.Environment.WebRootPath, "documents", "technical");
+if (Directory.Exists(technicalDocsPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(technicalDocsPath),
+        RequestPath = "/technical-resources/documents"
+    });
+}
 
 // Apply X-Robots-Tag to prevent indexing in non-production environments.
 // Placed after UseStaticFiles to avoid unnecessary header processing on static assets,

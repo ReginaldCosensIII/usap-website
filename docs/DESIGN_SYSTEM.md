@@ -754,3 +754,60 @@ No placeholder tagline. Company name is in the brand column and the sole copyrig
 | Ultra-Wide Contrast Overlay (C1R11 / C1R12) | Ultra-Wide (>= 100rem / 1600px) | 2-layer gradient: Candidate D vertical fade layered over softened canvas-anchored horizontal copy protection | `linear-gradient(to right, var(--color-brand-navy) 0, var(--color-brand-navy) calc(max(0px, (100vw - 100rem) / 2) + 30rem), rgba(13, 27, 46, 0.88) calc(max(0px, (100vw - 100rem) / 2) + 40rem), rgba(13, 27, 46, 0.58) calc(max(0px, (100vw - 100rem) / 2) + 50rem), rgba(13, 27, 46, 0.24) calc(max(0px, (100vw - 100rem) / 2) + 62rem), transparent calc(max(0px, (100vw - 100rem) / 2) + 72rem))` layered under Candidate D vertical fade. Zero right-to-left gutter gradient. |
 | Mobile Media & Overlay | Mobile (< 48rem / 768px) | `object-fit: cover; object-position: center; overlay: rgba(13, 27, 46, 0.90);` | Atmospheric background presentation providing safe contrast for white typography on compact screens. |
 | Rotator Hero Entry Mask (C1R13-R1) | Ultra-Wide (>= 100rem / 1600px) on `.internal-hero--family-antenna-rotator-control-systems .internal-hero-picture` | `-webkit-mask-image` / `mask-image`: `linear-gradient(to right, transparent 0, rgba(0, 0, 0, 0.55) 4rem, rgba(0, 0, 0, 0.85) 8rem, #000 12rem)` | Asset-composition-driven alpha fade that smoothly dissolves the rotator schematic grid's sharp rectangular left boundary into the underlying navy hero field over 12rem. Zero effect below 100rem; zero effect on other 9 hero routes. |
+
+---
+
+## Technical Resources Library Component (USAP-TECHDOC-001)
+
+**Pattern:** Clean, responsive, and accessible document library providing direct public access to canonical technical documentation.
+
+### 1. Library Toolbar & Controls
+
+| Element | Selector | Purpose & Design System Compliance |
+|---|---|---|
+| Search Group Container | `.resources-search-form` | Contained, right-aligned search group on desktop (`max-width: 32rem; width: 100%; margin-left: auto; margin-right: 0`) with visible search button and clear separation, balancing against left-aligned family filters. Full width on mobile/tablet. |
+| Search Input | `.resources-search-input` | Clean 3rem input with left search icon, 1px neutral border, and 3px focus ring (`--color-focus`). Supports keyword, model, title, and family queries. |
+| Search Submit Button | `.resources-search-submit` | Prominent primary button (`--color-brand-navy`) aligned beside input with visual gap (`--space-3`). Preserves progressive enhancement for no-JS environments. |
+| Clear Button | `.resources-search-clear` | Unobtrusive clear button positioned inside the right edge of the input. Appears only when input is non-empty. |
+| Active Preset Filter Banner | `.active-filter-banner` | Visually communicates active homepage shortcut or URL preset filter (e.g., "Filtered by: Product Data Sheets", "Filtered by: Antenna Systems") with active badge and direct "Clear filter" reset link. Redundant toolbar reset link is suppressed when active. |
+| Filter Pills | `.filter-pill` | Rounded pill buttons (`border-radius: 9999px`) displaying category name and count badge. Active state uses `--color-brand-navy` with white text and light badge. Supports ArrowLeft/ArrowRight keyboard navigation. |
+| Status Bar | `.resources-status-bar` | Displays current visible count vs. total count. Includes an accessible live region (`aria-live="polite"`). |
+
+### 2. Document Cards Grid
+
+| Element | Selector | Purpose & Design System Compliance |
+|---|---|---|
+| Responsive Grid | `.resources-grid` | Fluid grid: 1 column on mobile (< 640px), 2 columns on tablet (>= 640px), 3 columns on desktop (>= 1024px). Gap: `--space-6` (1.5rem). |
+| Document Card | `.resource-card` | White surface with subtle neutral border (`--color-neutral-80`), rounded corners (`--radius-md`), and gentle hover lift (`transform: translateY(-2px)`). |
+| Family Eyebrow | `.resource-card__family` | Uppercase tracking text in `--color-brand-red` identifying product family taxonomy. |
+| Badges | `.resource-badge` | Compact rounded badges identifying document type (`Data sheet`, `Product overview`, `Technical overview`) and file format (`PDF`). |
+| Title Link & States | `.resource-card__title-link` | High-contrast heading in `--color-brand-navy`. Explicit `:link`, `:visited`, `:hover`, `:focus-visible`, and `:active` styling ensures normal and visited states remain navy, eliminating browser-default purple link colors. |
+| Model Codes | `.resource-card__model-tag code` | Monospace model tags identifying specific models/configurations covered by the document. |
+| Description | `.resource-card__desc` | Readable neutral body copy (`--color-neutral-30`) summarizing document contents safely without research conflict tokens. |
+| Card Footer & Atomic Page Count | `.resource-card__footer`, `.resource-card__meta` | Single-row footer layout in 3-column desktop: restrained document SVG icon paired with atomic `nowrap` page indicator (`1 page`, `2 pages`), guaranteed never to wrap onto multiple lines. |
+| Compact Action Buttons | `.resource-card__action-btn`, `.resource-card__download-btn` | Compact proportions: primary "View Document" navigating to detail page (`/technical-resources/document/{slug}`) and secondary "Download PDF" (`download` attribute) pointing directly to canonical PDF binary. |
+
+### 3. Accessible Empty State
+
+| Element | Selector | Purpose & Design System Compliance |
+|---|---|---|
+| Empty State | `.resources-empty` | Centered dashed-border container with search icon, clear heading, guidance message, and "Reset Filters" and "Contact Engineering" CTAs. Shown only when search/filter returns zero matches. |
+
+---
+
+## Technical Document Detail Experience (USAP-TECHDOC-001-R1 / R2)
+
+**Pattern:** Dedicated, server-rendered, SEO-indexable HTML document detail page for canonical technical documentation, pairing verified metadata with an embedded native browser PDF viewer.
+
+### 1. Document Detail Architecture & Layout
+
+| Element | Selector | Purpose & Design System Compliance |
+|---|---|---|
+| Detail Header & Metadata | `.doc-detail-header` | High-contrast dark navy banner with H1 heading, family eyebrow, metadata badges (Document Type, Page Count, File Format, Byte Size), and streamlined primary/secondary action buttons. Redundant Back button removed. |
+| Relocated Breadcrumbs | `.breadcrumbs` | Semantic breadcrumbs positioned immediately below the hero, reusing the established Product Family breadcrumb architecture (`.breadcrumbs`, `.breadcrumbs__list`, `.breadcrumbs__item`, `.breadcrumbs__link`). Eliminates browser-default numbered list styling. |
+| Covered Models & Safe Copy | `.doc-property--models`, `.doc-detail-lead` | Real HTML rendering of verified covered models/configurations and sanitized public descriptions without exposing research conflict notes or internal IDs. |
+| Actions Bar | `.doc-detail-actions` | Prominent "Download PDF" primary action and "Open PDF in New Window" secondary action with clear file metadata. |
+| Native PDF Viewer Frame | `.doc-viewer-wrapper` | Fluid container with responsive height scaling (`min-height: 38rem; height: 52rem` on desktop; `min-height: 24rem; height: 32rem` on mobile). |
+| Native Embed Object | `.doc-pdf-object`, `.doc-pdf-iframe` | Semantic `<object type="application/pdf">` with nested fallback `<iframe>` and no-plugin HTML download fallback link. Uses meaningful `title` attribute for screen readers. |
+| Related Product Families | `.doc-related-groups` | Contextual navigation card linking the document back to its canonical product family catalog page. |
+| Closing CTA | `.closing-cta.closing-cta--default` | Branded navy full-width banner with controlled, approved copy ("Ready to Discuss Your Antenna Requirements?") and dual action buttons (Request a Quote, Request Information). |
