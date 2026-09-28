@@ -234,6 +234,17 @@
         toggle.setAttribute('aria-expanded', 'false');
       } else if (isOpen()) {
         updateHeaderBottom();
+      } else {
+        navList.setAttribute('hidden', '');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation menu');
+        removeBackgroundInert();
+        document.documentElement.classList.remove('nav-open-lock');
+        document.body.classList.remove('nav-open-lock');
+        document.documentElement.style.removeProperty('--mobile-header-bottom');
+        if (backdrop) {
+          backdrop.classList.remove('is-active');
+        }
       }
     }, 50);
   }
