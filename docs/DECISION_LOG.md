@@ -918,3 +918,148 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 8. **Explicitly Deferred Post-Baseline Items:**
    - Evaluated embedded PDF title anomalies (e.g. Word cut sheet titles) and reaffirmed byte-for-byte binary preservation for this baseline; deferred evaluation of metadata-normalized publication derivatives or a controlled/custom viewer after baseline commit.
    - Explicitly deferred image-backed hero exploration on document-detail pages until after baseline stabilization.
+
+---
+
+## DEC-045 — USAP-FORMS-002: CTA Context Routing, Two-Form Architecture, Dedicated Success Flows, and Integration Configuration Foundation
+
+**Date:** 2026-09-29
+**Decision:**
+1. **Preserve Exactly Two Dedicated Inquiry Forms:**
+   - Retained `/contact-us` (for informational, technical, engineering, and general inquiries) and `/request-a-quote` (for commercial pricing, quantity, and requirements). Both reuse `_InquiryForm.cshtml` partial.
+2. **Context Propagation and Canonical Separation:**
+   - Implemented `ICtaContextResolver` (`CtaContextResolver`) to deterministically resolve incoming query strings (`reason`, `family`, `group`, `product`, `doc`) against canonical domain models via `IProductCatalogService`.
+   - Strictly separated trusted canonical source context (`SourceContextCategory`, `SourceContextTitle`, `SourceContextSummary`) from visitor-editable form inputs (`ProductOfInterest`).
+   - Implemented visible, accessible `.inquiry-context-panel` on forms to reassure visitors without masquerading as an editable input.
+3. **Canonical 5-Intent Model & Safe Engineering Support Wording:**
+   - Canonical intents: `GeneralInquiry`, `ProductInformation`, `RequestAQuote`, `EngineeringSupport`, `TechnicalDocumentation`.
+   - `EngineeringSupport` display name standardized to `Engineering & Requirements Support` with safe boundaries (application requirements, equipment options, suitability, mounting), explicitly omitting claims of custom mechanical/RF engineering services, custom manufacturing, or guaranteed integration.
+4. **Form Field Validation & Progressive Enhancement:**
+   - `Organization` is strictly REQUIRED for `/request-a-quote` (both server-side and client indicator) and remains OPTIONAL for `/contact-us`.
+   - `Phone` remains conditional (required only when Phone preferred).
+   - Form remains 100% usable without JavaScript.
+5. **Accessible Offscreen Honeypot:**
+   - Replaced contradictory `.sr-only` class with `.form-honeypot` (offscreen absolute positioning, zero opacity, `pointer-events: none`, `tabindex="-1"`, `aria-hidden="true"`). Silent diversion on submission preserved.
+6. **Dedicated Success Flows:**
+   - Created dedicated Razor Pages `/contact-us/thank-you` and `/request-a-quote/thank-you` with `noindex, nofollow` and sitemap exclusion.
+   - Preserved POST-Redirect-GET and reference-number display via `TempData`. Direct navigation renders clean guidance state without triggering conversion events.
+   - Legacy `/thank-you` redirects safely to `/contact-us/thank-you`.
+7. **Integration Configuration Foundations & Zero-Secrets Rule:**
+   - Added options classes: `SmtpOptions`, `RecaptchaOptions`, `AnalyticsOptions`.
+   - Superseded legacy reCAPTCHA v2 Checkbox recommendation in favor of score-based Google Cloud reCAPTCHA website integration.
+   - Superseded GTM in favor of Direct GA4 (`gtag.js`).
+   - Binding rule: No credentials in `appsettings*.json`. Secrets managed via .NET User Secrets in Dev and IIS Environment Variables in Production.
+
+---
+
+## DEC-046 — USAP-FORMS-002-R1: Thank-You Visual Reconciliation, Identifier-Based Context Revalidation, and Claim-Safety Reconciliation
+
+**Date:** 2026-09-29
+**Decision:**
+1. **Identifier-Based Context Persistence & Server Revalidation:**
+   - Client form carries only minimal, untrusted context identifiers (`ContextReason`, `ContextFamily`, `ContextGroup`, `ContextDoc`).
+   - Client-posted display strings (`SourceContextCategory`, `SourceContextTitle`, `SourceContextSummary`) are explicitly treated as untrusted and not posted as hidden fields.
+   - On every POST, `ICtaContextResolver` re-resolves and validates submitted identifiers against canonical catalog records before redisplaying context or composing notification messages.
+2. **Product Query Parameter Trust Boundary:**
+   - Removed `product` query parameter handling from `ICtaContextResolver`. Untrusted query strings cannot establish trusted canonical model context.
+   - Arbitrary visitor product/model entries are accommodated exclusively through the existing visitor-editable `Product / Model of Interest` form control.
+3. **404-Aligned Thank-You Visual Architecture:**
+   - Replaced custom cards on dedicated thank-you pages with a centered utility page composition (`confirmation.css`) visually aligned with `/not-found`.
+   - Reused the light-surface technical signal overlay with restrained visual intensity (0.09 opacity, ~half of the 404 page's 0.18 opacity).
+   - Standardized green reference card, paired CTA buttons (`Return to Homepage`, `Explore Products`), and a 404-matching `Helpful Links` section with arrow hover micro-animations.
+   - Removed all inline presentation styles from Razor views.
+4. **Context-Aware Helpful Links:**
+   - Helpful Links on Thank-You pages are dynamically derived from server-revalidated canonical context passed via `TempData` identifiers (up to 3 links, e.g. Return to Document, Related Product Family, Browse Technical Resources, Request a Quote). Direct navigation renders safe fallback links.
+5. **Claim-Safety & Response Time Copy Reconciliation:**
+   - Eliminated all unsupported response-time and turnaround promises (e.g. 1–2 business days, fixed turnaround windows).
+   - Corrected product-family closing section copy from "custom engineering requirements" to "application and system requirements".
+6. **Program.cs Formatter Verification:**
+   - Confirmed multiline brace formatting in `Program.cs` is strictly required by the active solution analyzer rule `IDE0011: Add braces to 'if' statement`. Reversion to single-line causes `dotnet format --verify-no-changes` to fail with 19 warnings. Retained to preserve clean static verification.
+
+---
+
+## DEC-047 — USAP-FORMS-002-R2: 404 Background Treatment Parity, Mobile QA Repair, Canonical Helpful-Link Routing, and Visitor Confirmation Email Decision Recording
+
+**Date:** 2026-09-29
+**Decision:**
+1. **Exact 404 Background Treatment Parity:**
+   - Superseded the R1 reduced-opacity (0.09) decision. The confirmation page wrapper intentionally reuses the exact background texture treatment from `/not-found`:
+     - Exact asset: `usap-light-surface-technical-signal-overlay-v1.png`.
+     - Exact opacity: `0.18`.
+     - Exact background sizing: `cover`.
+     - Exact background positioning: `center`.
+     - Exact repeat behavior: `no-repeat`.
+     - Exact wrapper behavior: `min-height: clamp(34rem, 54vh, 44rem)` with `isolation: isolate;`.
+     - Compacted vertical padding in `.confirmation-container` (`var(--space-8)` desktop) so active confirmation wrapper height (~608px) closely matches 404 wrapper height (594px), eliminating texture distortion, over-cropping, and asset magnification.
+   - `/not-found` (`error.css`) remains visually untouched and pixel-equivalent.
+2. **Canonical Technical Document Helpful Link Routing:**
+   - Corrected Thank-You page Helpful Link generation from `/technical-resources/{slug}` to the canonical branded HTML route `/technical-resources/document/{slug}` across both `ContactUs/ThankYou.cshtml.cs` and `RequestAQuote/ThankYou.cshtml.cs`.
+   - Confirmed Product Group Helpful Links point to `/products/{family}#{group.SectionAnchor}`, matching stable article element IDs on Family pages.
+3. **Mobile QA Repair & Live Browser Testing:**
+   - Identified root cause of R1 screenshot discrepancy: static HTML files saved from responses and opened without the live web server failed to load stylesheets and `site-navigation.js`, preventing the progressive `.js-nav-ready` class from attaching. This caused the desktop navigation `<ul>` to expand the document body to ~800px width inside a 390px window.
+   - Refined mobile confirmation CSS (`confirmation.css`):
+     - Fluid monospace sizing `clamp(1rem, 4.5vw, 1.25rem)` on `.confirmation-reference-code`.
+     - Controlled mobile card padding (`var(--space-3) var(--space-4)`) and `overflow-wrap: anywhere; word-break: normal;` allowing `REQ-20260929-XXXXXX` (19 chars) to render cleanly on a single line at 320px.
+     - Mobile container padding reduced to `var(--space-4)` at ≤30rem and `var(--space-3)` at ≤22.5rem.
+   - Verified live browser POST-Redirect-GET flow at 1440px, 1024px, 768px, 390px, 375px, 360px, and 320px with zero horizontal overflow (`scrollWidth <= innerWidth`).
+4. **Visitor Confirmation Email Architecture (Planned for FORMS-003):**
+   - Superseded prior planning decision to omit visitor confirmation emails. Legitimate accepted submissions will receive an automated confirmation email containing the same reference number shown on the Thank-You page.
+   - Implementation deferred to FORMS-003 alongside internal SMTP delivery.
+   - Thank-You page copy in R2 remains strictly truthful (no claim of sent email until delivery exists).
+   - Planned FORMS-003 submission contract distinguishes `InquiryAccepted`, `InternalNotificationSent`, and `VisitorConfirmationSent`.
+   - Conditional UI display: Thank-You page displays confirmation email notice only when visitor delivery succeeds; displays fallback guidance ("keep this reference number for your records") if visitor delivery fails, ensuring inquiries are never lost due to visitor SMTP issues.
+   - Abuse protection: Operates strictly behind antiforgery, honeypot, rate limiting, and future score-based reCAPTCHA. Visitor has zero control over sender, headers, subject structure, body content, or arbitrary routing.
+
+---
+
+## DEC-048 — USAP-FORMS-002-R3: Contact/Quote Workflow Boundary Enforcement, Honeypot Silent-Success Hardening, and Explicit Submission-State Tracking
+
+**Date:** 2026-09-29
+**Decision:**
+1. **Binding Contact vs. Quote Workflow Boundary:**
+   - `/contact-us` permits only 4 inquiry types: `GeneralInquiry`, `ProductInformation`, `EngineeringSupport`, `TechnicalDocumentation`.
+   - In `_InquiryForm.cshtml`, the inquiry-type `<select>` explicitly filters out `RequestAQuote`.
+   - Quote Details fieldset (`EstimatedQuantity`, `DesiredTimeline`, `IntendedApplication`) is wrapped in `@if (Model.Type == InquiryType.RequestAQuote)`, omitting quote inputs entirely from `/contact-us` HTML (both JS and No-JS safe).
+   - On GET `/contact-us?reason=request-a-quote`, issues an immediate 302 redirect to `/request-a-quote`, preserving only valid trusted canonical context identifiers (`family`, `group`, `doc`). Arbitrary query parameters and display strings are discarded.
+   - On POST `/contact-us`, forged submissions attempting `Input.Type == RequestAQuote` are strictly rejected via ModelState error ("Please use the Request a Quote form for quote requests."), never dispatched to `IInquirySubmissionService`, and never converted to `GeneralInquiry`.
+   - `/request-a-quote` remains locked server-side to `RequestAQuote` with `Organization/Company` required. Forged POSTs attempting non-quote types are overridden to `RequestAQuote` and validated under quote rules.
+2. **Honeypot Silent-Success Hardening:**
+   - When honeypot (`Input.Website`) is populated, submission service is bypassed (0 backend calls, 0 emails dispatched, 0 PII stored in `TempData`).
+   - A synthetic reference code (`REQ-yyyyMMdd-XXXXXX`) is generated matching the canonical public reference format.
+   - Redirects via PRG 302 to the dedicated Thank-You page, rendering the standard confirmation layout, reference card, and canonical helpful links so bots cannot detect rejection.
+3. **Explicit Submission-State Architecture:**
+   - Introduced explicit server-controlled state tracking in `TempData`:
+     - `IsGenuineSubmission`: `true` for genuine submissions, `false` for honeypot diversions, `null` for direct navigation.
+     - `SubmissionDisplayState`: `"GenuineSuccess"` vs `"HoneypotDiversion"` vs `null`.
+     - `HasDisplaySuccess`: `true` when a reference number is present.
+     - `IsGenuine`: `true` only when `IsGenuineSubmission == true`.
+   - Direct navigation to `/contact-us/thank-you` or `/request-a-quote/thank-you` renders the neutral status view (`Inquiry Status`, `Quote Request Status`) without a reference card or conversion eligibility.
+4. **Future Analytics & SMTP Safety Gates:**
+   - Binding requirement for future GA4 integration: `generate_lead` and conversion tracking must gate strictly on `IsGenuineSubmission == true`. Honeypot diversions must NEVER fire conversion events.
+   - Binding requirement for FORMS-003: internal notification emails and visitor confirmation emails are dispatched strictly when `IsGenuineSubmission == true`. Zero emails are sent for honeypot diversions.
+
+---
+
+## DEC-049 — USAP-FORMS-002-R4: Route-Authoritative Workflow Presentation, Canonical Context Precedence, and Final Checkpoint Authorization
+
+**Date:** 2026-09-29
+**Decision:**
+1. **Route-Authoritative Workflow Presentation via `IsQuoteWorkflow`:**
+   - Decoupled `_InquiryForm.cshtml` form structure from visitor-bound `Input.Type`. Introduced server-controlled property `IsQuoteWorkflow` on `InquiryPageModelBase` (`false` by default on Contact, overridden to `true` on `RequestAQuoteModel`).
+   - Structural form controls evaluate `isQuoteWorkflow`:
+     - Organization required indicator (`*`) and `aria-required="true"` render only on Quote workflow.
+     - Inquiry Type renders locked static badge on Quote workflow; renders filtered 4-option dropdown on Contact workflow.
+     - Quote Details fieldset (`EstimatedQuantity`, `DesiredTimeline`, `IntendedApplication`) renders only when `isQuoteWorkflow == true`.
+   - On forged Contact POST (`Input.Type=RequestAQuote` or undefined type), the server rejects submission, normalizes `Input.Type` to a safe Contact type, clears the attacker's attempted value from ModelState (`ModelState.Remove`), and adds the user-safe validation error. The redisplayed page remains visually and structurally a Contact form.
+2. **Canonical Context Precedence (`document > group > family`):**
+   - Implemented strict hierarchical precedence in `CtaContextResolver`:
+     1. Valid Technical Document (`doc`): Authoritative for document metadata and derived canonical family (`docRecord.FamilySlug`). Conflicting `group` and `family` parameters are ignored.
+     2. Valid Product Group (`group`): Authoritative for group metadata and derived canonical family (`groupRecord.FamilyId`). Conflicting `family` parameters are ignored.
+     3. Valid Product Family (`family`): Authoritative only when neither a valid document nor group has established context.
+     4. Invalid Fallback: Invalid higher-priority parameters fall through to valid lower-priority parameters (e.g. invalid doc + valid group -> group context; invalid doc/group + valid family -> family context; all invalid -> generic context).
+   - Explicit GET redirect `/contact-us?reason=request-a-quote` forwards only the minimum highest-priority canonical identifier (`doc`, `group`, or `family`).
+3. **Confirmation Background Asset Path & Options Property Corrections:**
+   - Corrected documentation and evidence to record the actual asset location `wwwroot/images/shared/backgrounds/usap-light-surface-technical-signal-overlay-v1.png` (CSS relative `../images/shared/backgrounds/...`).
+   - Reconciled review package documentation with actual source options properties (`AnalyticsOptions`, `RecaptchaOptions`, `SmtpOptions`).
+4. **Final Checkpoint Authorization:**
+   - Authorized final local Git checkpoint commit `feat(forms): implement contextual inquiry and quote workflows` upon passing full build, formatting, and route verification gates. Push and merge remain strictly deferred.

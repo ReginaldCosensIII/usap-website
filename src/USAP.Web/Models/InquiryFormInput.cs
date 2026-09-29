@@ -89,6 +89,29 @@ public class InquiryFormInput
         set => _desiredTimeline = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
     }
 
+    // Untrusted context identifiers submitted from client (re-resolved server-side)
+    [StringLength(50)]
+    public string? ContextReason { get; set; }
+
+    [StringLength(100)]
+    public string? ContextFamily { get; set; }
+
+    [StringLength(100)]
+    public string? ContextGroup { get; set; }
+
+    [StringLength(150)]
+    public string? ContextDoc { get; set; }
+
+    // Canonical source context populated server-side from ICtaContextResolver
+    [StringLength(100)]
+    public string? SourceContextCategory { get; set; }
+
+    [StringLength(200)]
+    public string? SourceContextTitle { get; set; }
+
+    [StringLength(500)]
+    public string? SourceContextSummary { get; set; }
+
     // Honeypot field
     [StringLength(200)]
     public string? Website { get; set; }

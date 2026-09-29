@@ -231,7 +231,7 @@
                     <span class="faq-icon" aria-hidden="true"></span>
                 </summary>
                 <div class="faq-content">
-                    <p>You can submit a quotation request through our online <a href="/request-a-quote">Request a Quote</a> form or contact our engineering team directly via <a href="/contact-us">Contact Engineering</a> with your operational parameters, frequency ranges, and mounting requirements.</p>
+                    <p>You can submit a quotation request through our online <a href="/request-a-quote">Request a Quote</a> form or contact our engineering team directly via <a asp-page="/ContactUs" asp-route-reason="engineering-support">Contact Engineering</a> with your operational parameters, frequency ranges, and mounting requirements.</p>
                 </div>
             </details>
         </div>
@@ -247,7 +247,7 @@
             <p>Share your application requirements, frequency coverage needs, or deployment constraints. USAP engineering can help you evaluate available antenna and positioning options.</p>
             <div class="closing-cta-actions">
                 <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
-                <a href="/contact-us" class="btn btn-inverse">Contact Engineering</a>
+                <a asp-page="/ContactUs" asp-route-reason="engineering-support" class="btn btn-inverse">Contact Engineering</a>
             </div>
         </div>
     </div>

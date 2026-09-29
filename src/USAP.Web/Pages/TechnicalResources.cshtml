@@ -239,7 +239,7 @@
             <p class="resources-empty__message">No documents matched your current search or category filter. Adjust your search terms, select another product family, or reset all filters.</p>
             <div class="resources-empty__actions">
                 <button type="button" id="reset-filters-btn" class="btn btn-secondary">Reset Filters</button>
-                <a href="/contact-us" class="btn btn-primary">Request Information</a>
+                <a asp-page="/ContactUs" asp-route-reason="technical-documentation" class="btn btn-primary">Request Technical Information</a>
             </div>
         </div>
     </div>
@@ -253,7 +253,7 @@
             <p>Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.</p>
             <div class="closing-cta-actions">
                 <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
-                <a href="/contact-us" class="btn btn-inverse">Request Information</a>
+                <a asp-page="/ContactUs" asp-route-reason="technical-documentation" class="btn btn-inverse">Request Technical Information</a>
             </div>
         </div>
     </div>

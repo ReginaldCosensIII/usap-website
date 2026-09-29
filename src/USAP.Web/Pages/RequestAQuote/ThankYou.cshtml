@@ -1,0 +1,64 @@
+@page "/request-a-quote/thank-you"
+@model USAP.Web.Pages.RequestAQuote.ThankYouModel
+@{
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = Model.HasActiveSubmission ? "Quote Request Received" : "Quote Request Status",
+        Description = "Your quotation request has been received by United States Antenna Products.",
+        CanonicalPath = "/request-a-quote/thank-you",
+        Robots = "noindex, nofollow",
+        OmitCanonical = true,
+        OpenGraphType = "website"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/confirmation.css" asp-append-version="true" />
+}
+
+<div class="confirmation-page-wrapper">
+    <div class="confirmation-container">
+        <div class="confirmation-content">
+            @if (Model.HasActiveSubmission)
+            {
+                <span class="confirmation-eyebrow">Quote Request Confirmed</span>
+                <h1 class="confirmation-heading">Quote Request Received</h1>
+                <p class="confirmation-description">Thank you. Your request has been received.</p>
+
+                <div class="confirmation-reference-card" role="status">
+                    <span class="confirmation-reference-label">Quote Request Reference Number</span>
+                    <code class="confirmation-reference-code">@Model.ReferenceNumber</code>
+                </div>
+
+                <p class="confirmation-guidance">Keep this reference number for your records. USAP will review the information you provided and follow up if clarification or additional information is needed.</p>
+
+                <div class="confirmation-actions">
+                    <a asp-page="/Index" class="btn btn-primary">Return to Homepage</a>
+                    <a asp-page="/Products/Index" class="btn btn-outline">Explore Products</a>
+                </div>
+            }
+            else
+            {
+                <h1 class="confirmation-heading">Quote Request Status</h1>
+                <p class="confirmation-description">No active quote request was found in your current session.</p>
+
+                <p class="confirmation-guidance">If you would like to request commercial pricing or discuss technical requirements, please submit a request through our quote form.</p>
+
+                <div class="confirmation-actions">
+                    <a asp-page="/RequestAQuote" class="btn btn-primary">Go to Request a Quote</a>
+                    <a asp-page="/Index" class="btn btn-outline">Return to Homepage</a>
+                </div>
+            }
+
+            <div class="confirmation-nav">
+                <h2>Helpful Links</h2>
+                <ul>
+                    @foreach (var link in Model.HelpfulLinks)
+                    {
+                        <li><a href="@link.Url">@link.Text</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

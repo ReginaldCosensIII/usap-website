@@ -13,7 +13,7 @@ public enum InquiryType
     [Display(Name = "Product Information")]
     ProductInformation = 3,
 
-    [Display(Name = "Engineering/System Support")]
+    [Display(Name = "Engineering & Requirements Support")]
     EngineeringSupport = 4,
 
     [Display(Name = "Technical Documentation")]

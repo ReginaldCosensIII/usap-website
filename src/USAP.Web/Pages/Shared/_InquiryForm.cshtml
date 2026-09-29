@@ -1,14 +1,35 @@
 @model USAP.Web.Models.InquiryFormInput
 @using USAP.Web.Models
+@using USAP.Web.Pages
+
+@{
+    var isQuoteWorkflow = (bool?)ViewData["IsQuoteWorkflow"]
+        ?? (ViewContext.ActionDescriptor as Microsoft.AspNetCore.Mvc.RazorPages.CompiledPageActionDescriptor)?.HandlerTypeInfo == typeof(RequestAQuoteModel);
+}
 
 <form method="post" id="inquiryForm" class="inquiry-form stack" data-quote-value="@((int)InquiryType.RequestAQuote)">
 
     <div asp-validation-summary="All" class="notice notice-error" role="alert"></div>
 
-    @* Honeypot *@
-    <div class="sr-only" aria-hidden="true">
-        <label for="Website">Website</label>
-        <input type="text" asp-for="Website" tabindex="-1" autocomplete="off" />
+    @* Trusted Context Treatment (FORMS-002) *@
+    @if (!string.IsNullOrWhiteSpace(Model.SourceContextTitle))
+    {
+        <aside class="inquiry-context-panel" role="region" aria-label="Originating Context">
+            <span class="inquiry-context-panel__label">@(Model.SourceContextCategory ?? "Inquiry Context")</span>
+            <strong class="inquiry-context-panel__title">@Model.SourceContextTitle</strong>
+        </aside>
+    }
+
+    @* Context Identifiers (Re-resolved Server-Side on POST) *@
+    <input type="hidden" asp-for="ContextReason" />
+    <input type="hidden" asp-for="ContextFamily" />
+    <input type="hidden" asp-for="ContextGroup" />
+    <input type="hidden" asp-for="ContextDoc" />
+
+    @* Accessible Honeypot (FORMS-002) *@
+    <div class="form-honeypot" aria-hidden="true">
+        <label for="form-website-field">Website</label>
+        <input type="text" asp-for="Website" id="form-website-field" tabindex="-1" autocomplete="off" />
     </div>
 
     <div class="grid grid-2">
@@ -25,8 +46,16 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="Organization" class="form-label">Organization/Company</label>
-            <input asp-for="Organization" class="form-control" autocomplete="organization" />
+            @if (isQuoteWorkflow)
+            {
+                <label asp-for="Organization" class="form-label">Organization/Company <span class="form-required" aria-label="required">*</span></label>
+                <input asp-for="Organization" class="form-control" autocomplete="organization" aria-required="true" />
+            }
+            else
+            {
+                <label asp-for="Organization" class="form-label">Organization/Company</label>
+                <input asp-for="Organization" class="form-control" autocomplete="organization" />
+            }
             <span asp-validation-for="Organization" class="form-error"></span>
         </div>
 
@@ -38,12 +67,26 @@
     </div>
 
     <div class="grid grid-2">
-        <div class="form-group">
-            <label asp-for="Type" class="form-label">Inquiry Type <span class="form-required" aria-label="required">*</span></label>
-            <select asp-for="Type" asp-items="Html.GetEnumSelectList<InquiryType>()" class="form-control js-inquiry-type-select" aria-required="true">
-            </select>
-            <span asp-validation-for="Type" class="form-error"></span>
-        </div>
+        @if (isQuoteWorkflow)
+        {
+            <div class="form-group">
+                <label class="form-label">Inquiry Type</label>
+                <div class="form-control form-control--static">Request a Quote</div>
+                <input type="hidden" asp-for="Type" value="@InquiryType.RequestAQuote" />
+            </div>
+        }
+        else
+        {
+            var contactTypes = Html.GetEnumSelectList<InquiryType>()
+                .Where(item => item.Value != ((int)InquiryType.RequestAQuote).ToString());
+
+            <div class="form-group">
+                <label asp-for="Type" class="form-label">Inquiry Type <span class="form-required" aria-label="required">*</span></label>
+                <select asp-for="Type" asp-items="contactTypes" class="form-control js-inquiry-type-select" aria-required="true">
+                </select>
+                <span asp-validation-for="Type" class="form-error"></span>
+            </div>
+        }
 
         <div class="form-group">
             <label asp-for="PreferredContactMethod" class="form-label">Preferred Contact Method</label>
@@ -59,29 +102,32 @@
         <span asp-validation-for="ProductOfInterest" class="form-error"></span>
     </div>
 
-    <fieldset class="form-group js-conditional-group js-quote-fields stack-sm quote-details-group">
-        <legend class="form-label">Quote Details</legend>
+    @if (isQuoteWorkflow)
+    {
+        <fieldset class="form-group js-conditional-group js-quote-fields stack-sm quote-details-group">
+            <legend class="form-label">Quote Details</legend>
 
-        <div class="grid grid-2">
-            <div class="form-group">
-                <label asp-for="EstimatedQuantity" class="form-label">Estimated Quantity</label>
-                <input asp-for="EstimatedQuantity" class="form-control" />
-                <span asp-validation-for="EstimatedQuantity" class="form-error"></span>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label asp-for="EstimatedQuantity" class="form-label">Estimated Quantity</label>
+                    <input asp-for="EstimatedQuantity" class="form-control" />
+                    <span asp-validation-for="EstimatedQuantity" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DesiredTimeline" class="form-label">Desired Timeline</label>
+                    <input asp-for="DesiredTimeline" class="form-control" placeholder="e.g., target quarter or ASAP" />
+                    <span asp-validation-for="DesiredTimeline" class="form-error"></span>
+                </div>
             </div>
 
             <div class="form-group">
-                <label asp-for="DesiredTimeline" class="form-label">Desired Timeline</label>
-                <input asp-for="DesiredTimeline" class="form-control" placeholder="e.g., target quarter or ASAP" />
-                <span asp-validation-for="DesiredTimeline" class="form-error"></span>
+                <label asp-for="IntendedApplication" class="form-label">Intended Application</label>
+                <textarea asp-for="IntendedApplication" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="IntendedApplication" class="form-error"></span>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="IntendedApplication" class="form-label">Intended Application</label>
-            <textarea asp-for="IntendedApplication" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="IntendedApplication" class="form-error"></span>
-        </div>
-    </fieldset>
+        </fieldset>
+    }
 
     <div class="form-group">
         <label asp-for="Message" class="form-label">Message / Project Requirements <span class="form-required" aria-label="required">*</span></label>

@@ -24,9 +24,19 @@ public class InquiryMessageComposer : IInquiryMessageComposer
             sb.AppendLine($"Phone: {input.Phone}");
         }
 
+        if (!string.IsNullOrWhiteSpace(input.SourceContextTitle))
+        {
+            var category = string.IsNullOrWhiteSpace(input.SourceContextCategory) ? "Context" : input.SourceContextCategory;
+            sb.AppendLine($"Originating Context: {category} — {input.SourceContextTitle}");
+            if (!string.IsNullOrWhiteSpace(input.SourceContextSummary) && input.SourceContextSummary != input.SourceContextTitle)
+            {
+                sb.AppendLine($"Context Detail: {input.SourceContextSummary}");
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(input.ProductOfInterest))
         {
-            sb.AppendLine($"Product of Interest: {input.ProductOfInterest}");
+            sb.AppendLine($"Product of Interest (Visitor Entered): {input.ProductOfInterest}");
         }
 
         if (input.PreferredContactMethod.HasValue)
@@ -59,12 +69,17 @@ public class InquiryMessageComposer : IInquiryMessageComposer
         sb.AppendLine("Message / Project Requirements:");
         sb.AppendLine(input.Message);
 
-        // Strip carriage returns and line feeds from name to prevent header injection
+        // Strip carriage returns and line feeds from name and context to prevent header injection
         var safeName = Regex.Replace(input.Name, @"[\r\n]", string.Empty).Trim();
+        var contextTag = !string.IsNullOrWhiteSpace(input.SourceContextTitle)
+            ? $" — {Regex.Replace(input.SourceContextTitle, @"[\r\n]", string.Empty).Trim()}"
+            : (!string.IsNullOrWhiteSpace(input.ProductOfInterest)
+                ? $" — {Regex.Replace(input.ProductOfInterest, @"[\r\n]", string.Empty).Trim()}"
+                : string.Empty);
 
         return new InquiryMessage
         {
-            Subject = $"Website Inquiry: {input.Type} from {safeName}",
+            Subject = $"Website Inquiry: {input.Type}{contextTag} from {safeName}",
             Body = sb.ToString()
         };
     }
