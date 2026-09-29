@@ -256,8 +256,8 @@
                 <h2 id="closing-cta-heading">Ready to Discuss Your Antenna Requirements?</h2>
                 <p>Share your application requirements, product questions, or system needs. USAP can help you evaluate available antenna and related equipment options.</p>
                 <div class="closing-cta-actions">
-                    <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
-                    <a href="/contact-us" class="btn btn-inverse">Request Information</a>
+                    <a asp-page="/RequestAQuote" asp-route-doc="@Model.Document.Slug" class="btn btn-primary">Request a Quote</a>
+                    <a asp-page="/ContactUs" asp-route-reason="technical-documentation" asp-route-doc="@Model.Document.Slug" class="btn btn-inverse">Ask About This Document</a>
                 </div>
             </div>
         </div>

@@ -44,8 +44,8 @@
             <h1 id="family-hero-title" class="internal-hero-title">@familyName</h1>
             <p class="internal-hero-lead">@familySummary</p>
             <div class="internal-hero-actions">
-                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
-                <a href="/contact-us" class="btn btn-inverse">Contact Engineering</a>
+                <a asp-page="/RequestAQuote" asp-route-family="@Model.FamilySlug" class="btn btn-primary">Request a Quote</a>
+                <a asp-page="/ContactUs" asp-route-reason="engineering-support" asp-route-family="@Model.FamilySlug" class="btn btn-inverse">Contact Engineering</a>
             </div>
         </div>
     </div>
@@ -251,7 +251,7 @@
                             }
 
                             <div class="product-group-disclosure__action">
-                                <a href="/contact-us" class="card-link product-group-disclosure__contact-link">
+                                <a asp-page="/ContactUs" asp-route-reason="product-information" asp-route-group="@group.Id" class="card-link product-group-disclosure__contact-link">
                                     <span class="card-link__text">Inquire about @group.Name with USAP Engineering</span>
                                     <span class="card-link__arrow" aria-hidden="true">&rarr;</span>
                                 </a>
@@ -270,7 +270,7 @@
             <p>Product configurations, compatibility, documentation, and availability vary by application and project requirements. Contact USAP engineering for help identifying appropriate models, supporting hardware, and current technical information for your project.</p>
         </div>
         <div class="configuration-support-action">
-            <a href="/contact-us" class="btn btn-primary">Contact Engineering</a>
+            <a asp-page="/ContactUs" asp-route-reason="engineering-support" asp-route-family="@Model.FamilySlug" class="btn btn-primary">Contact Engineering</a>
         </div>
     </aside>
 
@@ -285,10 +285,10 @@
         <div class="closing-cta-content">
             <span class="eyebrow">Technical Support</span>
             <h2 id="closing-cta-heading">Inquire About @familyName</h2>
-            <p>Speak with USAP engineering regarding specific frequency bands, mounting configurations, or custom engineering requirements for your deployment.</p>
+            <p>Speak with USAP engineering regarding specific frequency bands, mounting configurations, or application and system requirements for your deployment.</p>
             <div class="closing-cta-actions">
-                <a href="/request-a-quote" class="btn btn-primary">Request a Quote</a>
-                <a href="/contact-us" class="btn btn-inverse">Contact USAP</a>
+                <a asp-page="/RequestAQuote" asp-route-family="@Model.FamilySlug" class="btn btn-primary">Request a Quote</a>
+                <a asp-page="/ContactUs" asp-route-reason="engineering-support" asp-route-family="@Model.FamilySlug" class="btn btn-inverse">Contact Engineering</a>
             </div>
         </div>
     </div>

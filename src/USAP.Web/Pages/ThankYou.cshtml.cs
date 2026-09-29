@@ -11,7 +11,8 @@ public class ThankYouModel : PageModel
     [TempData]
     public string? ConfirmationMessage { get; set; }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        return RedirectToPage("/ContactUs/ThankYou");
     }
 }

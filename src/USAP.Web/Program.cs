@@ -1,45 +1,126 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.FileProviders;
 using System.Threading.RateLimiting;
+using USAP.Web.Configuration;
 using USAP.Web.Middleware;
+using USAP.Web.Models;
 using USAP.Web.Services;
 using USAP.Web.Services.Catalog;
-using USAP.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages with default conventions.
 builder.Services.AddRazorPages();
 
+// Integration Options Foundations (FORMS-002) — populated via UserSecrets in Dev or IIS Env in Prod
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(SmtpOptions.SectionName));
+builder.Services.Configure<RecaptchaOptions>(builder.Configuration.GetSection(RecaptchaOptions.SectionName));
+builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection(AnalyticsOptions.SectionName));
+
 builder.Services.AddOptions<SiteSettings>()
     .Bind(builder.Configuration.GetSection(SiteSettings.SectionName))
     .Validate(settings =>
     {
-        if (string.IsNullOrWhiteSpace(settings.BaseUrl)) return false;
-        if (!Uri.TryCreate(settings.BaseUrl, UriKind.Absolute, out var uri)) return false;
-        if (uri.Scheme != Uri.UriSchemeHttps) return false;
-        if (string.IsNullOrEmpty(uri.Host)) return false;
-        if (!string.IsNullOrEmpty(uri.UserInfo)) return false;
-        if (!string.IsNullOrEmpty(uri.Query)) return false;
-        if (!string.IsNullOrEmpty(uri.Fragment)) return false;
-        if (uri.AbsolutePath != "/") return false;
-        if (settings.BaseUrl.EndsWith("/")) return false;
+        if (string.IsNullOrWhiteSpace(settings.BaseUrl))
+        {
+            return false;
+        }
 
-        if (string.IsNullOrWhiteSpace(settings.SiteName)) return false;
-        if (string.IsNullOrWhiteSpace(settings.OrganizationName)) return false;
-        if (string.IsNullOrWhiteSpace(settings.DefaultTitle)) return false;
-        if (string.IsNullOrWhiteSpace(settings.DefaultDescription)) return false;
-        if (string.IsNullOrWhiteSpace(settings.DefaultSocialImagePath) || !settings.DefaultSocialImagePath.StartsWith("/") || settings.DefaultSocialImagePath.StartsWith("//")) return false;
-        if (string.IsNullOrWhiteSpace(settings.DefaultSocialImageAlt)) return false;
-        if (string.IsNullOrWhiteSpace(settings.Locale)) return false;
-        if (string.IsNullOrWhiteSpace(settings.ThemeColor)) return false;
-        if (string.IsNullOrWhiteSpace(settings.TitleSeparator)) return false;
-        if (string.IsNullOrWhiteSpace(settings.TwitterCard)) return false;
+        if (!Uri.TryCreate(settings.BaseUrl, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        if (uri.Scheme != Uri.UriSchemeHttps)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(uri.Host))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(uri.UserInfo))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(uri.Query))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrEmpty(uri.Fragment))
+        {
+            return false;
+        }
+
+        if (uri.AbsolutePath != "/")
+        {
+            return false;
+        }
+
+        if (settings.BaseUrl.EndsWith("/"))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.SiteName))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.OrganizationName))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.DefaultTitle))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.DefaultDescription))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.DefaultSocialImagePath) || !settings.DefaultSocialImagePath.StartsWith("/") || settings.DefaultSocialImagePath.StartsWith("//"))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.DefaultSocialImageAlt))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.Locale))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.ThemeColor))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.TitleSeparator))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(settings.TwitterCard))
+        {
+            return false;
+        }
 
         return true;
     }, "Critical SiteSettings are missing or invalid.")
     .ValidateOnStart();
 
+builder.Services.AddScoped<ICtaContextResolver, CtaContextResolver>();
 builder.Services.AddScoped<IInquiryMessageComposer, InquiryMessageComposer>();
 builder.Services.AddSingleton<IProductCatalogService, ProductCatalogService>();
 

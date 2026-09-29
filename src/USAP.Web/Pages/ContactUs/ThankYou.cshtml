@@ -1,0 +1,64 @@
+@page "/contact-us/thank-you"
+@model USAP.Web.Pages.ContactUs.ThankYouModel
+@{
+    ViewData[USAP.Web.Models.SeoMetadata.ViewDataKey] = new USAP.Web.Models.SeoMetadata
+    {
+        Title = Model.HasActiveSubmission ? "Thank You — Inquiry Received" : "Inquiry Status",
+        Description = "Your inquiry has been received by United States Antenna Products.",
+        CanonicalPath = "/contact-us/thank-you",
+        Robots = "noindex, nofollow",
+        OmitCanonical = true,
+        OpenGraphType = "website"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/confirmation.css" asp-append-version="true" />
+}
+
+<div class="confirmation-page-wrapper">
+    <div class="confirmation-container">
+        <div class="confirmation-content">
+            @if (Model.HasActiveSubmission)
+            {
+                <span class="confirmation-eyebrow">Inquiry Received</span>
+                <h1 class="confirmation-heading">Thank You</h1>
+                <p class="confirmation-description">Your inquiry has been received.</p>
+
+                <div class="confirmation-reference-card" role="status">
+                    <span class="confirmation-reference-label">Inquiry Reference Number</span>
+                    <code class="confirmation-reference-code">@Model.ReferenceNumber</code>
+                </div>
+
+                <p class="confirmation-guidance">Keep this reference number for your records. USAP will review your message and follow up using the contact information you provided.</p>
+
+                <div class="confirmation-actions">
+                    <a asp-page="/Index" class="btn btn-primary">Return to Homepage</a>
+                    <a asp-page="/Products/Index" class="btn btn-outline">Explore Products</a>
+                </div>
+            }
+            else
+            {
+                <h1 class="confirmation-heading">Inquiry Status</h1>
+                <p class="confirmation-description">No active inquiry submission was found in your current session.</p>
+
+                <p class="confirmation-guidance">If you need assistance or wish to inquire about antennas, rotators, or accessories, please submit a message using our contact form.</p>
+
+                <div class="confirmation-actions">
+                    <a asp-page="/ContactUs" class="btn btn-primary">Go to Contact Form</a>
+                    <a asp-page="/Index" class="btn btn-outline">Return to Homepage</a>
+                </div>
+            }
+
+            <div class="confirmation-nav">
+                <h2>Helpful Links</h2>
+                <ul>
+                    @foreach (var link in Model.HelpfulLinks)
+                    {
+                        <li><a href="@link.Url">@link.Text</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
