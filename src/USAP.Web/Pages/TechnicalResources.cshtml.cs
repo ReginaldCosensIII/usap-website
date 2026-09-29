@@ -133,6 +133,17 @@ public class TechnicalResourcesModel : PageModel
         FamilyGroups = familyGroups;
     }
 
+    public CatalogAsset? GetDocumentThumbnail(ProductResourceRecord doc)
+    {
+        if (string.IsNullOrEmpty(doc.ProductGroupId))
+        {
+            return null;
+        }
+
+        var group = _catalogService.GetProductGroupById(doc.ProductGroupId);
+        return group?.AssociatedAsset;
+    }
+
     public record ResourceCategoryItem(string Slug, string Name, int Count);
     public record ResourceFamilyGroupViewModel(string Slug, string Name, int DisplayOrder, IReadOnlyList<ProductResourceRecord> Documents, int MatchingCount);
 }
