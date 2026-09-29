@@ -154,6 +154,20 @@
                                      data-search="@doc.SearchText.ToLowerInvariant()"
                                      data-title="@doc.Title.ToLowerInvariant()"
                                      data-models="@string.Join(" ", doc.ModelCodes).ToLowerInvariant()">
+                                @{
+                                    var thumbnail = Model.GetDocumentThumbnail(doc);
+                                }
+                                @if (thumbnail != null)
+                                {
+                                    <div class="resource-document-row__thumbnail">
+                                        <img src="@thumbnail.ImagePath"
+                                             alt="@thumbnail.AltText"
+                                             width="96"
+                                             height="64"
+                                             loading="lazy"
+                                             class="resource-document-row__thumb-img" />
+                                    </div>
+                                }
                                 <div class="resource-document-row__main">
                                     <div class="resource-document-row__header-line">
                                         <h3 class="resource-document-row__title">
