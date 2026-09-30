@@ -318,7 +318,7 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
 | Decision | Deferred to |
 |---|---|
 | Static content data format and location | Catalog & Resources (Completed for products and technical documents) |
-| SMTP/email service | Forms & Search (Currently simulated in Development with `DevelopmentInquirySubmissionService`; unavailable elsewhere) |
+| SMTP/email service | Forms & Search (Completed in USAP-FORMS-003-C1 via MailKit 4.18.1 / IONOS Dev SMTP) |
 | Analytics (GA4) | Forms & Search |
 | Advanced Technical Resources filtering | Separately authorized (basic search, family category filters, and homepage preset views implemented) |
 | Legacy page redirect map | Technical document redirects (34 URLs) are fully implemented via `LegacyDocumentRedirectMiddleware`. Legacy WordPress category and product URLs remain deferred to Milestone C3. |
@@ -392,6 +392,90 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
   - reCAPTCHA architecture direction: Score-based Google Cloud reCAPTCHA (supersedes legacy v2 Checkbox).
   - Analytics architecture direction: Direct GA4 (`gtag.js`) via server partial (supersedes Google Tag Manager).
 - Submission endpoints are protected by ASP.NET Core IP rate limiting (`InquirySubmission` policy: 5 permits/min).
+
+## SMTP Delivery, Internal Notification, Visitor Confirmation, and Delivery-Aware Architecture (USAP-FORMS-003-C1 / R1)
+
+- **Provider-Neutral SMTP Transport Abstraction & Strict Transport Security**:
+  - `ISmtpEmailSender` defines the asynchronous email sending contract accepting a structured `EmailMessage` value object.
+  - `MailKitSmtpEmailSender` implements the abstraction using MailKit 4.18.1 / MimeKit (`net10.0`). Uses `MailKit.Net.Smtp.SmtpClient` with full asynchronous lifecycle (`ConnectAsync`, `AuthenticateAsync`, `SendAsync`, `DisconnectAsync`).
+  - Strict TLS Certificate Validation: Certificate validation is never bypassed, disabled, or weakened (`CheckCertificateRevocation = true`).
+  - Strict SecurityMode Policy: `SmtpOptions.ResolveSecureSocketOptions()` restricts encryption modes exclusively to `StartTls` and `SslOnConnect` (case-insensitive `ssl` accepted). Permissive or unencrypted modes (`None`, `Auto`, `StartTlsWhenAvailable`) are strictly rejected.
+  - Disposing and disconnecting: Proper `using` lifecycle guarantees sockets are closed and SMTP QUIT is issued cleanly.
+
+- **Zero Secrets & True Startup Options Validation**:
+  - Configuration keys: `Smtp:Enabled`, `Smtp:Host`, `Smtp:Port`, `Smtp:SecurityMode`, `Smtp:Username`, `Smtp:Password`, `Smtp:FromAddress`, `Smtp:FromName`, `Smtp:NotificationRecipient`.
+  - Zero secrets in tracked code or repository configuration; dev secrets managed via .NET User Secrets; stage/prod via IIS Environment Variables.
+  - Startup validation: Registered via `builder.Services.AddOptions<SmtpOptions>().ValidateOnStart()`, ensuring immediate application startup failure if `Smtp:Enabled == true` and required configuration is invalid.
+  - Address validation: `FromAddress` and `NotificationRecipient` are validated using `MimeKit.MailboxAddress.TryParse`, rejecting invalid addresses or simple `@` presence checks. Application starts cleanly without credentials when `Smtp:Enabled == false`.
+
+- **Canonical Reference Number Consistency**:
+  - `InquiryReferenceGenerator` provides the centralized, deterministic reference generator.
+  - Canonical format: `REQ-yyyyMMdd-XXXXXX` (19 characters: `REQ-`, 8-digit date, hyphen, 6-hex uppercase random suffix).
+  - Genuine and honeypot submissions share the exact same visible shape and entropy, ensuring bots cannot detect honeypot diversion through reference structure or length.
+
+- **Internal-First Delivery Order & Delivery-Aware Submission Result**:
+  - `IInquirySubmissionService` returns `InquirySubmissionResult` with delivery-aware flags:
+    - `InquiryAccepted`: Whether the submission has been accepted and recorded.
+    - `InternalNotificationSent`: Whether the notification to USAP internal staff succeeded.
+    - `VisitorConfirmationSent`: Whether the confirmation to the visitor succeeded.
+    - `ReferenceNumber`: Authoritative reference code formatted as `REQ-yyyyMMdd-XXXXXX`.
+  - Sequential delivery pipeline:
+    1. Server-side validation and canonical CTA context re-resolution succeed.
+    2. Authoritative inquiry reference number is generated via `InquiryReferenceGenerator`.
+    3. Compose internal notification message via `IEmailComposer`.
+    4. Send internal notification via `ISmtpEmailSender`.
+    5. **Gate**: Only if internal notification succeeds (`InternalNotificationSent == true`), compose and send visitor confirmation email.
+    6. Return delivery-aware result.
+  - Failure Semantics:
+    - **Case A (Both succeed)**: `InquiryAccepted=true`, `InternalNotificationSent=true`, `VisitorConfirmationSent=true`. Thank-You page displays confirmation email notice ("A confirmation email containing this reference number has been sent to the email address you provided.").
+    - **Case B (Internal succeeds, visitor fails)**: `InquiryAccepted=true`, `InternalNotificationSent=true`, `VisitorConfirmationSent=false`. The inquiry is never dropped or rejected. Thank-You page displays fallback notice ("Your submission has been received. Please keep this reference number for your records."). Sanitized warning logged.
+    - **Case C (Internal fails)**: `InquiryAccepted=false`, `InternalNotificationSent=false`, `VisitorConfirmationSent=false`. No visitor confirmation is attempted. No success redirect. Form is redisplayed with safe user-facing message ("We couldn't send your request at this time. Please try again.") while preserving submitted inputs. Zero SMTP exceptions or credentials exposed.
+    - **Case D (Honeypot)**: `IsGenuineSubmission=false`. Zero SMTP calls. Diverts silently to Thank-You page with synthetic reference code matching the genuine reference shape without claiming an email was sent.
+    - **Case E (Direct Navigation)**: Zero SMTP calls. Renders neutral Thank-You status view.
+  - Cancellation Semantics: `OperationCanceledException` is propagated directly when cancellation is requested, preventing cancellation from being misinterpreted as delivery failure.
+
+- **Controlled Subject Architecture (Zero Free-Text Injection)**:
+  - Email subjects are strictly constructed from server-controlled tokens:
+    - Non-production environment prefix: `[DEV]`
+    - Site brand: `USAP Website` or `United States Antenna Products`
+    - Controlled taxonomy label: e.g. `General Inquiry`, `Request a Quote`, `Engineering & Requirements Support`
+    - Validated canonical context: only trusted server-resolved document or group names (e.g. ` — LP-1017 Log Periodic`)
+    - Reference code: ` — REQ-yyyyMMdd-XXXXXX`
+  - Visitor-authored free text (`ProductOfInterest`, `Name`, `Organization`, `Message`, `IntendedApplication`, etc.) is strictly forbidden from appearing in email subjects, preventing header injection and CRLF attacks.
+
+- **Address & Reply-To Routing**:
+  - Internal Notification:
+    - `From`: Configured `Smtp:FromAddress` and `Smtp:FromName` (authenticated development mailbox, never spoofed).
+    - `To`: Configured `Smtp:NotificationRecipient`.
+    - `Reply-To`: Validated visitor email address. Enables direct email client replies to the visitor.
+  - Visitor Confirmation:
+    - `From`: Configured `Smtp:FromAddress` and `Smtp:FromName`.
+    - `To`: Validated visitor email address.
+    - `Reply-To`: Configured `Smtp:FromAddress`. Never visitor-controlled.
+
+- **Email Branding System & Dual Multipart/Alternative Composition**:
+  - Dual MIME `multipart/alternative` with `text/plain; charset=utf-8` and `text/html; charset=utf-8`.
+  - Final Visual Header Hierarchy: Dark navy background (`#0d1b2e`) with a 3px USAP red (`#c8102e`) bottom accent rule:
+    - Red Brand Eyebrow: `USAP WEBSITE` (`#c8102e`, 11px, font-weight 700, uppercase, letter-spacing 1.2px, line-height 1.2, margin-bottom 6px).
+    - Typographic Brand Lockup: `UNITED STATES<br />ANTENNA PRODUCTS` (white `#ffffff`, 21px, font-weight 800, line-height 1.2, letter-spacing 1.2px, uppercase).
+    - Functional Descriptor: Light neutral (`#cbd5e1`, 12px, font-weight 600, letter-spacing 0.8px, uppercase, margin-top 8px).
+    - Development/Test Badge: Clear amber badge (`#fef3c7`, border `#f59e0b`, text `#92400e`, 11px, bold, margin-top 12px); automatically omitted in Production.
+    - Header Padding: Compact operational dimensions (`padding: 26px 32px 22px 32px`).
+  - Body Visual Hierarchy:
+    - Reference Callout: Light neutral card (`#f8fafc`, border `#e2e8f0`) with 4px USAP red left border, USAP red eyebrow label (`REFERENCE NUMBER` / `QUOTE REQUEST REFERENCE`, `#c8102e`, 11px, bold, uppercase, letter-spacing 0.6px), and dark navy monospace reference value.
+    - Section Eyebrows: Restrained USAP red eyebrows (`SUBMISSION SUMMARY`, `CANONICAL WEBSITE CONTEXT`, `VISITOR CONTACT DETAILS`, etc. in `#c8102e`, 11px, bold, uppercase, letter-spacing 0.8px) with subtle neutral bottom divider.
+  - Refined Company Footer: Dark navy background (`#0d1b2e`) with 3px red accent rule, verified public contact information (5263 Agro Drive, Frederick, MD 21703; Phone: 240-341-7120; Fax: 240-371-4980; Canonical domain link: `https://www.usantennaproducts.com/`, display text: `www.usantennaproducts.com`), and automated submission disclosure. Website footer itself remains completely untouched.
+  - Multiline Rendering: Encodes HTML and converts newlines to `<br />` under standard line-height, eliminating double-spacing artifacts.
+  - Plain-Text Fallback: High-quality ASCII formatting with complete data hierarchy, `USAP WEBSITE` eyebrow, and canonical website domain.
+  - Logo Strategy: Raster logo from `usap-logo.svg` contains an embedded 180x102 JPEG on an opaque white rect background and is NOT used in production email. The production email remains purely typographic and robust across all email clients. A future approved transparent vector/raster logo enhancement is documented as DEFERRED for separate stakeholder authorization and can be substituted into the shared header composition as a localized template change.
+
+- **Logging and Privacy Policy**:
+  - Operational logs record only: reference number, controlled inquiry type, delivery stage, and sanitized outcome.
+  - Raw Exception objects are never passed into `ILogger`, logging only `ex.GetType().Name` to prevent leakage of SMTP command strings or recipient mailboxes.
+  - Explicitly forbidden from logs: SMTP passwords, secrets, full email bodies, visitor messages, intended applications, visitor email addresses as routine data, and phone numbers.
+
+- **Out of Scope for FORMS-003**:
+  - reCAPTCHA (CreateAssessment API, browser scripts) and GA4 (`gtag.js`, `generate_lead`) remain deferred to future checkpoints.
 
 ## IIS deployment
 

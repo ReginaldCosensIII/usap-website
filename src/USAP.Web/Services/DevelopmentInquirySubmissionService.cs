@@ -15,7 +15,7 @@ public class DevelopmentInquirySubmissionService : IInquirySubmissionService
 
     public Task<InquirySubmissionResult> SubmitAsync(Models.InquiryFormInput input, CancellationToken cancellationToken = default)
     {
-        var referenceNumber = $"REQ-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
+        var referenceNumber = InquiryReferenceGenerator.Generate();
 
         // Ensure composer is invoked so the architecture is validated, but do not log the result.
         var message = _composer.Compose(input);
@@ -25,6 +25,9 @@ public class DevelopmentInquirySubmissionService : IInquirySubmissionService
         return Task.FromResult(new InquirySubmissionResult
         {
             IsSuccess = true,
+            InquiryAccepted = true,
+            InternalNotificationSent = false,
+            VisitorConfirmationSent = false,
             ReferenceNumber = referenceNumber,
             ConfirmationMessage = "Your inquiry was successfully processed by the development simulator (no external email was sent)."
         });

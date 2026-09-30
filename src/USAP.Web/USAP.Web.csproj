@@ -7,4 +7,8 @@
     <UserSecretsId>414740df-1761-4205-9d89-1fd5d966dff2</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.18.1" />
+  </ItemGroup>
+
 </Project>
