@@ -46,6 +46,11 @@
     </div>
 </div>
 
+@inject Microsoft.Extensions.Options.IOptions<USAP.Web.Configuration.RecaptchaOptions> RecaptchaOptionsAccessor
 @section Scripts {
+    @if (RecaptchaOptionsAccessor.Value.Enabled && !string.IsNullOrWhiteSpace(RecaptchaOptionsAccessor.Value.SiteKey))
+    {
+        <script src="https://www.google.com/recaptcha/enterprise.js?render=@RecaptchaOptionsAccessor.Value.SiteKey" async defer></script>
+    }
     <script src="~/js/inquiry-form.js" asp-append-version="true" defer></script>
 }

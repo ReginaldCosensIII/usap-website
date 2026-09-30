@@ -1,15 +1,33 @@
 @model USAP.Web.Models.InquiryFormInput
 @using USAP.Web.Models
 @using USAP.Web.Pages
+@using Microsoft.Extensions.Options
+@using USAP.Web.Configuration
+@inject IOptions<RecaptchaOptions> RecaptchaOptionsAccessor
 
 @{
     var isQuoteWorkflow = (bool?)ViewData["IsQuoteWorkflow"]
         ?? (ViewContext.ActionDescriptor as Microsoft.AspNetCore.Mvc.RazorPages.CompiledPageActionDescriptor)?.HandlerTypeInfo == typeof(RequestAQuoteModel);
+    var recaptchaOptions = RecaptchaOptionsAccessor.Value;
+    var recaptchaEnabled = recaptchaOptions.Enabled;
+    var recaptchaSiteKey = recaptchaOptions.SiteKey;
+    var recaptchaAction = (string?)ViewData["RecaptchaAction"] ?? (isQuoteWorkflow ? "quote_request" : "contact_submit");
 }
 
-<form method="post" id="inquiryForm" class="inquiry-form stack" data-quote-value="@((int)InquiryType.RequestAQuote)">
+<form method="post" id="inquiryForm" class="inquiry-form stack" data-quote-value="@((int)InquiryType.RequestAQuote)" data-recaptcha-enabled="@(recaptchaEnabled ? "true" : "false")" data-recaptcha-site-key="@recaptchaSiteKey" data-recaptcha-action="@recaptchaAction">
 
     <div asp-validation-summary="All" class="notice notice-error" role="alert"></div>
+
+    <div id="recaptchaClientError" class="notice notice-error" role="alert" style="display: none;">We couldn't verify your submission. Please try again.</div>
+
+    @if (recaptchaEnabled)
+    {
+        <noscript>
+            <div class="notice notice-warning" role="alert">
+                JavaScript is required to submit this form because spam protection is enabled.
+            </div>
+        </noscript>
+    }
 
     @* Trusted Context Treatment (FORMS-002) *@
     @if (!string.IsNullOrWhiteSpace(Model.SourceContextTitle))
@@ -25,6 +43,9 @@
     <input type="hidden" asp-for="ContextFamily" />
     <input type="hidden" asp-for="ContextGroup" />
     <input type="hidden" asp-for="ContextDoc" />
+
+    @* Dedicated reCAPTCHA token field *@
+    <input type="hidden" name="RecaptchaToken" id="recaptchaToken" value="" />
 
     @* Accessible Honeypot (FORMS-002) *@
     <div class="form-honeypot" aria-hidden="true">

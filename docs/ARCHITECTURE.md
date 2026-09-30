@@ -474,8 +474,52 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
   - Raw Exception objects are never passed into `ILogger`, logging only `ex.GetType().Name` to prevent leakage of SMTP command strings or recipient mailboxes.
   - Explicitly forbidden from logs: SMTP passwords, secrets, full email bodies, visitor messages, intended applications, visitor email addresses as routine data, and phone numbers.
 
-- **Out of Scope for FORMS-003**:
-  - reCAPTCHA (CreateAssessment API, browser scripts) and GA4 (`gtag.js`, `generate_lead`) remain deferred to future checkpoints.
+- **Google Cloud Score-Based reCAPTCHA Assessment Integration (FORMS-004)**:
+  - **Modern REST Assessment Architecture**:
+    - Abstraction: `IRecaptchaAssessmentService` with concrete implementation `GoogleRecaptchaAssessmentService`.
+    - API Endpoint: `POST https://recaptchaenterprise.googleapis.com/v1/projects/{ProjectId}/assessments`.
+    - Pure REST client using typed `HttpClient` and `System.Text.Json` (no third-party Google Cloud SDK package needed).
+    - Authentication: Google API key transmitted strictly via `x-goog-api-key` header (never in URL query string).
+    - Timeout and Retries: Bounded 10-second timeout; automatic retries are strictly prohibited because reCAPTCHA tokens are single-use.
+  - **Server-Controlled Expected Actions**:
+    - `/contact-us` resolves: `contact_submit`.
+    - `/request-a-quote` resolves: `quote_request`.
+    - Actions are determined strictly server-side by `InquiryPageModelBase.RecaptchaAction` and never trusted from visitor input or client attributes.
+  - **Client Token Generation & Submit Guarding**:
+    - Script integration: `https://www.google.com/recaptcha/enterprise.js?render={SiteKey}` loaded dynamically only when `Recaptcha.Enabled == true`.
+    - Token generation occurs at submit time only via `grecaptcha.enterprise.ready()` followed by `grecaptcha.enterprise.execute(siteKey, { action })`.
+    - Native HTML5 validation runs first; submit button is guarded against duplicate clicks and recursive loops.
+    - If token acquisition fails, submission is prevented, submit button is re-enabled, and a generic error notice is displayed.
+  - **Pipeline Ordering**:
+    1. Rate limiting & Antiforgery validation.
+    2. Server-controlled workflow identity establishment.
+    3. Canonical CTA context re-resolution.
+    4. Honeypot check: populated honeypot triggers silent synthetic diversion immediately (zero Google calls, zero SMTP calls).
+    5. Server model validation: invalid forms redisplay immediately (zero Google calls, zero SMTP calls, preserving assessment quota).
+    6. reCAPTCHA assessment verification: required if `Recaptcha.Enabled == true`.
+    7. SMTP delivery: only accepted assessments proceed to `SmtpInquirySubmissionService`.
+  - **Fail-Closed Verification Gates (All 5 Required)**:
+    1. Google API returns HTTP 200 with usable JSON structure.
+    2. `tokenProperties.valid == true`.
+    3. `tokenProperties.action` matches expected server action.
+    4. `tokenProperties.hostname` matches the explicitly configured `RecaptchaOptions.ExpectedHostname` (case-insensitive, normalized bare hostname). Inbound HTTP `Request.Host` is strictly NOT a reCAPTCHA hostname authority and cannot override or satisfy this gate. Development sets `Recaptcha:ExpectedHostname = "localhost"` in `appsettings.Development.json`; production must explicitly set `Recaptcha__ExpectedHostname=www.usantennaproducts.com` via IIS environment variables. Startup fails closed on start if reCAPTCHA is enabled without an explicit valid bare hostname.
+    5. `riskAnalysis.score >= MinimumScore` (0.5f inclusive threshold).
+    - Any verification failure or API/network error fails closed, blocking SMTP and redisplaying the form with a safe generic error ("We couldn't verify your submission. Please try again.").
+  - **Token Handling & Redisplay Clearance**:
+    - Dedicated `RecaptchaToken` property on `InquiryPageModelBase`, strictly separated from business inquiry data, emails, logs, and Thank-You state.
+    - Cleared immediately on every form redisplay, preventing token replay.
+  - **No-JavaScript Behavior**:
+    - When enabled: `<noscript>` message explains that JavaScript is required for spam protection; tokenless POSTs fail closed without Google or SMTP calls.
+    - When disabled: application starts without credentials, client scripts are omitted, and standard form submission is supported.
+  - **Logging and Header Protection**:
+    - The API key is sent strictly via the `x-goog-api-key` HTTP header and is never included in the URL query string.
+    - Application logging never writes the API key, tokens, request bodies, or visitor PII.
+    - Standard HttpClientFactory logging retains its default header-value redaction behavior; no custom redaction override is installed.
+    - Operational logs record only: score, controlled action, hostname, and sanitized result category.
+    - Strictly forbidden from logs: API keys, raw tokens, full request/response payloads, and visitor PII.
+
+- **Out of Scope for FORMS-004**:
+  - Google Analytics 4 (GA4), `gtag.js`, Google Tag Manager, `generate_lead` events, Measurement Protocol, database persistence, and production IIS deployment remain strictly out of scope.
 
 ## IIS deployment
 

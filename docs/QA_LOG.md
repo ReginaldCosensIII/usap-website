@@ -1304,3 +1304,40 @@ To prevent recurrence:
     - `dotnet restore USAP.Web.sln`: Success (exit code 0).
     - `dotnet build USAP.Web.sln --configuration Release --no-restore`: 0 warnings, 0 errors (exit code 0, targeting `net10.0`).
     - `dotnet format whitespace USAP.Web.sln --verify-no-changes --no-restore`: Clean (exit code 0).
+
+---
+
+## Deferred Enhancement — Thank-You Page Visual/Content Refinement
+
+**Classification:** DEFERRED / NON-BLOCKING / ENHANCEMENT PHASE
+**Date Logged:** 2026-09-30 (USAP-FORMS-004-R1)
+**Target Routes:** `/contact-us/thank-you` and `/request-a-quote/thank-you`
+**Status:** Documented for future refinement pass; zero markup or CSS modified during FORMS-004.
+
+### Logged Items:
+A. **Supporting Copy:**
+   - Current success-page supporting text feels too long and dense.
+   - Text measure/width is too constrained on wide viewports.
+   - Later enhancement will simplify the copy and improve comfortable, readable line length.
+
+B. **Typography:**
+   - Perform a dedicated typography and hierarchy pass across both Thank-You pages.
+   - Reassess visual weight, sizing, and spacing of eyebrow, H1, lead/supporting copy, section labels, reference card, and overall vertical rhythm.
+
+C. **Duplicate Success Messaging:**
+   - Current Contact success state contains redundant success language (e.g. eyebrow `Inquiry Received` positioned adjacent to body copy conveying the same receipt confirmation).
+   - Later enhancement will eliminate the redundant layer and establish a single clear success communication hierarchy.
+   - Apply equivalent review to the Quote confirmation page (`/request-a-quote/thank-you`).
+
+D. **Reference-Number Component Corner Radii:**
+   - The left colored accent border on the reference-number component currently terminates into sharp points at the top-left and bottom-left edges while outer card corners are rounded.
+   - Reconcile left corner radii so the component displays consistent rounded corners around the entire card surface.
+   - Align styling with the accepted email reference-number component.
+
+E. **Reference-Number Branding:**
+   - Reassess whether the current green success accent should remain as an intentional status color or be reconciled more closely with the authoritative USAP navy (`#0d1b2e`) and red (`#c8102e`) design system tokens.
+   - Decision deferred to the later visual enhancement milestone.
+
+F. **Scope Boundary:**
+   - Refinements will apply consistently across `/contact-us/thank-you` and `/request-a-quote/thank-you`.
+   - All Thank-You templates (`ContactUs/ThankYou.cshtml`, `RequestAQuote/ThankYou.cshtml`, `confirmation.css`, and related PageModels) remained strictly untouched during FORMS-004.
