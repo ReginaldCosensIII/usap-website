@@ -30,7 +30,18 @@
                     <code class="confirmation-reference-code">@Model.ReferenceNumber</code>
                 </div>
 
-                <p class="confirmation-guidance">Keep this reference number for your records. USAP will review the information you provided and follow up if clarification or additional information is needed.</p>
+                @if (Model.IsGenuine && Model.VisitorConfirmationSent == true)
+                {
+                    <p class="confirmation-guidance">A confirmation email containing this quote request reference number has been sent to the email address you provided. Keep this reference number for your records. USAP will review the information you provided and follow up if clarification or additional information is needed.</p>
+                }
+                else if (Model.IsGenuine && Model.VisitorConfirmationSent == false)
+                {
+                    <p class="confirmation-guidance">Your quote request has been received. Please keep this reference number for your records. USAP will review the information you provided and follow up if clarification or additional information is needed.</p>
+                }
+                else
+                {
+                    <p class="confirmation-guidance">Keep this reference number for your records. USAP will review the information you provided and follow up if clarification or additional information is needed.</p>
+                }
 
                 <div class="confirmation-actions">
                     <a asp-page="/Index" class="btn btn-primary">Return to Homepage</a>

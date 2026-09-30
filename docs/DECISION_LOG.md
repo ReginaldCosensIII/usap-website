@@ -1063,3 +1063,117 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
    - Reconciled review package documentation with actual source options properties (`AnalyticsOptions`, `RecaptchaOptions`, `SmtpOptions`).
 4. **Final Checkpoint Authorization:**
    - Authorized final local Git checkpoint commit `feat(forms): implement contextual inquiry and quote workflows` upon passing full build, formatting, and route verification gates. Push and merge remain strictly deferred.
+
+---
+
+## DEC-050 — USAP-FORMS-003-C1: MailKit SMTP Transport, Internal Notification, Visitor Confirmation Email, and Delivery-Aware Success State
+
+**Date:** 2026-09-30
+**Decision:**
+1. **MailKit / MimeKit Provider-Neutral SMTP Transport:**
+   - Added MailKit 4.18.1 (`net10.0`) package dependency, adhering to repository package conventions.
+   - Introduced `ISmtpEmailSender` abstraction and `MailKitSmtpEmailSender` implementation utilizing `MailKit.Net.Smtp.SmtpClient`.
+   - Strict TLS Certificate Validation: Certificate validation is never bypassed, disabled, or weakened (`CheckCertificateRevocation = true`).
+   - Maps `SecurityMode` safely via `SmtpOptions.ResolveSecureSocketOptions()` (`StartTls` for IONOS dev port 587, `SslOnConnect` for port 465, `StartTlsWhenAvailable`, `Auto`, `None`).
+   - Sockets and sessions are disconnected and disposed cleanly using asynchronous APIs (`ConnectAsync`, `AuthenticateAsync`, `SendAsync`, `DisconnectAsync`).
+2. **Configuration Validation & Zero Secrets Rule:**
+   - Configuration contracts: `Smtp:Enabled`, `Smtp:Host`, `Smtp:Port`, `Smtp:SecurityMode`, `Smtp:Username`, `Smtp:Password`, `Smtp:FromAddress`, `Smtp:FromName`, `Smtp:NotificationRecipient`.
+   - Zero secrets stored in source control; dev secrets managed via .NET User Secrets; stage/prod via IIS Environment Variables.
+   - Robust startup validation via `SmtpOptions.IsValid(out string? error)` ensures valid Host, Port, Username, Password, FromAddress, and NotificationRecipient when `Smtp:Enabled == true`. Application starts cleanly when SMTP is disabled.
+3. **Internal-First Delivery Order & Delivery-Aware Submission Result:**
+   - Evolved `IInquirySubmissionService` contract to return `InquirySubmissionResult` with `InquiryAccepted`, `InternalNotificationSent`, `VisitorConfirmationSent`, and authoritative `ReferenceNumber`.
+   - Sequential delivery pipeline:
+     1. Validate input and re-resolve canonical context.
+     2. Generate authoritative inquiry reference number (`REQ-yyyyMMdd-XXXXXX`).
+     3. Compose and dispatch internal notification to `Smtp:NotificationRecipient` with `Reply-To` set to visitor's email.
+     4. Gate: Only if internal notification succeeds, compose and dispatch visitor confirmation email.
+     5. Return delivery-aware result.
+   - Failure Semantics:
+     - Case A (Both succeed): Thank-You page renders confirmation email sent notice ("A confirmation email containing this reference number has been sent to the email address you provided.").
+     - Case B (Internal succeeds, visitor fails): Inquiry accepted, submission not lost. Thank-You page displays fallback guidance ("Your submission has been received. Please keep this reference number for your records."). Sanitized warning logged.
+     - Case C (Internal fails): Inquiry rejected, no visitor email attempted, no success redirect. Redisplays form with safe visitor error ("We couldn't send your request at this time. Please try again.") while preserving submitted inputs. Zero SMTP exceptions or credentials exposed.
+     - Case D (Honeypot): Zero SMTP calls, silent diversion with synthetic reference number, zero claim of email sent.
+     - Case E (Direct Navigation): Zero SMTP calls, neutral status view.
+4. **Controlled Subject Policy (Zero Arbitrary Text Injection):**
+   - Subjects composed strictly from controlled server tokens: `[DEV] USAP Website — {Controlled Inquiry Type} — {Optional Canonical Context} — {Reference}` for internal, and `[DEV] United States Antenna Products — {Inquiry Received / Quote Request Received} — {Reference}` for visitor.
+   - Arbitrary visitor-authored free text (`ProductOfInterest`, `Name`, `Organization`, `Message`, `IntendedApplication`) is strictly barred from subjects, preventing CRLF and header injection.
+5. **Dual Multipart/Alternative Email Body Standards:**
+   - Both HTML and plain-text versions generated using MimeKit `BodyBuilder`.
+   - HTML: Clean industrial styling, 600px centered table container, system font stack, USAP navy headers (`#0d1b2e`), high contrast, text-based branding, zero external dependencies/JS/tracking pixels.
+   - Non-production environment marker: Obvious `DEVELOPMENT / TEST` banner rendered at top and bottom in non-Production environments; suppressed in Production.
+   - Visitor confirmation emails display a clean Submission Summary without echoing sensitive free-text `Message` or `IntendedApplication` fields, and without turnaround or availability promises.
+   - Plain-text versions contain complete substantive data with clean ASCII formatting.
+6. **Logging & Privacy Audit:**
+   - Operational logs record reference number, controlled inquiry type, delivery stage, and sanitized outcome.
+   - Strictly excluded from logs: SMTP passwords, secrets, full email bodies, visitor messages, intended applications, visitor email addresses as routine data, and phone numbers.
+7. **Strict Scope Boundary:**
+   - reCAPTCHA and GA4 remain deferred to future checkpoints. No commit, push, or merge during this checkpoint.
+
+---
+
+## DEC-051 — USAP-FORMS-003-R1: SMTP Security Hardening, Canonical Reference Consistency, Branded Email Refinement, and Failure Semantics
+
+**Date:** 2026-09-30
+**Decision:**
+1. **Canonical Reference Number Consistency (`InquiryReferenceGenerator`):**
+   - Consolidated inquiry reference generation across genuine (`SmtpInquirySubmissionService`, `DevelopmentInquirySubmissionService`) and honeypot (`InquiryPageModelBase`) pathways into `InquiryReferenceGenerator.Generate()`.
+   - Canonical format: `REQ-yyyyMMdd-XXXXXX` (19 characters, e.g. `REQ-20260930-B2582E`).
+   - Ensures honeypot diversion cannot be distinguished from genuine submissions by prefix, length, or entropy.
+   - Byte-for-byte consistency verified across internal subject/body, visitor subject/body, Thank-You pages, and structured logs.
+2. **Strict SMTP Transport Security Hardening:**
+   - Restricted supported SMTP `SecurityMode` values to `StartTls` and `SslOnConnect` (case-insensitive aliases: `starttls`, `sslonconnect`, `ssl`).
+   - Insecure modes (`None`, `Auto`, `StartTlsWhenAvailable`) are strictly rejected and fail validation.
+   - Certificate validation remains strict (`CheckCertificateRevocation = true`). Provider-neutral transport; no hardcoded IONOS logic.
+3. **True Startup SMTP Options Validation:**
+   - Enforced `.ValidateOnStart()` on `SmtpOptions` in `src/USAP.Web/Program.cs`.
+   - Validates that when `Smtp:Enabled == true`, Host, Port, Username, Password, FromAddress, NotificationRecipient, and SecurityMode are valid.
+   - Validates mailbox addresses using `MimeKit.MailboxAddress.TryParse` (rejecting crude string checks).
+   - Allows clean application startup when `Smtp:Enabled == false` without credentials.
+4. **Sanitized Failure Logging Correction:**
+   - Eliminated raw `Exception` object logging across SMTP pipeline.
+   - Normal operational failure logs record only: reference number, controlled inquiry type, delivery stage, and exception type name (`ex.GetType().Name`).
+   - Zero SMTP credentials, command responses, full exception stacks, visitor messages, or PII exposed to logs or visitors.
+5. **Cancellation Semantics:**
+   - Updated `SmtpInquirySubmissionService` to catch and rethrow `OperationCanceledException` when cancellation is requested on the supplied token (`catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }`).
+   - Request cancellation is no longer misclassified as an ordinary SMTP delivery failure.
+6. **Email Branding Refinement (Website-Aligned) [Superseded in part by DEC-052]:**
+   - Header: Clean white surface with all-red typographic USAP brand mark (`UNITED STATES ANTENNA PRODUCTS`) in uppercase bold sans-serif with tracked spacing, followed by a mandatory 3px USAP red (`#c8102e`) horizontal rule. *(Superseded by DEC-052: R3 dark navy header `#0d1b2e`, red eyebrow `USAP WEBSITE`, and 21px bold white brand mark).*
+   - Accent Rebalancing: Replaced light-blue accents with USAP red (`#c8102e`), USAP dark navy (`#0d1b2e`), and neutral borders (`#e2e8f0`).
+   - Multiline Normalization: Removed `white-space: pre-wrap` where `<br>` conversion occurred, eliminating double-spacing artifacts.
+   - Footer: Dark navy (`#0d1b2e`) branded footer with 3px red accent rule and verified public contact info from `_ContactSidebar.cshtml` (5263 Agro Drive, Frederick, MD 21703; Phone: 240-341-7120; Fax: 240-371-4980; Canonical domain link: `https://www.usantennaproducts.com/`). *(Superseded in part by DEC-052: canonical domain corrected to usantennaproducts.com).*
+   - Public Contact Info Integrity: Zero invented emails, business hours, department names, or turnaround promises.
+   - Scope Discipline: The actual website footer and site-wide logo remain completely untouched.
+7. **Logo Asset Limitation & Alternate Preview:**
+   - Evaluated `wwwroot/images/brand/usap-logo.svg`: found to contain an embedded 180x102 JPEG on an opaque white rect background, lacking transparent vector master qualities.
+   - Selected typographic brand mark as the authoritative production template implementation.
+   - Preserved logo-based variation strictly as alternate sanitized previews in `optional-logo-variant/`.
+8. **Git Boundary:**
+   - Strict uncommitted working tree preserved. No reset, no stash, no commit, no push, no merge. No index mutation used for diff generation.
+
+---
+
+## DEC-052 — USAP-FORMS-003-R3: Final Email Visual Enrichment, Eyebrow Branding, Canonical Domain Reconciliation, and Logo Asset Enhancement Deferral
+
+**Date:** 2026-09-30
+**Decision:**
+1. **Final Email Header Architecture (Website-Aligned Red Eyebrow & Brand Hierarchy):**
+   - Established the accepted dark navy (`#0d1b2e`) header foundation with a bottom 3px USAP red (`#c8102e`) accent rule.
+   - Red Eyebrow Accent: Added `USAP WEBSITE` (`#c8102e`, 11px, font-weight 700, uppercase, letter-spacing 1.2px, line-height 1.2, margin-bottom 6px) above the company name, matching the website's restrained red eyebrow design language.
+   - Typographic Brand Lockup: `UNITED STATES<br />ANTENNA PRODUCTS` rendered in high-contrast solid white (`#ffffff`, 21px, font-weight 800, line-height 1.2, letter-spacing 1.2px, uppercase). System email-safe font stack ensures reliable rendering without web font downloads.
+   - Subordinate Functional Descriptors: Subdued cool neutral (`#cbd5e1`, 12px, font-weight 600, uppercase, letter-spacing 0.8px, margin-top 8px) for email type identification (`NEW WEBSITE INQUIRY`, `NEW QUOTE REQUEST`, `INQUIRY CONFIRMATION`, `QUOTE REQUEST CONFIRMATION`).
+   - Development Badge: Positioned with 12px top margin beneath the descriptor; automatically omitted in Production.
+   - Operational Header Padding: Balanced compact dimensions (`26px 32px 22px 32px`) preventing excessive vertical height.
+2. **Body Accent & Section Eyebrow Refinement:**
+   - Reference Callout: Preserved light neutral card with 4px red left border; converted reference label (`REFERENCE NUMBER` / `QUOTE REQUEST REFERENCE`) to USAP red eyebrow treatment (`#c8102e`, 11px, font-weight 700, uppercase, letter-spacing 0.6px).
+   - Section Eyebrows: Refined `SUBMISSION SUMMARY`, `CANONICAL WEBSITE CONTEXT`, `VISITOR CONTACT DETAILS`, `VISITOR-PROVIDED REQUEST DETAILS`, and `MESSAGE / PROJECT REQUIREMENTS` into restrained USAP red eyebrows (`#c8102e`, 11px, font-weight 700, uppercase, letter-spacing 0.8px) with subtle bottom border.
+3. **Canonical Domain Reconciliation (Zero Stale Domain in Output):**
+   - Verified that all generated email outputs (both HTML and plain-text across all 4 message types) use the authoritative public domain: `https://www.usantennaproducts.com/` (display text: `www.usantennaproducts.com`).
+   - Confirmed zero occurrences of stale domain `usantenna.com` in current generated email outputs.
+   - Actual website Contact sidebar and footer remain completely untouched in this branch.
+4. **Production Typographic Lockup & Future Professional Logo Asset Deferral:**
+   - Evaluated existing raster-in-SVG asset (`usap-logo.svg`) and confirmed that embedded JPEG on opaque white background is unsuitable for production email headers.
+   - Production email remains purely typographic, lightweight, and independent of image loading or CID attachments.
+   - Deferred Enhancement: A future high-quality transparent / true-vector USAP logo asset may be proposed to CES and USAP stakeholders during the first stakeholder feedback round as a separately authorized branding enhancement. The template structure allows future substitution as a localized header-template edit.
+5. **Final Review Gate & Git Boundary:**
+   - Maintained full cumulative C1 + R1 + R2 + R3 working tree without committing, pushing, merging, or mutating the Git index.
+   - Complete 19-item review package and SHA-256 validated archive prepared for Human Project Lead review.

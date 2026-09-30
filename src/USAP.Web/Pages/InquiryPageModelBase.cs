@@ -49,7 +49,7 @@ public abstract class InquiryPageModelBase : PageModel
         if (!string.IsNullOrEmpty(Input.Website))
         {
             // Honeypot triggered — silent diversion without sending email or invoking backend
-            var syntheticRef = $"REQ-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}";
+            var syntheticRef = Services.InquiryReferenceGenerator.Generate();
             TempData["ReferenceNumber"] = syntheticRef;
             TempData["IsGenuineSubmission"] = false;
             TempData["SubmissionDisplayState"] = "HoneypotDiversion";
@@ -84,6 +84,7 @@ public abstract class InquiryPageModelBase : PageModel
             TempData["IsGenuineSubmission"] = true;
             TempData["SubmissionDisplayState"] = "GenuineSuccess";
             TempData["SubmittedEmail"] = Input.Email;
+            TempData["VisitorConfirmationSent"] = result.VisitorConfirmationSent;
             if (Context.HasContext)
             {
                 TempData["ContextReason"] = Input.ContextReason;

@@ -29,6 +29,9 @@ public class ThankYouModel : PageModel
     public string? SubmittedEmail { get; set; }
 
     [TempData]
+    public bool? VisitorConfirmationSent { get; set; }
+
+    [TempData]
     public string? ContextReason { get; set; }
 
     [TempData]

@@ -6,14 +6,18 @@ using USAP.Web.Middleware;
 using USAP.Web.Models;
 using USAP.Web.Services;
 using USAP.Web.Services.Catalog;
+using USAP.Web.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages with default conventions.
 builder.Services.AddRazorPages();
 
-// Integration Options Foundations (FORMS-002) — populated via UserSecrets in Dev or IIS Env in Prod
-builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(SmtpOptions.SectionName));
+// Integration Options Foundations (FORMS-002, FORMS-003) — populated via UserSecrets in Dev or IIS Env in Prod
+builder.Services.AddOptions<SmtpOptions>()
+    .Bind(builder.Configuration.GetSection(SmtpOptions.SectionName))
+    .Validate(options => options.IsValid(out _), "SMTP configuration is invalid when Enabled=true.")
+    .ValidateOnStart();
 builder.Services.Configure<RecaptchaOptions>(builder.Configuration.GetSection(RecaptchaOptions.SectionName));
 builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection(AnalyticsOptions.SectionName));
 
@@ -122,9 +126,18 @@ builder.Services.AddOptions<SiteSettings>()
 
 builder.Services.AddScoped<ICtaContextResolver, CtaContextResolver>();
 builder.Services.AddScoped<IInquiryMessageComposer, InquiryMessageComposer>();
+builder.Services.AddScoped<IEmailComposer, EmailComposer>();
+builder.Services.AddScoped<ISmtpEmailSender, MailKitSmtpEmailSender>();
 builder.Services.AddSingleton<IProductCatalogService, ProductCatalogService>();
 
-if (builder.Environment.IsDevelopment())
+var smtpSection = builder.Configuration.GetSection(SmtpOptions.SectionName);
+var smtpEnabled = smtpSection.GetValue<bool>("Enabled");
+
+if (smtpEnabled)
+{
+    builder.Services.AddScoped<IInquirySubmissionService, SmtpInquirySubmissionService>();
+}
+else if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddScoped<IInquirySubmissionService, DevelopmentInquirySubmissionService>();
 }
