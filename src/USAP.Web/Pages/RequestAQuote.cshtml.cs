@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
+using USAP.Web.Configuration;
 using USAP.Web.Models;
 using USAP.Web.Services;
+using USAP.Web.Services.Recaptcha;
 
 namespace USAP.Web.Pages;
 
@@ -10,12 +13,16 @@ public class RequestAQuoteModel : InquiryPageModelBase
 {
     public RequestAQuoteModel(
         IInquirySubmissionService submissionService,
-        ICtaContextResolver contextResolver)
-        : base(submissionService, contextResolver)
+        ICtaContextResolver contextResolver,
+        IRecaptchaAssessmentService recaptchaService,
+        IOptions<RecaptchaOptions> recaptchaOptions)
+        : base(submissionService, contextResolver, recaptchaService, recaptchaOptions)
     {
     }
 
     public override bool IsQuoteWorkflow => true;
+
+    public override string RecaptchaAction => "quote_request";
 
     public void OnGet(string? family, string? group, string? doc)
     {

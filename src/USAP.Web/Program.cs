@@ -7,19 +7,29 @@ using USAP.Web.Models;
 using USAP.Web.Services;
 using USAP.Web.Services.Catalog;
 using USAP.Web.Services.Email;
+using USAP.Web.Services.Recaptcha;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Razor Pages with default conventions.
 builder.Services.AddRazorPages();
 
-// Integration Options Foundations (FORMS-002, FORMS-003) — populated via UserSecrets in Dev or IIS Env in Prod
+// Integration Options Foundations (FORMS-002, FORMS-003, FORMS-004) — populated via UserSecrets in Dev or IIS Env in Prod
 builder.Services.AddOptions<SmtpOptions>()
     .Bind(builder.Configuration.GetSection(SmtpOptions.SectionName))
     .Validate(options => options.IsValid(out _), "SMTP configuration is invalid when Enabled=true.")
     .ValidateOnStart();
-builder.Services.Configure<RecaptchaOptions>(builder.Configuration.GetSection(RecaptchaOptions.SectionName));
+builder.Services.AddOptions<RecaptchaOptions>()
+    .Bind(builder.Configuration.GetSection(RecaptchaOptions.SectionName))
+    .Validate(options => options.IsValid(out _), "reCAPTCHA configuration is invalid when Enabled=true.")
+    .ValidateOnStart();
 builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection(AnalyticsOptions.SectionName));
+
+builder.Services.AddHttpClient<IRecaptchaAssessmentService, GoogleRecaptchaAssessmentService>(client =>
+{
+    client.BaseAddress = new Uri("https://recaptchaenterprise.googleapis.com/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 builder.Services.AddOptions<SiteSettings>()
     .Bind(builder.Configuration.GetSection(SiteSettings.SectionName))

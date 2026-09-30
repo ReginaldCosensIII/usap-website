@@ -1,20 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Options;
+using USAP.Web.Configuration;
 using USAP.Web.Models;
 using USAP.Web.Services;
+using USAP.Web.Services.Recaptcha;
 
 namespace USAP.Web.Pages;
 
 [EnableRateLimiting("InquirySubmission")]
 public class ContactUsModel : InquiryPageModelBase
 {
-
     public ContactUsModel(
         IInquirySubmissionService submissionService,
-        ICtaContextResolver contextResolver)
-        : base(submissionService, contextResolver)
+        ICtaContextResolver contextResolver,
+        IRecaptchaAssessmentService recaptchaService,
+        IOptions<RecaptchaOptions> recaptchaOptions)
+        : base(submissionService, contextResolver, recaptchaService, recaptchaOptions)
     {
     }
+
+    public override string RecaptchaAction => "contact_submit";
 
     private static readonly HashSet<InquiryType> s_allowedContactTypes = new()
     {
@@ -72,6 +78,7 @@ public class ContactUsModel : InquiryPageModelBase
     {
         if (Input.Type == InquiryType.RequestAQuote)
         {
+            ClearRecaptchaToken();
             Context = _contextResolver.Resolve(Input.ContextReason, Input.ContextFamily, Input.ContextGroup, Input.ContextDoc);
             Input.SourceContextCategory = Context.DisplayCategory;
             Input.SourceContextTitle = Context.DisplayTitle;
@@ -93,6 +100,7 @@ public class ContactUsModel : InquiryPageModelBase
         if (!s_allowedContactTypes.Contains(Input.Type) ||
             ModelState.GetFieldValidationState($"{nameof(Input)}.{nameof(Input.Type)}") == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
         {
+            ClearRecaptchaToken();
             Context = _contextResolver.Resolve(Input.ContextReason, Input.ContextFamily, Input.ContextGroup, Input.ContextDoc);
             Input.SourceContextCategory = Context.DisplayCategory;
             Input.SourceContextTitle = Context.DisplayTitle;

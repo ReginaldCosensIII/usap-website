@@ -1177,3 +1177,77 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
 5. **Final Review Gate & Git Boundary:**
    - Maintained full cumulative C1 + R1 + R2 + R3 working tree without committing, pushing, merging, or mutating the Git index.
    - Complete 19-item review package and SHA-256 validated archive prepared for Human Project Lead review.
+
+---
+
+## DEC-053 — USAP-FORMS-004-C1: Score-Based Google Cloud reCAPTCHA Assessment Integration
+
+**Date:** 2026-09-30
+**Decision:**
+1. **Modern Google Cloud CreateAssessment Architecture:**
+   - Implemented `IRecaptchaAssessmentService` and `GoogleRecaptchaAssessmentService` using the modern Google Cloud reCAPTCHA Enterprise REST API (`POST https://recaptchaenterprise.googleapis.com/v1/projects/{ProjectId}/assessments`).
+   - Strictly rejected legacy `siteverify` endpoint and legacy secret keys.
+   - Integrated using built-in `HttpClient` and `System.Text.Json` without adding third-party Google Cloud SDK client libraries, keeping dependencies minimal.
+2. **Strict Server-Controlled Action Architecture:**
+   - Enforced two fixed server-controlled actions: `contact_submit` (for `/contact-us`) and `quote_request` (for `/request-a-quote`).
+   - Defined via abstract property `RecaptchaAction` on `InquiryPageModelBase`. Expected action is never bound from visitor form inputs or client-side tampering.
+3. **Client-Side Submit-Time Token Generation & Double-Submit Guard:**
+   - Tokens are acquired strictly at submission time via `grecaptcha.enterprise.ready()` and `grecaptcha.enterprise.execute()`, ensuring tokens remain fresh and are never generated on idle page loads.
+   - Native HTML5 validation is executed first; submission is guarded to prevent duplicate POSTs and recursive loops. If client token acquisition fails, the submit button is re-enabled and a generic error notice is displayed.
+4. **Fail-Closed Verification Gates (All 5 Required):**
+   - Protected submissions pass only when:
+     1. Google API returns HTTP 200 with usable JSON structure.
+     2. `tokenProperties.valid == true`.
+     3. `tokenProperties.action` matches the server's expected action (`contact_submit` or `quote_request`).
+     4. `tokenProperties.hostname` matches the expected hostname (`localhost` in development).
+     5. `riskAnalysis.score >= MinimumScore` (threshold enforced inclusively; default 0.5f).
+   - If any check fails, or on network/API failure, verification fails closed, blocking SMTP delivery and redisplaying the form with a generic error message ("We couldn't verify your submission. Please try again.").
+5. **Strict Pipeline Ordering (Honeypot Before reCAPTCHA, reCAPTCHA Before SMTP):**
+   - Rate limiting and antiforgery execute first.
+   - Honeypot evaluation occurs before reCAPTCHA: honeypot submissions generate zero Google calls and zero SMTP calls.
+   - Server model validation occurs before reCAPTCHA: invalid forms generate zero Google calls and zero SMTP calls, preserving quota.
+   - reCAPTCHA verification occurs before SMTP: only genuine accepted assessments enter `SmtpInquirySubmissionService`.
+6. **Token Field Architecture & Redisplay Clearance:**
+   - Dedicated `RecaptchaToken` property on `InquiryPageModelBase`, strictly separated from business inquiry data, emails, logs, and Thank-You state.
+   - Token is cleared immediately on every form redisplay, ensuring single-use compliance and preventing replayed tokens.
+7. **Secret Safety & Header Authentication:**
+   - API key is transmitted strictly via the `x-goog-api-key` HTTP header, never in URL query strings.
+   - HttpClient is configured with header redaction (`RedactLoggedHeader("x-goog-api-key")`).
+   - Zero credentials, tokens, request bodies, or visitor PII are logged.
+8. **Startup Configuration Validation:**
+   - Registered via `builder.Services.AddOptions<RecaptchaOptions>().Validate(...).ValidateOnStart()`.
+   - When `Enabled == true`: requires non-empty `ProjectId`, `SiteKey`, `ApiKey`, and `MinimumScore` between 0.0 and 1.0.
+   - When `Enabled == false`: application starts cleanly without requiring credentials, and no client scripts are loaded.
+9. **No-JavaScript Behavior:**
+   - When `Enabled == true`: `<noscript>` explanation rendered near form; tokenless POSTs fail closed without SMTP or Google calls.
+   - When `Enabled == false`: standard no-JS submission remains supported.
+10. **GA4 Deferral:**
+    - Google Analytics 4, gtag.js, Google Tag Manager, and `generate_lead` remain strictly out of scope.
+
+---
+
+## DEC-054 — USAP-FORMS-004-R1: Explicit Hostname Trust Hardening, Interface Streamlining, and Deferred Thank-You Enhancement Recording
+
+**Date:** 2026-09-30
+**Decision:**
+1. **Explicit Configured Hostname as Sole Trust Authority:**
+   - Corrected C1 dual-authority hostname validation. Inbound HTTP `Request.Host` is completely removed from the reCAPTCHA token trust decision.
+   - `RecaptchaOptions.ExpectedHostname` is established as the sole authoritative expected hostname for evaluating `tokenProperties.hostname`.
+   - Hostname matching requires exact equality between `Normalize(tokenProperties.hostname)` and `Normalize(RecaptchaOptions.ExpectedHostname)` (case-insensitive, normalized bare hostname).
+2. **Interface Streamlining:**
+   - Removed `expectedHostname` parameter from `IRecaptchaAssessmentService.AssessAsync(...)`. The concrete service implementation reads the trusted value directly from injected `RecaptchaOptions`, eliminating any opportunity for callers to pass untrusted request-derived hostnames.
+3. **Startup Options Validation for ExpectedHostname:**
+   - Added validation in `RecaptchaOptions.IsValid(out string? error)`: when `Enabled == true`, `ExpectedHostname` is required, must not be whitespace, and must be a bare hostname (no `http://`, `https://`, port, path, query, or fragment).
+   - Startup fails closed immediately via `ValidateOnStart()` if reCAPTCHA is enabled without a valid bare hostname.
+   - When `Enabled == false`, `ExpectedHostname` is not required.
+4. **Environment Configuration Division:**
+   - Development: Configured `Recaptcha:ExpectedHostname = "localhost"` in tracked `src/USAP.Web/appsettings.Development.json` (non-secret).
+   - Production: Production IIS deployment must explicitly configure `Recaptcha__ExpectedHostname=www.usantennaproducts.com` as an environment variable alongside production reCAPTCHA credentials.
+5. **Deferred Thank-You Page Visual/Content Enhancement Recording:**
+   - Recorded the Human Project Lead's observations regarding `/contact-us/thank-you` and `/request-a-quote/thank-you` as strictly DEFERRED / NON-BLOCKING / ENHANCEMENT-PHASE work:
+     - Supporting copy: Simplify copy and improve constrained line measure/width.
+     - Typography: Dedicated hierarchy pass across eyebrow, H1, lead copy, section labels, and card vertical rhythm.
+     - Duplicate success messaging: Eliminate redundant success phrasing between eyebrow and body statements.
+     - Reference card styling: Add rounded corner radii to left colored border edges to match full card radii, comparing with email reference component.
+     - Reference card branding: Reassess green accent vs. USAP navy/red design tokens.
+   - Confirmed zero modifications to Thank-You markup (`ContactUs/ThankYou.cshtml`, `RequestAQuote/ThankYou.cshtml`, `confirmation.css`, PageModels) during FORMS-004.
