@@ -1212,8 +1212,8 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
    - Token is cleared immediately on every form redisplay, ensuring single-use compliance and preventing replayed tokens.
 7. **Secret Safety & Header Authentication:**
    - API key is transmitted strictly via the `x-goog-api-key` HTTP header, never in URL query strings.
-   - HttpClient is configured with header redaction (`RedactLoggedHeader("x-goog-api-key")`).
-   - Zero credentials, tokens, request bodies, or visitor PII are logged.
+   - Standard HttpClientFactory logging retains its default header-value redaction behavior; no custom `RedactLoggedHeader(s)` override is installed.
+   - Application logging never writes the API key, tokens, request bodies, or visitor PII. Zero credentials, tokens, request bodies, or visitor PII are logged.
 8. **Startup Configuration Validation:**
    - Registered via `builder.Services.AddOptions<RecaptchaOptions>().Validate(...).ValidateOnStart()`.
    - When `Enabled == true`: requires non-empty `ProjectId`, `SiteKey`, `ApiKey`, and `MinimumScore` between 0.0 and 1.0.

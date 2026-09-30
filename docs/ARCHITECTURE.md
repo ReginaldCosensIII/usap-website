@@ -511,8 +511,10 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
   - **No-JavaScript Behavior**:
     - When enabled: `<noscript>` message explains that JavaScript is required for spam protection; tokenless POSTs fail closed without Google or SMTP calls.
     - When disabled: application starts without credentials, client scripts are omitted, and standard form submission is supported.
-  - **Logging and Redaction**:
-    - Log redaction configured on HttpClient for `x-goog-api-key`.
+  - **Logging and Header Protection**:
+    - The API key is sent strictly via the `x-goog-api-key` HTTP header and is never included in the URL query string.
+    - Application logging never writes the API key, tokens, request bodies, or visitor PII.
+    - Standard HttpClientFactory logging retains its default header-value redaction behavior; no custom redaction override is installed.
     - Operational logs record only: score, controlled action, hostname, and sanitized result category.
     - Strictly forbidden from logs: API keys, raw tokens, full request/response payloads, and visitor PII.
 

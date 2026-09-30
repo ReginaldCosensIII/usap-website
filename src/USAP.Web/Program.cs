@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Razor Pages with default conventions.
 builder.Services.AddRazorPages();
 
-// Integration Options Foundations (FORMS-002, FORMS-003, FORMS-004) — populated via UserSecrets in Dev or IIS Env in Prod
+// Integration Options Foundations (FORMS-002, FORMS-003, FORMS-004) - populated via UserSecrets in Dev or IIS Env in Prod
 builder.Services.AddOptions<SmtpOptions>()
     .Bind(builder.Configuration.GetSection(SmtpOptions.SectionName))
     .Validate(options => options.IsValid(out _), "SMTP configuration is invalid when Enabled=true.")

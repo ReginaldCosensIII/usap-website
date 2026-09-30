@@ -78,7 +78,7 @@ public abstract class InquiryPageModelBase : PageModel
 
         if (!string.IsNullOrEmpty(Input.Website))
         {
-            // Honeypot triggered — silent diversion without sending email or invoking Google assessment
+            // Honeypot triggered - silent diversion without sending email or invoking Google assessment
             ClearRecaptchaToken();
             var syntheticRef = InquiryReferenceGenerator.Generate();
             TempData["ReferenceNumber"] = syntheticRef;
