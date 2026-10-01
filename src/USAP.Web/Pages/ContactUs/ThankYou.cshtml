@@ -73,3 +73,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @await Html.PartialAsync("_GenerateLeadEvent", new USAP.Web.Models.GenerateLeadEventModel(
+        Model.ShouldTrackGenerateLead,
+        USAP.Web.Models.GenerateLeadEventModel.ContactLeadSource))
+}

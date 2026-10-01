@@ -1251,3 +1251,50 @@ dotnet sln USAP.Web.sln add --in-root src\USAP.Web\USAP.Web.csproj
      - Reference card styling: Add rounded corner radii to left colored border edges to match full card radii, comparing with email reference component.
      - Reference card branding: Reassess green accent vs. USAP navy/red design tokens.
    - Confirmed zero modifications to Thank-You markup (`ContactUs/ThankYou.cshtml`, `RequestAQuote/ThankYou.cshtml`, `confirmation.css`, PageModels) during FORMS-004.
+
+---
+
+## DEC-055 — Direct GA4 Integration, Privacy-Safe Measurement, and Server-Confirmed Lead Conversion Tracking (USAP-ANALYTICS-001)
+
+**Date:** 2026-09-30
+**Decision:**
+1. **Direct Google Tag (`gtag.js`) Without Tag Managers:**
+   - Integrate Google Analytics 4 directly using Google tag (`gtag.js`) via a shared Razor partial `_GoogleAnalytics.cshtml` rendered once in `<head>` of `_Layout.cshtml`.
+   - Prohibit Google Tag Manager (GTM), container snippets, and server-side Measurement Protocol to maintain full code auditability and minimize external dependencies.
+2. **Options Pattern, Strict Startup Validation, and Kill-Switch:**
+   - Contract in `AnalyticsOptions`: `Enabled` (bool), `MeasurementId` (string?), `DebugMode` (bool).
+   - Startup validation via `ValidateOnStart()`: When `Enabled == true`, `MeasurementId` must be non-empty, trimmed, and match GA4 format `^[Gg]-[A-Za-z0-9]+$`. When `Enabled == false`, `MeasurementId` is not validated and no external scripts or tags render.
+3. **DebugMode Support in Development:**
+   - Configured tracked non-secret `Analytics:DebugMode = true` in `appsettings.Development.json`.
+   - Emits `debug_mode: true` in the initial `gtag('config')` call to facilitate real-time inspection in GA4 DebugView during local development without skewing production stats. Defaults to `false` in production.
+4. **URL and Referrer Privacy Hardening:**
+   - Strips all functional query parameters (`q`, `reason`, `family`, `group`, `doc`, `category`, `type`, `view`) and arbitrary visitor query strings from `page_location`.
+   - Strictly preserves 10 approved marketing attribution parameters: `utm_source`, `utm_medium`, `utm_campaign`, `utm_id`, `utm_term`, `utm_content`, `gclid`, `dclid`, `gbraid`, `wbraid`.
+   - Strips query string and fragment from `page_referrer`.
+5. **Authoritative Server-Confirmed Conversion Tracking (`generate_lead` via `InquiryAccepted`):**
+   - Standardizes on Google's recommended event: `generate_lead`.
+   - Conversion eligibility is strictly governed by `InquiryAccepted == true`, which represents authoritative USAP receipt of the lead. While `result.IsSuccess` controls controller request flow and redirection, it is not the analytics trust boundary.
+   - Tied strictly to delivery outcome:
+     - Case A (Internal SMTP success, Visitor confirmation success): `InquiryAccepted == true` -> `generate_lead` emitted.
+     - Case B (Internal SMTP success, Visitor confirmation failure): `InquiryAccepted == true` -> `generate_lead` emitted (USAP received inquiry).
+     - Case C (Internal SMTP failure): `InquiryAccepted == false` -> Zero `generate_lead` emitted.
+     - Case D (Honeypot diversion): `IsGenuineSubmission == false` -> Zero `generate_lead` emitted.
+     - Case E (Direct navigation / Refresh): Zero active submission / TempData consumed -> Zero `generate_lead` emitted.
+     - Case F (Validation / reCAPTCHA / Antiforgery failure): `InquiryAccepted == false` -> Zero `generate_lead` emitted.
+6. **One-Time Conversion Semantics via TempData:**
+   - Gated via single-use `TempData["AnalyticsLeadEligible"] = true` immediately before the PRG redirect on accepted submissions (`if (result.InquiryAccepted)`).
+   - Consumed on the Thank-You PageModel first GET. Upon browser refresh or direct navigation, TempData is consumed (`null`) and zero subsequent conversion events are fired.
+7. **PII & Financial Parameter Prohibition:**
+   - Transmits zero visitor PII (names, emails, phones, messages, organizations, intended applications).
+   - Transmits zero inquiry reference numbers in parameters, user IDs, or custom dimensions.
+   - Transmits zero economic values (`value`, `currency`).
+   - Server controls `lead_source`: `"website_contact_form"` for Contact Us and `"website_quote_request"` for Request a Quote.
+8. **Campaign Attribution Privacy & Data Redaction Defense in Depth:**
+   - Marketing campaign parameters (`utm_*`, `gclid`, etc.) must never intentionally contain visitor PII (such as personal email addresses, names, or phone numbers).
+   - Application URL/referrer normalization is the primary defense, ensuring only approved attribution keys reach GA.
+   - GA4 native Web stream Data Redaction (email address redaction and URL query parameter redaction) serves as an operational defense-in-depth handoff control, not as an excuse for lax application hygiene. No assertion is made that GA4 Admin redaction has already been configured in production.
+9. **Observational Failure Isolation:**
+   - Client scripts verify `typeof gtag === 'function'`. Network or ad-blocker failures fail silently and never disrupt inquiry acceptance or visitor feedback.
+10. **Analytics Scope Boundary (Contracted Baseline vs. Separately Scoped Future Work):**
+    - **Included Basic Initial GA4 Scope:** Direct gtag.js installation, standard page measurement, server-confirmed `generate_lead` events for Contact Us and Request a Quote, basic key-event handoff readiness, basic privacy safeguards, production configuration/handoff instructions, and implementation verification.
+    - **Explicitly Deferred / Separately Scoped Future Analytics Work:** Custom dashboards, advanced funnel analysis, advanced/custom conversion modeling, custom dimension strategy, audience strategy, Google Ads / advertising integration, enhanced conversions, attribution consulting, campaign optimization, recurring reporting, ongoing analytics monitoring, marketing-performance analysis, and other advanced analytics consulting.

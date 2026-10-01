@@ -145,6 +145,10 @@ public abstract class InquiryPageModelBase : PageModel
             TempData["SubmissionDisplayState"] = "GenuineSuccess";
             TempData["SubmittedEmail"] = Input.Email;
             TempData["VisitorConfirmationSent"] = result.VisitorConfirmationSent;
+            if (result.InquiryAccepted)
+            {
+                TempData["AnalyticsLeadEligible"] = true;
+            }
             if (Context.HasContext)
             {
                 TempData["ContextReason"] = Input.ContextReason;
