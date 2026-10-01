@@ -23,7 +23,10 @@ builder.Services.AddOptions<RecaptchaOptions>()
     .Bind(builder.Configuration.GetSection(RecaptchaOptions.SectionName))
     .Validate(options => options.IsValid(out _), "reCAPTCHA configuration is invalid when Enabled=true.")
     .ValidateOnStart();
-builder.Services.Configure<AnalyticsOptions>(builder.Configuration.GetSection(AnalyticsOptions.SectionName));
+builder.Services.AddOptions<AnalyticsOptions>()
+    .Bind(builder.Configuration.GetSection(AnalyticsOptions.SectionName))
+    .Validate(options => options.IsValid(out _), "Analytics configuration is invalid when Enabled=true.")
+    .ValidateOnStart();
 
 builder.Services.AddHttpClient<IRecaptchaAssessmentService, GoogleRecaptchaAssessmentService>(client =>
 {

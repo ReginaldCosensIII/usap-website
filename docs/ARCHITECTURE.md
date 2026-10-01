@@ -519,7 +519,58 @@ Mobile navigation uses a CSS disclosure and fixed overlay pattern:
     - Strictly forbidden from logs: API keys, raw tokens, full request/response payloads, and visitor PII.
 
 - **Out of Scope for FORMS-004**:
-  - Google Analytics 4 (GA4), `gtag.js`, Google Tag Manager, `generate_lead` events, Measurement Protocol, database persistence, and production IIS deployment remain strictly out of scope.
+  - Database persistence and production IIS deployment remain strictly out of scope.
+
+## Analytics Architecture (USAP-ANALYTICS-001)
+
+### Overview
+United States Antenna Products integrates direct Google Analytics 4 (GA4) via Google tag (`gtag.js`) for privacy-safe visitor page measurement and server-confirmed lead conversion tracking. The architecture explicitly rejects Google Tag Manager (GTM), container scripts, server-side Measurement Protocol, and client-side form-submission scraping in favor of deterministic, server-governed conversion events.
+
+### Core Principles & Architecture Decisions
+1. **Direct Google Tag (`gtag.js`)**:
+   - Single global script inclusion via partial `_GoogleAnalytics.cshtml` inserted once in `<head>` of `_Layout.cshtml`.
+   - Loaded asynchronously: `<script async src="https://www.googletagmanager.com/gtag/js?id={MeasurementId}"></script>`.
+   - GTM containers, GTM `<noscript>` iframes, and third-party tag management systems are strictly prohibited.
+2. **Options Pattern & Startup Validation (`AnalyticsOptions`)**:
+   - Properties: `Enabled` (bool), `MeasurementId` (string?), `DebugMode` (bool).
+   - Validation: When `Enabled == true`, startup validation (`ValidateOnStart()`) strictly enforces that `MeasurementId` is non-empty, trimmed, begins with `G-`, and contains only valid alphanumeric characters (`^[Gg]-[A-Za-z0-9]+$`).
+   - Kill-Switch: When `Enabled == false`, `MeasurementId` is not required, no Google scripts or tags are rendered, and normal site functionality remains completely intact without external analytics requests.
+3. **DebugMode & Environment Separation**:
+   - `DebugMode` defaults to `false` in production.
+   - In development, `Analytics:DebugMode = true` is configured in `appsettings.Development.json` (tracked, non-secret), causing `gtag('config', id, { debug_mode: true })` to be emitted. This directs events to GA4 DebugView for live inspection without polluting standard production metrics.
+   - The Measurement ID is managed via external configuration / User Secrets and must never be hardcoded into tracked source files.
+4. **Automatic Page View & Privacy Normalization**:
+   - Standard full-document navigation uses the default `page_view` dispatched automatically by `gtag('config')`. No manual duplicate `page_view` events are emitted.
+   - **Privacy URL Sanitization (`page_location`)**: Visitor URLs may contain functional query parameters (`q`, `reason`, `family`, `group`, `doc`, `category`, `type`, `view`) or arbitrary visitor-entered query parameters. A client helper (`window.usapAnalytics.getCleanLocation()`) strips all query parameters and fragments, preserving only 10 explicitly approved marketing attribution parameters: `utm_source`, `utm_medium`, `utm_campaign`, `utm_id`, `utm_term`, `utm_content`, `gclid`, `dclid`, `gbraid`, `wbraid`.
+   - **Attribution Privacy & Redaction Defense in Depth**: Marketing campaign parameters must never intentionally contain visitor PII (such as email addresses, phone numbers, or individual names). Application-level URL normalization serves as the first-line protection. Native GA4 Web stream data redaction (email address and query parameter redaction) serves as an operational defense-in-depth handoff control, not as a replacement for application-level data hygiene.
+   - **Privacy Referrer Sanitization (`page_referrer`)**: `window.usapAnalytics.getCleanReferrer()` preserves referrer scheme, hostname, and path, but strips all query parameters and fragments. If `document.referrer` is empty, no referrer is fabricated.
+   - Browser-visible URLs remain completely untouched.
+5. **Server-Confirmed Lead Conversion Tracking (`generate_lead`)**:
+   - Uses Google's recommended standard event: `generate_lead`. Custom event names (`contact_submit_success`, `form_conversion`) and Enhanced Measurement `form_submit` are strictly not used as authoritative conversions.
+   - **Authoritative Conversion Authority (`InquiryAccepted`)**: `InquiryAccepted == true` is the explicit, authoritative lead-conversion business state. While `result.IsSuccess` governs existing controller request flow and user redirection, it does strictly NOT define analytics conversion eligibility.
+   - **Conversion Definition & Delivery States**:
+     - *Case A (Internal SMTP success, Visitor confirmation success)*: `InquiryAccepted == true` -> Lead accepted by USAP -> `generate_lead` emitted.
+     - *Case B (Internal SMTP success, Visitor confirmation failure)*: `InquiryAccepted == true`, `VisitorConfirmationSent == false` -> Lead accepted by USAP -> `generate_lead` emitted.
+     - *Case C (Internal SMTP failure)*: `InquiryAccepted == false` -> Lead not accepted -> Zero `generate_lead` emitted.
+     - *Case D (Honeypot diversion)*: Synthetic success display, `IsGenuineSubmission == false`, `InquiryAccepted == false` -> Zero `generate_lead` emitted.
+     - *Case E (Direct Thank-You navigation / Refresh)*: Zero active submission, TempData unpopulated or consumed -> Zero `generate_lead` emitted (no second event on refresh).
+     - *Case F (Form validation / reCAPTCHA / Antiforgery / Rate limit failure)*: `InquiryAccepted == false` -> Redisplays form -> Zero `generate_lead` emitted.
+6. **One-Time Conversion Semantics (TempData Boundary)**:
+   - When `InquiryAccepted == true`, the server sets a dedicated single-use flag `TempData["AnalyticsLeadEligible"] = true` immediately before the PRG redirect.
+   - The Thank-You PageModel consumes this flag via `[TempData] public bool? AnalyticsLeadEligible { get; set; }` and exposes `public bool ShouldTrackGenerateLead => AnalyticsLeadEligible == true;`.
+   - The event script `_GenerateLeadEvent.cshtml` renders only when `AnalyticsOptions.Enabled == true` and `Model.ShouldTrack == true`.
+   - Upon page refresh or direct navigation, TempData has already been consumed (`AnalyticsLeadEligible == null`), guaranteeing exactly one conversion event per genuine submission.
+   - No persistent cookies or localStorage are used for conversion gating.
+7. **PII & Sensitive Data Prohibition**:
+   - Zero visitor PII (name, email, phone, organization, message, intended application, IP address) is transmitted to Google Analytics.
+   - Zero inquiry reference numbers are transmitted in event parameters, custom dimensions, user IDs, or event IDs.
+   - Zero economic values (`value`, `currency`) are transmitted as no verified financial lead value exists.
+   - `lead_source` is strictly server-controlled: `"website_contact_form"` for Contact Us inquiries, and `"website_quote_request"` for Request a Quote inquiries.
+8. **Fault Tolerance**:
+   - Analytics is purely observational. All event emissions are guarded with `typeof gtag === 'function'`.
+   - Ad blockers, network failures, or unavailable Google tag endpoints fail silently without impacting the visitor's Thank-You display or submission outcome.
+9. **Out of Scope for ANALYTICS-001**:
+   - Google Tag Manager (GTM), Measurement Protocol, Google Ads conversion tags, remarketing, User-ID, Enhanced Conversions, CRM sync, third-party consent platforms, and production property provisioning remain strictly out of scope.
 
 ## IIS deployment
 

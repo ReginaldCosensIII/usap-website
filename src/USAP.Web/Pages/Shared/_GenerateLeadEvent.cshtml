@@ -1,0 +1,18 @@
+@model USAP.Web.Models.GenerateLeadEventModel
+@inject Microsoft.Extensions.Options.IOptions<USAP.Web.Configuration.AnalyticsOptions> AnalyticsOptionsAccessor
+
+@{
+    var options = AnalyticsOptionsAccessor.Value;
+    var isEnabled = options.Enabled && !string.IsNullOrWhiteSpace(options.MeasurementId);
+}
+
+@if (isEnabled && Model.ShouldTrack)
+{
+    <script>
+        if (typeof gtag === 'function') {
+            gtag('event', 'generate_lead', {
+                'lead_source': '@Model.LeadSource'
+            });
+        }
+    </script>
+}

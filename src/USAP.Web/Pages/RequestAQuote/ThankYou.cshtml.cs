@@ -43,11 +43,16 @@ public class ThankYouModel : PageModel
     [TempData]
     public string? ContextDoc { get; set; }
 
+    [TempData]
+    public bool? AnalyticsLeadEligible { get; set; }
+
     public bool HasDisplaySuccess => !string.IsNullOrEmpty(ReferenceNumber);
 
     public bool IsGenuine => IsGenuineSubmission == true;
 
     public bool HasActiveSubmission => HasDisplaySuccess;
+
+    public bool ShouldTrackGenerateLead => AnalyticsLeadEligible == true;
 
     public IReadOnlyList<HelpfulLinkItem> HelpfulLinks { get; set; } = Array.Empty<HelpfulLinkItem>();
 

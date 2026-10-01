@@ -1,0 +1,86 @@
+@inject Microsoft.Extensions.Options.IOptions<USAP.Web.Configuration.AnalyticsOptions> AnalyticsOptionsAccessor
+
+@{
+    var options = AnalyticsOptionsAccessor.Value;
+    var isEnabled = options.Enabled && !string.IsNullOrWhiteSpace(options.MeasurementId);
+    var measurementId = options.MeasurementId?.Trim();
+}
+
+@if (isEnabled)
+{
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=@measurementId"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        window.usapAnalytics = window.usapAnalytics || {};
+        window.usapAnalytics.allowedParams = [
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_id',
+            'utm_term', 'utm_content', 'gclid', 'dclid', 'gbraid', 'wbraid'
+        ];
+
+        window.usapAnalytics.getCleanLocation = function(rawUrl) {
+            try {
+                var u;
+                if (rawUrl) {
+                    u = typeof rawUrl === 'string' ? new URL(rawUrl) : rawUrl;
+                } else {
+                    u = window.location;
+                }
+                var clean = u.protocol + '//' + u.host + u.pathname;
+                if (u.search) {
+                    var params = new URLSearchParams(u.search);
+                    var cleanParams = new URLSearchParams();
+                    var allowed = window.usapAnalytics.allowedParams;
+                    for (var i = 0; i < allowed.length; i++) {
+                        var key = allowed[i];
+                        if (params.has(key)) {
+                            var values = params.getAll(key);
+                            for (var j = 0; j < values.length; j++) {
+                                cleanParams.append(key, values[j]);
+                            }
+                        }
+                    }
+                    var qs = cleanParams.toString();
+                    if (qs) {
+                        clean += '?' + qs;
+                    }
+                }
+                return clean;
+            } catch (e) {
+                return window.location ? (window.location.protocol + '//' + window.location.host + window.location.pathname) : '';
+            }
+        };
+
+        window.usapAnalytics.getCleanReferrer = function(refString) {
+            try {
+                var ref = refString !== undefined ? refString : document.referrer;
+                if (!ref) return '';
+                var u = new URL(ref);
+                return u.protocol + '//' + u.host + u.pathname;
+            } catch (e) {
+                return '';
+            }
+        };
+
+        (function() {
+            var configParams = {
+                'page_location': window.usapAnalytics.getCleanLocation()
+            };
+
+            var cleanRef = window.usapAnalytics.getCleanReferrer();
+            if (cleanRef) {
+                configParams['page_referrer'] = cleanRef;
+            }
+
+            @if (options.DebugMode)
+            {
+                <text>configParams['debug_mode'] = true;</text>
+            }
+
+            gtag('config', '@measurementId', configParams);
+        })();
+    </script>
+}
